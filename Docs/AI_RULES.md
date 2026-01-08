@@ -1,9 +1,9 @@
 # AI Rules (strict)
 
-- No refactors.
-- No renaming of types/files/functions unless explicitly requested.
-- No formatting-only changes.
-- Only change files I explicitly allow (whitelist).
-- Keep diffs minimal.
-- Preserve existing architecture: Views are presentation only; logic and data are separated.
-- If something is unclear: stop and ask instead of guessing.
+- NO refactors, NO renaming, NO architecture changes.
+- NO formatting-only edits.
+- Only modify files that are explicitly whitelisted in the task.
+- Keep diffs minimal and localized.
+- Preserve separation: Views render only; logic/data live outside Views.
+- Do not touch existing stable modules unless requested.
+- If anything is unclear: stop and ask instead of guessing.
