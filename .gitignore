@@ -31,3 +31,11 @@ fastlane/test_output
 # Secrets (falls vorhanden)
 *.env
 *.zip
+
+# Xcode
+.DS_Store
+DerivedData/
+build/
+xcuserdata/
+*.xccheckout
+*.xcscmblueprint
