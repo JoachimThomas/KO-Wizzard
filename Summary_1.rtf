@@ -1,0 +1,99 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww12920\viewh7000\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 import Foundation\
+\
+/// Klasse zur Bereinigung von Eingaben und f\'fcr einfache Berechnungen (z.B. Ratio-Werte).\
+class BasicsEngine \{\
+\
+	// MARK: - String <-> Double Konvertierung (NEU HINZUGEF\'dcGT)\
+	\
+	/// Konvertiert einen bereinigten String (erwartet Komma als Dezimaltrennzeichen) in ein Double.\
+	///\
+	/// - Parameter cleaned: Der Eingabestring, z.B. "123,45" oder "1000".\
+	/// - Returns: Der Double-Wert oder nil, wenn die Konvertierung fehlschl\'e4gt.\
+	static func stringToDouble(_ cleaned: String) -> Double? \{\
+		// 1. Ersetze das deutsche Komma durch den amerikanischen Punkt, damit Double() es versteht\
+		let normalizedString = cleaned.replacingOccurrences(of: ",", with: ".")\
+		\
+		// 2. Versuche, in Double zu konvertieren\
+		return Double(normalizedString)\
+	\}\
+	\
+	/// Konvertiert einen optionalen Double-Wert in einen String mit Komma als Dezimaltrennzeichen.\
+	///\
+	/// - Parameter val: Der Double-Wert, der konvertiert werden soll (optional).\
+	/// - Returns: Der formatierte String (z.B. "123,45") oder ein leerer String, wenn val nil ist.\
+	static func doubleToString(val: Double?) -> String \{\
+		guard let value = val else \{\
+			return ""\
+		\}\
+		\
+		// Verwende einen NumberFormatter, um das Komma als Dezimaltrennzeichen zu erzwingen\
+		// (Locale "de_DE" stellt sicher, dass das Komma verwendet wird)\
+		let formatter = NumberFormatter()\
+		formatter.locale = Locale(identifier: "de_DE")\
+		formatter.numberStyle = .decimal\
+		// Setze die maximale Anzahl an Nachkommastellen auf einen sinnvollen Wert\
+		formatter.maximumFractionDigits = 8 \
+		\
+		return formatter.string(from: NSNumber(value: value)) ?? String(value)\
+	\}\
+\
+	// MARK: - Eingabebereinigung\
+	\
+	/// Vereinheitlicht und bereinigt Zahleneingaben (Komma/Punkt).\
+	static func sanitizeNumber(_ s: String, allowComma: Bool = true) -> String \{\
+		var cleaned = s\
+\
+		if allowComma \{\
+			// Ersetzt Punkt durch Komma\
+			cleaned = cleaned.replacingOccurrences(of: ".", with: ",")\
+			cleaned = cleaned.filter \{ "0123456789,".contains($0) \}\
+\
+			// Verhindert mehr als ein Komma\
+			let parts = cleaned.split(separator: ",", omittingEmptySubsequences: false)\
+			if parts.count > 2 \{\
+				// Korrektur: Nimmt nur den ersten Teil vor dem Komma und den zweiten Teil\
+				let firstPart = String(parts[0])\
+				let secondPart = String(parts[1])\
+				cleaned = "\\(firstPart),\\(secondPart)"\
+			\}\
+		\} else \{\
+			// Logik f\'fcr Bezugsverh\'e4ltnis (nur ganze Zahlen)\
+			cleaned = cleaned.filter \{ "0123456789".contains($0) \}\
+		\}\
+\
+		return cleaned\
+	\}\
+\
+	// MARK: - Ratio-Logik\
+	\
+	/// Berechnet den tats\'e4chlichen Wert des Bezugsverh\'e4ltnisses.\
+	///\
+	/// - Parameter option: Die gew\'e4hlte RatioOption.\
+	/// - Parameter customValue: Der manuelle Eingabestring (wird nur bei .individuell verwendet).\
+	/// - Returns: Der tats\'e4chliche Double-Wert des Bezugsverh\'e4ltnisses.\
+	static func getRatioValue(for option: RatioOption, customValue: String) -> Double \{\
+		switch option \{\
+			case .none:\
+				return 0.0 // Ratio ist 0, wenn .none gew\'e4hlt, um "nicht gesetzt" zu signalisieren\
+			case .oneToOne: return 1.0\
+			case .oneToTen: return 10.0\
+			case .oneToOneHundred: return 100.0\
+			case .oneToThousand: return 1000.0\
+			case .individuell:\
+				// Nutze die neue stringToDouble-Funktion\
+				// Wenn Konvertierung fehlschl\'e4gt oder Wert 0 ist, wird auf 1.0 zur\'fcckgegriffen\
+				if let customDouble = stringToDouble(customValue), customDouble > 0 \{\
+					return customDouble\
+				\} else \{\
+					return 1.0 // Fallback\
+				\}\
+		\}\
+	\}\
+\}}

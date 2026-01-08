@@ -1,0 +1,518 @@
+import Foundation
+import SwiftUI
+import Combine
+
+	/// Zentrale Engine der KO-Wizard App
+	/// - Hält globalen State (Landing, Workspace-Modi)
+	/// - Beinhaltet Stores (Instrumente, später Trades)
+	/// - Views greifen ausschließlich über diese Engine zu
+
+final class AppStateEngine: ObservableObject {
+
+		// MARK: - (Legacy) Tabs – aktuell nur noch logisch
+
+	enum RootTab: Hashable {
+		case instruments
+		case trades
+		case reports
+	}
+
+	@Published var selectedTab: RootTab = .instruments
+
+	func selectTab(_ tab: RootTab) {
+		selectedTab = tab
+	}
+
+		// MARK: - Workspace-Modus (Hauptzustände im Workspace)
+
+	enum WorkspaceMode: Hashable {
+		case instrumentsCreate          // "create Instrument"
+		case instrumentsShowAndChange   // "show & change Instrument"
+		case instrumentCalculation      // Calculations
+		case instrumentsTrade           // "tradeInstrument"
+		case reports                    // Auswertung
+	}
+
+		/// Steuert, welcher Inhalt im Workspace angezeigt wird
+	@Published var workspaceMode: WorkspaceMode = .instrumentsShowAndChange
+
+		// MARK: - Landing / Navigation
+
+		/// Steuert, ob die LandingPage sichtbar ist
+	@Published var isLandingVisible: Bool = true
+
+		// MARK: - Instrument-Erstellung (Draft)
+
+		/// Entwurf für ein neues Instrument im Create-Flow
+	@Published var draftInstrument: Instrument = .empty()
+
+		/// Aktueller Schritt der Benutzerführung (kann später genutzt werden, aktuell nur vorbereitet)
+	enum InstrumentCreationStep: Hashable {
+		case assetClass
+		case subgroup
+		case emittent
+		case direction
+		case isin
+		case basispreis
+		case bezugsverhaeltnis
+		case aufgeld
+		case favorite
+		case done
+	}
+
+	@Published var creationStep: InstrumentCreationStep = .assetClass
+
+		// Landing-Button: "Instrument anlegen"
+	func startInstrumentCreation() {
+		resetDraftInstrument()
+		selectedTab = .instruments
+		workspaceMode = .instrumentsCreate
+		isLandingVisible = false
+	}
+
+		// Landing-Button: "Instrument anzeigen"
+	func showInstrumentList() {
+		selectedTab = .instruments
+		workspaceMode = .instrumentsShowAndChange
+		isLandingVisible = false
+	}
+
+		// Landing-Button: "Trade erfassen"
+	func startTradeCreation() {
+		selectedTab = .trades
+		workspaceMode = .instrumentsTrade
+		isLandingVisible = false
+	}
+
+		// Landing-Button: "Auswertung"
+	func showReports() {
+		selectedTab = .reports
+		workspaceMode = .reports
+		isLandingVisible = false
+	}
+
+	 func resetDraftInstrument() {
+		draftInstrument = .empty()
+		creationStep = .assetClass
+		selectedInstrumentID = nil
+		recalcDraftName()
+	}
+
+		// MARK: - Top-Toolbar-Tabs (rechts: Instrument / Berechnung / Trade / Report)
+
+		/// Instrument-Tab oben rechts
+	func switchToInstruments() {
+		selectedTab = .instruments
+		workspaceMode = .instrumentsShowAndChange
+		isLandingVisible = false
+	}
+
+		/// Berechnung-Tab oben rechts
+		/// → hier: Create-Flow für Instrumente
+	func switchToCalculation() {
+		selectedTab = .instruments
+		if workspaceMode != .instrumentsCreate {
+			resetDraftInstrument()
+		}
+		workspaceMode = .instrumentsCreate
+		isLandingVisible = false
+	}
+
+		/// Trade-Tab oben rechts
+	func switchToTrades() {
+		selectedTab = .trades
+		workspaceMode = .instrumentsTrade
+		isLandingVisible = false
+	}
+
+		/// Report-Tab oben rechts
+	func switchToReports() {
+		selectedTab = .reports
+		workspaceMode = .reports
+		isLandingVisible = false
+	}
+
+		// MARK: - Stores
+
+	let instrumentStore: InstrumentStore
+		// später:
+		// let tradeStore: TradeStore
+
+		// MARK: - Instrument-Listen-State
+
+		/// Nur Favoriten anzeigen oder alle
+	@Published var showFavoritesOnly: Bool = false
+
+		/// Nur die letzten 10 gespeicherten Instrumente anzeigen (Verlauf)
+	@Published var showRecentOnly: Bool = false
+
+		/// Suchtext: Isin, Subgroup, Direction, Kombis wie "dax short"
+	@Published var searchText: String = ""
+
+		/// Globaler Collapse-Status für die Liste (Toolbar steuert das später)
+	@Published var isGlobalCollapsed: Bool = false
+
+		/// Einzelne Asset-Klassen einklappbar
+	@Published private var collapsedAssetClasses: Set<AssetClass> = []
+
+		/// Aktuell ausgewähltes Instrument (per ID)
+	@Published var selectedInstrumentID: UUID? = nil
+
+		/// Zuletzt gespeichertes Instrument (Neu oder geändert)
+	@Published var lastSavedInstrumentID: UUID? = nil
+
+		/// Zuletzt im Show-&-Change-Modus angezeigtes Instrument
+	@Published var lastShownInstrumentID: UUID? = nil
+
+		// MARK: - Init
+
+	init(instrumentStore: InstrumentStore = InstrumentStore()) {
+		self.instrumentStore = instrumentStore
+	}
+
+		// Irgendwo bei den Published Properties
+	@Published var editingReturnStep: InstrumentCreationStep? = nil
+
+		// MARK: - Create-Flow Edit-Unterstützung
+
+	func startEditing(step: InstrumentCreationStep) {
+			// Nur im Create-Mode sinnvoll
+		workspaceMode = .instrumentsCreate
+		editingReturnStep = creationStep
+		creationStep = step
+	}
+
+	func finishEditingStepIfNeeded() {
+		if let back = editingReturnStep {
+			creationStep = back
+			editingReturnStep = nil
+		}
+	}
+
+		// MARK: - Public API für Instruments (rohe Daten)
+
+		/// Alle Instrumente aus dem Store
+	var instruments: [Instrument] {
+		instrumentStore.allInstruments()
+	}
+
+		/// Instrument hinzufügen
+	@discardableResult
+	func addInstrument(_ instrument: Instrument) -> UUID {
+		var inst = instrument
+		inst.lastModified = Date()        // Timestamp setzen
+		let id = instrumentStore.add(inst)
+
+			// NEU: letzte Speicherung merken
+		lastSavedInstrumentID = id
+		selectedInstrumentID = id         // optional: direkt auswählen
+
+		return id
+	}
+
+		/// Instrument aktualisieren
+	func updateInstrument(_ instrument: Instrument) {
+		var inst = instrument
+		inst.lastModified = Date()        // Timestamp setzen
+		instrumentStore.update(inst)
+
+			// NEU: letzte Speicherung merken
+		lastSavedInstrumentID = instrument.id
+	}
+
+		/// Instrument löschen
+	func deleteInstrument(_ instrument: Instrument) {
+		instrumentStore.delete(instrument)
+		lastShownInstrumentID = nil
+	}
+
+		/// Create-Mode betreten:
+		/// - Draft ggf. resetten
+		/// - zuletzt gespeichertes Instrument in der Liste markiert lassen
+	func enterCreateMode() {
+		selectedTab = .instruments
+		workspaceMode = .instrumentsCreate
+		isLandingVisible = false
+		resetDraftInstrument()
+
+		if let id = lastSavedInstrumentID {
+			selectedInstrumentID = id
+		}
+	}
+
+		/// Show-&-Change-Modus betreten:
+		/// - wenn vorhanden: zuletzt angezeigtes Instrument markieren
+		/// - sonst: zuletzt gespeichertes
+		/// - sonst: erstes vorhandenes
+	func enterShowAndChangeMode() {
+		selectedTab = .instruments
+		isLandingVisible = false
+
+		if let id = lastShownInstrumentID,
+		   instruments.contains(where: { $0.id == id }) {
+			selectedInstrumentID = id
+		} else if let id = lastSavedInstrumentID,
+				  instruments.contains(where: { $0.id == id }) {
+			selectedInstrumentID = id
+		} else if let first = instruments.first {
+			selectedInstrumentID = first.id
+		}
+
+		workspaceMode = .instrumentsShowAndChange
+	}
+		// MARK: - Draft-Manipulation (Create-Flow)
+
+		/// Allgemeine Update-Funktion für den Draft, sorgt auch dafür,
+		/// dass der Instrumentenname live neu berechnet wird.
+	func updateDraft(_ mutate: (inout Instrument) -> Void) {
+		var copy = draftInstrument
+		mutate(&copy)
+		draftInstrument = copy
+		recalcDraftName()
+	}
+
+		/// Live-Instrumentname nach Subgroup / Direction / Basispreis
+	private func recalcDraftName() {
+		let title = instrumentListTitle(for: draftInstrument)
+		draftInstrument.name = title
+	}
+
+		/// IG-Emittent → Isin & Bezugsverhältnis werden nicht benötigt
+	var draftNeedsisin: Bool {
+		draftInstrument.emittent != .igMarkets
+	}
+
+	var draftNeedsRatio: Bool {
+		draftInstrument.emittent != .igMarkets
+	}
+
+		/// Zulässige Subgroups für die aktuell gewählte Assetklasse
+	var draftSubgroups: [Subgroup] {
+		AssetClass.subgroupsTyped(for: draftInstrument.assetClass)
+	}
+
+		/// Filtert numerische Eingaben:
+		/// - Erlaubt nur 0–9, "," und "."
+		/// - Wandelt "." → ","
+		/// - Maximal ein Komma
+		/// - Kein Start mit Komma
+	func sanitizedDecimalInput(old: String, new: String) -> String {
+			// Erst alle Punkte in Kommas verwandeln
+		let replaced = new.replacingOccurrences(of: ".", with: ",")
+
+			// Nur erlaubte Zeichen behalten
+		let allowed = Set("0123456789,")
+		let filtered = replaced.filter { allowed.contains($0) }
+
+		var result = ""
+		var commaSeen = false
+
+		for ch in filtered {
+			if ch == "," {
+					// zweites Komma ignorieren
+				if commaSeen { continue }
+					// nicht mit Komma anfangen
+				if result.isEmpty { continue }
+				commaSeen = true
+			}
+			result.append(ch)
+		}
+
+		return result
+	}
+
+		// MARK: - Listenlogik: Filter, Suche, Sortierung, Gruppierung
+
+		/// Normalisiert Strings für Suche (lowercase, trim, Mehrfachspaces weg)
+	private func normalizedSearchString(_ s: String) -> String {
+		s
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+			.lowercased()
+			.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+	}
+
+		/// Sortierung:
+		/// AssetClass -> Subgroup -> Direction -> Instrumentname
+	private func instrumentSort(lhs: Instrument, rhs: Instrument) -> Bool {
+		let acL = lhs.assetClass.displayName
+		let acR = rhs.assetClass.displayName
+		if acL != acR { return acL < acR }
+
+			// Subgroup-Enum: fallback auf "" bei nil
+		let sgL = lhs.subgroup?.displayName.lowercased() ?? ""
+		let sgR = rhs.subgroup?.displayName.lowercased() ?? ""
+		if sgL != sgR { return sgL < sgR }
+
+		let dirL = lhs.direction.displayName
+		let dirR = rhs.direction.displayName
+		if dirL != dirR { return dirL < dirR }
+
+		let nameL = instrumentListTitle(for: lhs).lowercased()
+		let nameR = instrumentListTitle(for: rhs).lowercased()
+		return nameL < nameR
+	}
+
+		/// Name für die Listenanzeige:
+		/// Subclass · Direction · Basispreis
+	func instrumentListTitle(for instrument: Instrument) -> String {
+			// 1) Subgroup oder UnderlyingName
+		let subgroupName = instrument.subgroup?.displayName ?? ""
+		let subclass = subgroupName.isEmpty
+		? instrument.underlyingName
+		: subgroupName
+
+			// 2) Direction
+		let dir = instrument.direction.displayName
+
+			// 3) Basispreis kompakt
+		let bp = Instrument.compact(instrument.basispreisValue)
+
+			// 4) Bausteine säubern und zusammenfügen
+		return [subclass, dir, bp]
+			.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+			.filter { !$0.isEmpty }
+			.joined(separator: " · ")
+	}
+
+		/// Filtert und sortiert alle Instrumente gemäß:
+		/// - Verlauf: die neuesten 10 (optional)
+		/// - Favoritenfilter
+		/// - Suche (ISIN, Subgroup, Direction, Kombis wie "dax short")
+		/// - Sortierung: AssetClass -> Subgroup -> Direction -> Instrumentname
+	var filteredInstruments: [Instrument] {
+		var result = instruments
+
+			// 1) Verlauf: nur Instrumente mit Timestamp, davon die 10 neuesten
+		if showRecentOnly {
+			let recent = result
+				.filter { $0.lastModified != nil }
+				.sorted { ($0.lastModified!) > ($1.lastModified!) }
+
+			result = Array(recent.prefix(10))
+		}
+
+			// 2) Favoritenfilter
+		if showFavoritesOnly {
+			result = result.filter { $0.isFavorite }
+		}
+
+			// 3) Suche
+		let query = normalizedSearchString(searchText)
+		if !query.isEmpty {
+			let parts = query.split(separator: " ").map { String($0) }
+
+			result = result.filter { ins in
+				let subgroupName = ins.subgroup?.displayName ?? ""
+
+				let haystack = [
+					subgroupName,
+					ins.underlyingName,
+					ins.direction.displayName,
+					ins.isin,
+					instrumentListTitle(for: ins)
+				]
+					.joined(separator: " ")
+					.lowercased()
+
+					// alle Suchbegriffe müssen vorkommen (UND-Verknüpfung)
+				return parts.allSatisfy { token in
+					haystack.contains(token)
+				}
+			}
+		}
+
+			// 4) Sortierung
+		result.sort(by: instrumentSort(lhs:rhs:))
+		return result
+	}
+		/// Gruppierung nach AssetClass (für sektionierte Liste)
+		/// AssetKlasse -> [Instrumente]
+	var groupedInstruments: [(assetClass: AssetClass, instruments: [Instrument])] {
+		let base = filteredInstruments
+		let grouped = Dictionary(grouping: base, by: { $0.assetClass })
+
+		let sortedKeys = grouped.keys.sorted { $0.displayName < $1.displayName }
+
+		return sortedKeys.map { key in
+			let items = (grouped[key] ?? []).sorted(by: instrumentSort(lhs:rhs:))
+			return (assetClass: key, instruments: items)
+		}
+	}
+
+		// MARK: - Collapse-Steuerung
+
+	func isAssetClassCollapsed(_ assetClass: AssetClass) -> Bool {
+		if isGlobalCollapsed {
+			return true
+		}
+		return collapsedAssetClasses.contains(assetClass)
+	}
+
+	func toggleAssetClass(_ assetClass: AssetClass) {
+		if collapsedAssetClasses.contains(assetClass) {
+			collapsedAssetClasses.remove(assetClass)
+		} else {
+			collapsedAssetClasses.insert(assetClass)
+		}
+	}
+
+	func setGlobalCollapsed(_ flag: Bool) {
+		isGlobalCollapsed = flag
+	}
+
+		// MARK: - Auswahl
+
+	func selectInstrument(_ instrument: Instrument?) {
+		selectedInstrumentID = instrument?.id
+		if let id = instrument?.id {
+			lastShownInstrumentID = id     // immer merken, was zuletzt im Show-&-Change aktiv war
+		}
+	}
+
+	var selectedInstrument: Instrument? {
+		guard let id = selectedInstrumentID else { return nil }
+		return instruments.first(where: { $0.id == id })
+	}
+}
+extension AppStateEngine {
+
+		/// Debug-Ausgabe für den Abschluss des Create-Wizards
+	func debugPrintDoneStepState(
+		file: StaticString = #fileID,
+		function: StaticString = #function,
+		line: UInt = #line
+	) {
+		print("──────── DONE STEP DEBUG ────────")
+		print("Timestamp:", Date())
+		print("Source  :", "\(file) • \(function) #\(line)")
+		print("creationStep:", creationStep)
+		print("draftInstrument:")
+		print(draftInstrument)
+		print("instrumentStore.instruments.count:", instrumentStore.instruments.count)
+		print("──────── END DONE STEP DEBUG ────────")
+	}
+}
+	// MARK: - Instrument-Create-Flow Abschluss
+
+extension AppStateEngine {
+
+	func doneStep() {
+		debugPrintDoneStepState()
+
+			// aktuellen Draft sichern
+		let newInstrument = draftInstrument
+
+			// im Store ablegen
+		let newID = addInstrument(newInstrument)
+
+			// Auswahl auf das neue Instrument setzen
+		selectedInstrumentID = newID
+
+			// Draft zurücksetzen & View in "zeigen/ändern"-Modus
+		creationStep = .done
+		workspaceMode = .instrumentsShowAndChange
+		isLandingVisible = false
+	}
+}
+
+
