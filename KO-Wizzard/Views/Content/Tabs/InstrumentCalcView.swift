@@ -11,6 +11,10 @@ struct InstrumentCalcView: View {
 
 	let instrument: Instrument?
 	private let mode: AppStateEngine.WorkspaceMode = .instrumentCalculation
+	@State private var showUnderlyingInput: Bool = false
+	@State private var showCertificateInput: Bool = false
+	@State private var underlyingValue: String = "—"
+	@State private var certificateValue: String = "—"
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
@@ -29,6 +33,36 @@ struct InstrumentCalcView: View {
 			Spacer(minLength: 0)
 		}
 		.padding()
+		.sheet(isPresented: $showUnderlyingInput) {
+			ValueInputSheet(
+				title: "Underlying eingeben",
+				message: "Kurs des Underlyings",
+				kind: .numeric,
+				initialValue: "",
+				onCommit: { raw in
+					showUnderlyingInput = false
+					applyUnderlyingInput(raw)
+				},
+				onCancel: {
+					showUnderlyingInput = false
+				}
+			)
+		}
+		.sheet(isPresented: $showCertificateInput) {
+			ValueInputSheet(
+				title: "Zertifikatspreis eingeben",
+				message: "Preis des Zertifikats",
+				kind: .numeric,
+				initialValue: "",
+				onCommit: { raw in
+					showCertificateInput = false
+					applyCertificateInput(raw)
+				},
+				onCancel: {
+					showCertificateInput = false
+				}
+			)
+		}
 	}
 
 		// MARK: - Header
@@ -109,15 +143,19 @@ struct InstrumentCalcView: View {
 		VStack(alignment: .leading, spacing: 10) {
 			calculationRow(
 				label: "Underlying",
-				value: "—",
-				icon: "arrow.clockwise"
-			)
+				value: underlyingValue,
+				icon: "arrow.down.left"
+			) {
+				showUnderlyingInput = true
+			}
 			Divider()
 			calculationRow(
-				label: "Asset",
-				value: "—",
-				icon: "arrow.clockwise"
-			)
+				label: "Zertifikat",
+				value: certificateValue,
+				icon: "arrow.up.right"
+			) {
+				showCertificateInput = true
+			}
 		}
 		.padding()
 		.background(Color.secondary.opacity(0.08))
@@ -160,7 +198,8 @@ struct InstrumentCalcView: View {
 	private func calculationRow(
 		label: String,
 		value: String,
-		icon: String
+		icon: String,
+		action: @escaping () -> Void
 	) -> some View {
 		HStack {
 			Text(label)
@@ -169,12 +208,55 @@ struct InstrumentCalcView: View {
 			Text(value)
 				.fontWeight(.medium)
 			Spacer()
-			Button {
-			} label: {
+			Button(action: action) {
 				Image(systemName: icon)
 					.imageScale(.small)
 			}
 			.buttonStyle(.plain)
+		}
+	}
+
+	private func applyUnderlyingInput(_ raw: String) {
+		guard let instrument = instrument,
+			  let underlying = Instrument.parseNumber(raw) else {
+			underlyingValue = "—"
+			certificateValue = "—"
+			return
+		}
+
+		underlyingValue = raw
+
+		let result = InstrumentPricingEngine.priceFromUnderlying(
+			instrument: instrument,
+			underlyingPrice: underlying
+		)
+
+		if let value = result.value {
+			certificateValue = Instrument.compact(value)
+		} else {
+			certificateValue = "—"
+		}
+	}
+
+	private func applyCertificateInput(_ raw: String) {
+		guard let instrument = instrument,
+			  let certificate = Instrument.parseNumber(raw) else {
+			certificateValue = "—"
+			underlyingValue = "—"
+			return
+		}
+
+		certificateValue = raw
+
+		let result = InstrumentPricingEngine.underlyingFromPrice(
+			instrument: instrument,
+			certificatePrice: certificate
+		)
+
+		if let value = result.value {
+			underlyingValue = Instrument.compact(value)
+		} else {
+			underlyingValue = "—"
 		}
 	}
 
