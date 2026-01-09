@@ -9,55 +9,136 @@ import SwiftUI
 struct LandingView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@State private var isCreateHovered: Bool = false
+	@State private var isShowHovered: Bool = false
+	@State private var isCalcHovered: Bool = false
 
 	var body: some View {
-		VStack(spacing: 32) {
-
-				// App-Icon
-			Image("Chart")        // <- ggf. Name im Asset Catalog anpassen
+		ZStack(alignment: .topLeading) {
+			Image("Chart")
 				.resizable()
-				.scaledToFit()
-				.frame(width: 160, height: 160)
-				.cornerRadius(32)
-				.shadow(radius: 12)
-				.padding(.top, 40)
+				.scaledToFill()
+				.ignoresSafeArea()
 
-				// Buttons
-			VStack(spacing: 20) {
+			Rectangle()
+				.fill(
+					LinearGradient(
+						colors: [
+							Color.black.opacity(0.55),
+							Color.black.opacity(0.15),
+							Color.black.opacity(0.0)
+						],
+						startPoint: .topLeading,
+						endPoint: .bottomTrailing
+					)
+				)
+				.ignoresSafeArea()
 
-				landingButton("Instrument anlegen") {
+			VStack(alignment: .leading, spacing: 24) {
+				glossyLandingButton(
+					icon: "doc.badge.plus",
+					isHovered: isCreateHovered
+				) {
 					appState.enterCreateMode()
 				}
+				.onHover { hovering in
+					isCreateHovered = hovering
+				}
 
-				landingButton("Instrument anzeigen") {
+				glossyLandingButton(
+					icon: "eye",
+					isHovered: isShowHovered
+				) {
 					appState.enterShowAndChangeMode()
 				}
-
-				landingButton("Trade erfassen") {
-					appState.startTradeCreation()
+				.onHover { hovering in
+					isShowHovered = hovering
 				}
 
-				landingButton("Auswertung") {
-					appState.showReports()
+				glossyLandingButton(
+					icon: "function",
+					isHovered: isCalcHovered
+				) {
+					appState.selectedTab = .instruments
+					appState.workspaceMode = .instrumentCalculation
+					appState.isLandingVisible = false
 				}
+				.onHover { hovering in
+					isCalcHovered = hovering
+				}
+
+				Spacer()
 			}
-			.padding(.horizontal, 24)
-
-			Spacer()
+			.padding(.top, 70)
+			.padding(.leading, 80)
+			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 		}
 	}
 
-	private func landingButton(_ title: String, action: @escaping () -> Void) -> some View {
+	private func glossyLandingButton(
+		icon: String,
+		isHovered: Bool,
+		action: @escaping () -> Void
+	) -> some View {
 		Button(action: action) {
-			Text(title)
-				.font(.title2)
-				.fontWeight(.semibold)
-				.frame(maxWidth: .infinity)
-				.padding()
-				.foregroundColor(.white)
-				.background(Color.blue)
-				.cornerRadius(12)
+			ZStack {
+				Circle()
+					.fill(
+						LinearGradient(
+							colors: [Color.blue.opacity(0.95), Color.blue.opacity(0.65)],
+							startPoint: .topLeading,
+							endPoint: .bottomTrailing
+						)
+					)
+					.shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 4)
+
+				Circle()
+					.stroke(Color.white.opacity(0.18), lineWidth: 1)
+
+				Circle()
+					.stroke(Color.cyan.opacity(isHovered ? 0.7 : 0), lineWidth: 2)
+					.blur(radius: isHovered ? 1 : 2)
+					.animation(.easeInOut(duration: 0.14), value: isHovered)
+
+				Circle()
+					.fill(
+						RadialGradient(
+							colors: [Color.white.opacity(0.22), Color.clear],
+							center: .topLeading,
+							startRadius: 2,
+							endRadius: 30
+						)
+					)
+					.blendMode(.screen)
+
+				Circle()
+					.stroke(
+						LinearGradient(
+							colors: [Color.white.opacity(0.22), Color.clear],
+							startPoint: .topLeading,
+							endPoint: .bottomTrailing
+						),
+						lineWidth: 2
+					)
+					.blur(radius: 0.5)
+
+				Image(systemName: icon)
+					.font(.system(size: 27, weight: .semibold))
+			}
+			.frame(width: 64, height: 64)
 		}
+		.buttonStyle(PressableGlossyStyle())
+		.focusable(false)
+		.focusEffectDisabled(true)
+	}
+}
+
+private struct PressableGlossyStyle: ButtonStyle {
+	func makeBody(configuration: Configuration) -> some View {
+		configuration.label
+			.scaleEffect(configuration.isPressed ? 0.96 : 1)
+			.foregroundColor(configuration.isPressed ? Color.white.opacity(0.9) : .white)
+			.animation(.easeInOut(duration: 0.13), value: configuration.isPressed)
 	}
 }
 
