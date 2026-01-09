@@ -23,8 +23,7 @@ struct ContentRouterView: View {
 					instrument: appState.selectedInstrument
 				)
 			case .instrumentCalculation:
-				InstrumentDetailView(
-					mode: .instrumentCalculation,
+				InstrumentCalcView(
 					instrument: appState.selectedInstrument
 				)
 

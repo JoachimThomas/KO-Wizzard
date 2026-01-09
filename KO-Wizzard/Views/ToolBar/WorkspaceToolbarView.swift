@@ -106,9 +106,11 @@ struct WorkspaceToolbarView: View {
 
 					topTabButton(
 						title: "Berechnung",
-						isActive: appState.workspaceMode == .instrumentsCreate
+						isActive: appState.workspaceMode == .instrumentCalculation
 					) {
-						appState.switchToCalculation()
+						appState.selectedTab = .instruments
+						appState.workspaceMode = .instrumentCalculation
+						appState.isLandingVisible = false
 					}
 
 					topTabButton(
@@ -154,5 +156,4 @@ struct WorkspaceToolbarView: View {
 		}
 		.buttonStyle(.bordered)
 	}
-
 
