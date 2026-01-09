@@ -21,6 +21,7 @@ struct InstrumentCalcView: View {
 
 			if let instrument = instrument {
 				detailCard(for: instrument)
+				calculationCard()
 			} else {
 				emptyState
 			}
@@ -47,7 +48,7 @@ struct InstrumentCalcView: View {
 		}
 	}
 
-		// MARK: - Detail-Card
+	// MARK: - Detail-Card
 
 	@ViewBuilder
 	private func detailCard(for i: Instrument) -> some View {
@@ -101,6 +102,28 @@ struct InstrumentCalcView: View {
 		.cornerRadius(14)
 	}
 
+		// MARK: - Calculation Card
+
+	@ViewBuilder
+	private func calculationCard() -> some View {
+		VStack(alignment: .leading, spacing: 10) {
+			calculationRow(
+				label: "Underlying",
+				value: "—",
+				icon: "arrow.clockwise"
+			)
+			Divider()
+			calculationRow(
+				label: "Asset",
+				value: "—",
+				icon: "arrow.clockwise"
+			)
+		}
+		.padding()
+		.background(Color.secondary.opacity(0.08))
+		.cornerRadius(14)
+	}
+
 		// MARK: - Rows
 
 	private func staticRow(_ label: String, _ value: String) -> some View {
@@ -131,6 +154,27 @@ struct InstrumentCalcView: View {
 		.onTapGesture {
 			guard mode == .instrumentsCreate else { return }
 			appState.startEditing(step: step)
+		}
+	}
+
+	private func calculationRow(
+		label: String,
+		value: String,
+		icon: String
+	) -> some View {
+		HStack {
+			Text(label)
+				.foregroundColor(.secondary)
+				.frame(width: 150, alignment: .leading)
+			Text(value)
+				.fontWeight(.medium)
+			Spacer()
+			Button {
+			} label: {
+				Image(systemName: icon)
+					.imageScale(.small)
+			}
+			.buttonStyle(.plain)
 		}
 	}
 
