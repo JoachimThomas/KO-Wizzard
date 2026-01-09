@@ -39,3 +39,7 @@ build/
 xcuserdata/
 *.xccheckout
 *.xcscmblueprint
+
+# Xcode user data (do not commit)
+**/xcuserdata/
+**/*.xcuserstate
