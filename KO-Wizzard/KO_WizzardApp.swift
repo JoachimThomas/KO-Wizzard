@@ -19,5 +19,6 @@ struct KO_WizardApp: App {
 			RootView()
 				.environmentObject(appState)   // globale Engine
 		}
+		.windowStyle(.hiddenTitleBar)
 	}
 }

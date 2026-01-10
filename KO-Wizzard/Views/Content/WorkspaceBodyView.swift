@@ -26,24 +26,41 @@ struct WorkspaceBodyView: View {
 		}
 	}
 
-	private var footer: some View {
-		HStack {
-			Text("Wizard – \(appState.instrumentStore.instrumentCount) Assets geladen")
-			Spacer()
-			Text("Modus: \(modeLabel)")
-		}
-		.font(.custom("Menlo", size: 11))
-		.foregroundColor(.white)
-		.padding(.horizontal, 12)
-		.frame(height: 26)
-		.background(
-			LinearGradient(
-				colors: [Color.blue.opacity(0.55), Color.blue.opacity(0.9)],
-				startPoint: .top,
-				endPoint: .bottom
-			)
-		)
-	}
+       
+        // Stelle sicher, dass diese Definition in RootView oder einem gemeinsam genutzten Bereich existiert
+    private let appBlue = Color(red: 0.0, green: 0.48, blue: 1.0)
+
+    private var footer: some View {
+        HStack {
+            Text("Wizard – \(appState.instrumentStore.instrumentCount) Assets geladen")
+            Spacer()
+            Text("Modus: \(modeLabel)")
+        }
+        .font(.custom("Menlo", size: 11))
+        .foregroundColor(.white) // Weiße Schrift bleibt gut lesbar
+        .padding(.horizontal, 12)
+        .frame(height: 26)
+        .background(
+            ZStack {
+                    // 1. Die native macOS Material-Basis (Vibrancy-Effekt)
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+
+                    // 2. Der spezifische, invertierte Farbverlauf als Overlay
+                LinearGradient(
+                    colors: [
+                        appBlue.opacity(0.5),  // Oberer Rand des Footers (heller zur App-Mitte)
+                        appBlue.opacity(0.8)   // Unterer Rand des Footers (dunkler zum Fensterrand)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .blendMode(.multiply) // Sorgt für organische Verschmelzung
+            }
+        )
+    }
+
+
 
 	private var modeLabel: String {
 		switch appState.workspaceMode {
