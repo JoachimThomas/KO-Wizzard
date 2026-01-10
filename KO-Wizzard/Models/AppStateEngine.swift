@@ -57,6 +57,20 @@ final class AppStateEngine: ObservableObject {
 	}
 
 	@Published var creationStep: InstrumentCreationStep = .assetClass
+	let allowedEditSteps: Set<InstrumentCreationStep> = [
+		.isin,
+		.basispreis,
+		.bezugsverhaeltnis,
+		.aufgeld,
+		.favorite
+	]
+	private let allowedEditStepOrder: [InstrumentCreationStep] = [
+		.isin,
+		.basispreis,
+		.bezugsverhaeltnis,
+		.aufgeld,
+		.favorite
+	]
 
 		// Landing-Button: "Instrument anlegen"
 	func startInstrumentCreation() {
@@ -140,10 +154,18 @@ final class AppStateEngine: ObservableObject {
 
 		// Irgendwo bei den Published Properties
 	@Published var editingReturnStep: InstrumentCreationStep? = nil
+	@Published var editingTargetID: UUID? = nil
+
+	var isEditingExistingInstrument: Bool {
+		editingTargetID != nil
+	}
 
 		// MARK: - Create-Flow Edit-Unterstützung
 
 	func startEditing(step: InstrumentCreationStep) {
+		if isEditingExistingInstrument && !allowedEditSteps.contains(step) {
+			return
+		}
 			// Nur im Create-Mode sinnvoll
 		workspaceMode = .instrumentsCreate
 		editingReturnStep = creationStep
@@ -151,10 +173,80 @@ final class AppStateEngine: ObservableObject {
 	}
 
 	func finishEditingStepIfNeeded() {
+		if isEditingExistingInstrument {
+			if let idx = allowedEditStepOrder.firstIndex(of: creationStep) {
+				let nextIndex = allowedEditStepOrder.index(after: idx)
+				if nextIndex < allowedEditStepOrder.endIndex {
+					creationStep = allowedEditStepOrder[nextIndex]
+				} else {
+					creationStep = .done
+				}
+			} else {
+				creationStep = draftNeedsisin ? .isin : .basispreis
+			}
+			return
+		}
 		if let back = editingReturnStep {
 			creationStep = back
 			editingReturnStep = nil
 		}
+	}
+
+	func ensureAllowedEditStepIfNeeded() {
+		guard isEditingExistingInstrument else { return }
+		if creationStep == .done {
+			return
+		}
+		if !allowedEditSteps.contains(creationStep) {
+			creationStep = draftNeedsisin ? .isin : .basispreis
+		}
+	}
+
+	func enterEditModeForSelectedInstrument() {
+		guard let sel = selectedInstrument else { return }
+		draftInstrument = sel
+		editingTargetID = sel.id
+		workspaceMode = .instrumentsCreate
+		isLandingVisible = false
+		editingReturnStep = nil
+		creationStep = draftNeedsisin ? .isin : .basispreis
+	}
+
+	func commitEditSession() {
+		guard let targetID = editingTargetID,
+			  let original = instruments.first(where: { $0.id == targetID }) else {
+			return
+		}
+		var updated = original
+		updated.isin = draftInstrument.isin
+		updated.basispreis = draftInstrument.basispreis
+		updated.aufgeld = draftInstrument.aufgeld
+		updated.bezugsverhaeltnis = draftInstrument.bezugsverhaeltnis
+		updated.isFavorite = draftInstrument.isFavorite
+		updated.lastModified = Date()
+		instrumentStore.update(updated)
+		lastSavedInstrumentID = updated.id
+
+		editingTargetID = nil
+		editingReturnStep = nil
+		workspaceMode = .instrumentsShowAndChange
+		creationStep = .assetClass
+		resetDraftInstrument()
+		selectedInstrumentID = targetID
+		isLandingVisible = false
+	}
+
+	func discardEditSession() {
+		let targetID = editingTargetID
+		editingTargetID = nil
+		editingReturnStep = nil
+		workspaceMode = .instrumentsShowAndChange
+		creationStep = .assetClass
+		resetDraftInstrument()
+		if let targetID {
+			selectedInstrumentID = targetID
+		}
+		isLandingVisible = false
 	}
 
 		// MARK: - Public API für Instruments (rohe Daten)
@@ -482,4 +574,3 @@ extension AppStateEngine {
 		isLandingVisible = false
 	}
 }
-

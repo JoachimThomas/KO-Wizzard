@@ -125,6 +125,12 @@ struct InstrumentCreateFlowView: View {
         .frame(maxWidth: .infinity, alignment: .leading) 
 		.font(.menlo(textStyle: .body))
 		.onAppear {
+			appState.ensureAllowedEditStepIfNeeded()
+		}
+		.onChange(of: appState.creationStep) { _, _ in
+			appState.ensureAllowedEditStepIfNeeded()
+		}
+		.onAppear {
 			syncLocalFromDraftIfNeeded()
 		}
 		.sheet(item: $activeSheet) { sheet in
@@ -394,6 +400,9 @@ struct InstrumentCreateFlowView: View {
 				.pickerStyle(.menu)
 
 				.onChange(of: localRatio) { _, newValue in
+					if appState.isEditingExistingInstrument {
+						return
+					}
 					switch newValue {
 						case .none:
 							appState.updateDraft { $0.bezugsverhaeltnis = "" }
@@ -405,6 +414,33 @@ struct InstrumentCreateFlowView: View {
 
 						case .custom:
 							activeSheet = .ratioCustom
+					}
+				}
+
+				if appState.isEditingExistingInstrument {
+					HStack {
+						Spacer()
+						Button("Übernehmen") {
+							let currentValue = appState.draftInstrument.bezugsverhaeltnis
+								.trimmingCharacters(in: .whitespacesAndNewlines)
+
+							if localRatio == .custom && currentValue.isEmpty {
+								activeSheet = .ratioCustom
+								return
+							}
+
+							switch localRatio {
+								case .none:
+									appState.updateDraft { $0.bezugsverhaeltnis = "" }
+								case .oneToOne, .oneToTen, .oneToHundred, .oneToThousand:
+									appState.updateDraft { $0.bezugsverhaeltnis = localRatio.numericValue }
+								case .custom:
+									break
+							}
+
+							appState.finishEditingStepIfNeeded()
+						}
+						.buttonStyle(.borderedProminent)
 					}
 				}
 			}
@@ -471,7 +507,11 @@ struct InstrumentCreateFlowView: View {
 			HStack {
 				Spacer()
 				Button("Weiter") {
-					goNextOrReturn(default: .done)
+					if appState.isEditingExistingInstrument {
+						appState.creationStep = .done
+					} else {
+						goNextOrReturn(default: .done)
+					}
 				}
 				.buttonStyle(.borderedProminent)
 			}
@@ -480,26 +520,40 @@ struct InstrumentCreateFlowView: View {
 
 	private var doneStep: some View {
 		VStack(alignment: .leading, spacing: 12) {
-			Text("Instrument fertig erfasst.")
-				.font(.menlo(textStyle: .subheadline))
-				.foregroundColor(.secondary)
+			if appState.isEditingExistingInstrument {
+				Text("Änderungen übernehmen?")
+					.font(.menlo(textStyle: .subheadline))
+					.foregroundColor(.secondary)
 
-			if !isDraftValid {
-				Text("Bitte alle Pflichtfelder sinnvoll ausfüllen (keine leeren / Defaultwerte).")
-					.font(.menlo(textStyle: .footnote))
-					.foregroundColor(.red.opacity(0.8))
-			}
-
-			HStack {
-				Spacer()
-				Button("Instrument speichern") {
-					appState.addInstrument(appState.draftInstrument)
-					appState.workspaceMode = .instrumentsShowAndChange
-					appState.creationStep = .assetClass
-					appState.resetDraftInstrument()
+				HStack {
+					Spacer()
+					Button("Verwerfen") {
+						appState.discardEditSession()
+					}
+					Button("Speichern") {
+						appState.commitEditSession()
+					}
+					.buttonStyle(.borderedProminent)
 				}
-				.buttonStyle(.borderedProminent)
-				.disabled(!isDraftValid)
+			} else {
+				Text("Instrument fertig erfasst.")
+					.font(.menlo(textStyle: .subheadline))
+					.foregroundColor(.secondary)
+
+				if !isDraftValid {
+					Text("Bitte alle Pflichtfelder sinnvoll ausfüllen (keine leeren / Defaultwerte).")
+						.font(.menlo(textStyle: .footnote))
+						.foregroundColor(.red.opacity(0.8))
+				}
+
+				HStack {
+					Spacer()
+					Button("Instrument speichern") {
+						appState.doneStep()
+					}
+					.buttonStyle(.borderedProminent)
+					.disabled(!isDraftValid)
+				}
 			}
 		}
 	}

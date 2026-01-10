@@ -110,7 +110,7 @@ struct WorkspaceToolbarView: View {
 
 					// Instrument ändern
 				Button {
-					appState.enterCreateMode()
+					appState.enterEditModeForSelectedInstrument()
 				} label: {
 					toolbarIcon(
 						systemName: "slider.horizontal.2.arrow.trianglehead.counterclockwise",
