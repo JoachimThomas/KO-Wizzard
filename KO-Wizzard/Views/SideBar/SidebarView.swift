@@ -20,9 +20,7 @@ struct SidebarView: View {
 		VStack(spacing: 0) {
 
 				// Header ("Instrumente (n)")
-			header
-
-				// Suchfeld
+			// Suchfeld
 			searchField
 
 				// eigentliche Liste
@@ -31,25 +29,7 @@ struct SidebarView: View {
 		}
 		.frame(width: 280)
 		.frame(maxHeight: .infinity, alignment: .top)
-		.background(.white)
-	}
-
-		// MARK: - Header
-
-	private var header: some View {
-		HStack(spacing: 8) {
-			Text("Instrumente")
-				.font(.custom("Menlo", size: 14).weight(.semibold))
-				.foregroundColor(Color.black.opacity(0.9))
-
-			Text("(\(appState.filteredInstruments.count))")
-				.font(.custom("Menlo", size: 12))
-				.foregroundColor(Color.black.opacity(0.65))
-
-			Spacer()
-		}
-		.padding(.horizontal, 10)
-		.padding(.vertical, 6)
+		.workspaceGradientBackground()
 	}
 
 		// MARK: - Suche
@@ -85,6 +65,7 @@ struct SidebarView: View {
 		}
 		.frame(height: 30)
 		.padding(.horizontal, 8)
+		.padding(.top, 8)
 		.padding(.bottom, 6)
 	}
 }

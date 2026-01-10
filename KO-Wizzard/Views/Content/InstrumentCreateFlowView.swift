@@ -58,13 +58,6 @@ struct InstrumentCreateFlowView: View {
 
 	var body: some View {
 		ZStack {
-			RoundedRectangle(cornerRadius: 16)
-				.strokeBorder(Color.secondary.opacity(0.3), lineWidth: 1)
-				.background(
-					RoundedRectangle(cornerRadius: 16)
-						.fill(Color.secondary.opacity(0.04))
-				)
-
 			VStack(alignment: .leading, spacing: 20) {
 
 				HStack {
@@ -123,6 +116,7 @@ struct InstrumentCreateFlowView: View {
 			.padding(20)
 		}
         .frame(maxWidth: .infinity, alignment: .leading) 
+		.workspaceGradientBackground(cornerRadius: 16)
 		.font(.menlo(textStyle: .body))
 		.onAppear {
 			appState.ensureAllowedEditStepIfNeeded()
@@ -585,6 +579,7 @@ struct InstrumentCreateFlowView: View {
 					}
 				} onCancel: {
 					activeSheet = nil
+					cancelEditIfNeeded()
 				}
 
 			case .isin:
@@ -604,6 +599,7 @@ struct InstrumentCreateFlowView: View {
 					}
 				} onCancel: {
 					activeSheet = nil
+					cancelEditIfNeeded()
 				}
 
 			case .basispreis:
@@ -627,6 +623,7 @@ struct InstrumentCreateFlowView: View {
 					}
 				} onCancel: {
 					activeSheet = nil
+					cancelEditIfNeeded()
 				}
 
 			case .aufgeld:
@@ -642,6 +639,7 @@ struct InstrumentCreateFlowView: View {
 					goNextOrReturn(default: .favorite)
 				} onCancel: {
 					activeSheet = nil
+					cancelEditIfNeeded()
 				}
 
 			case .ratioCustom:
@@ -668,6 +666,7 @@ struct InstrumentCreateFlowView: View {
 				} onCancel: {
 					activeSheet = nil
 					localRatio = ratioOptionForValue(appState.draftInstrument.bezugsverhaeltnis)
+					cancelEditIfNeeded()
 				}
 
 		}
@@ -778,6 +777,12 @@ struct InstrumentCreateFlowView: View {
 
 	private func syncLocalFromDraftIfNeeded() {
 		localRatio = ratioOptionForValue(appState.draftInstrument.bezugsverhaeltnis)
+	}
+
+	private func cancelEditIfNeeded() {
+		if appState.isEditingExistingInstrument {
+			appState.discardEditSession()
+		}
 	}
 }
 private func readClipboardText() -> String {

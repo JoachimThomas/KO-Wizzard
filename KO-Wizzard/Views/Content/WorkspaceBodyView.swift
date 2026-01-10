@@ -30,16 +30,19 @@ struct WorkspaceBodyView: View {
         // Stelle sicher, dass diese Definition in RootView oder einem gemeinsam genutzten Bereich existiert
     private let appBlue = Color(red: 0.0, green: 0.48, blue: 1.0)
 
-    private var footer: some View {
-        HStack {
-            Text("Wizard – \(appState.instrumentStore.instrumentCount) Assets geladen")
-            Spacer()
-            Text("Modus: \(modeLabel)")
-        }
-        .font(.custom("Menlo", size: 11))
-        .foregroundColor(.white) // Weiße Schrift bleibt gut lesbar
-        .padding(.horizontal, 12)
-        .frame(height: 26)
+	private var footer: some View {
+		let isEditing = appState.isEditingExistingInstrument
+
+		return HStack {
+			Text("Wizard – \(appState.instrumentStore.instrumentCount) Assets geladen")
+				.foregroundColor(.white)
+			Spacer()
+			Text(isEditing ? "Modus: Asset-Änderung" : "Modus: \(modeLabel)")
+				.foregroundColor(isEditing ? .red : .white)
+		}
+		.font(.custom("Menlo", size: 11))
+		.padding(.horizontal, 12)
+		.frame(height: 26)
         .background(
             ZStack {
                     // 1. Die native macOS Material-Basis (Vibrancy-Effekt)

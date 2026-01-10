@@ -36,6 +36,7 @@ struct WorkspaceToolbarView: View {
 					//Alle Ansicht
 				Button {
 					appState.showFavoritesOnly = false
+					appState.showRecentOnly = false
 				} label: {
 					toolbarIcon(systemName: "chart.line.uptrend.xyaxis", isHovered: isAllHovered)
 				}
@@ -47,9 +48,9 @@ struct WorkspaceToolbarView: View {
 					isAllHovered = hovering
 				}
 
-					// Favoriten-Ansicht
+				// Favoriten-Ansicht
 				Button {
-					appState.showFavoritesOnly = true
+					appState.showFavoritesOnly.toggle()
 				} label: {
 					toolbarIcon(
 						systemName: appState.showFavoritesOnly ? "star.fill" : "star",
@@ -65,7 +66,12 @@ struct WorkspaceToolbarView: View {
 				}
 					// Verlauf, die letzten 10
 				Button {
-					appState.showRecentOnly.toggle()
+					if appState.showRecentOnly {
+						appState.showRecentOnly = false
+					} else {
+						appState.showFavoritesOnly = false
+						appState.showRecentOnly = true
+					}
 				} label: {
 					toolbarIcon(systemName: "clock", isHovered: isRecentHovered)
 				}
@@ -82,7 +88,7 @@ struct WorkspaceToolbarView: View {
 					appState.setGlobalCollapsed(!appState.isGlobalCollapsed)
 				} label: {
 					toolbarIcon(
-						systemName: appState.isGlobalCollapsed ? "book.closed" : "book",
+						systemName: appState.isGlobalCollapsed ? "book" : "book.closed",
 						isHovered: isCollapseHovered
 					)
 				}
@@ -143,15 +149,14 @@ struct WorkspaceToolbarView: View {
 				}
 
 			}
-
+            .padding(16)
 			.frame(width: sidebarWidth, alignment: .leading)
-					.padding(.leading, -20)
 
 					// MITTLERER BEREICH – Tabs zentriert über dem Content
 			ZStack {
 				HStack(spacing: 18) {
 					topTabButton(
-						title: "Asset anlegen",
+						title: "Asset Anlage",
 						icon: "doc.badge.plus",
 						isActive: appState.workspaceMode == .instrumentsCreate,
 						isHovered: isCreateHovered
@@ -175,14 +180,12 @@ struct WorkspaceToolbarView: View {
 					}
 
 					topTabButton(
-						title: "Berechnen",
+						title: "Asset Berechnen",
 						icon: "function",
 						isActive: appState.workspaceMode == .instrumentCalculation,
 						isHovered: isCalcHovered
 					) {
-						appState.selectedTab = .instruments
-						appState.workspaceMode = .instrumentCalculation
-						appState.isLandingVisible = false
+						appState.switchToCalculation()
 					}
 					.onHover { hovering in
 						isCalcHovered = hovering
@@ -190,19 +193,19 @@ struct WorkspaceToolbarView: View {
 				}
 			}
 			.frame(maxWidth: .infinity, alignment: .center)
-            }
-            .alert("Achtung!", isPresented: $showDeleteAlert, presenting: instrumentToDelete) { inst in
-                Button("Löschen", role: .destructive) {
-                    appState.deleteInstrument(inst)
+			.alert("Achtung!", isPresented: $showDeleteAlert, presenting: instrumentToDelete) { inst in
+				Button("Löschen", role: .destructive) {
+					appState.deleteInstrument(inst)
 
-                }
-                Button("Abbrechen", role: .cancel) {}
-            } message: { inst in
-                Text("Soll das Instrument '\(inst.name)' wirklich gelöscht werden?")
-            }
-            .padding(.horizontal, 16)
+				}
+				Button("Abbrechen", role: .cancel) {}
+			} message: { inst in
+				Text("Soll das Instrument '\(inst.name)' wirklich gelöscht werden?")
+			}
 			.padding(.vertical, 8)
 		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.workspaceGradientBackground()
 	}
 
 	private func topTabButton(
@@ -267,6 +270,7 @@ struct WorkspaceToolbarView: View {
 		.focusable(false)
 		.focusEffectDisabled(true)
 	}
+}
 
 
 private struct PressableToolbarStyle: ButtonStyle {

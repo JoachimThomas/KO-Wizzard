@@ -72,48 +72,128 @@ struct SidebarListArea: View {
 									return name == subgroupName
 								}
 
-								if !subgroupName.trimmingCharacters(in: .whitespaces).isEmpty {
-									Text(subgroupName)
-										.font(.custom("Menlo", size: 12))
-										.foregroundColor(Color.black.opacity(0.75))
+								let trimmedSubgroup = subgroupName.trimmingCharacters(in: .whitespaces)
+
+								if !trimmedSubgroup.isEmpty {
+									Button {
+										appState.toggleSubgroup(
+											assetClass: assetClass,
+											subgroup: trimmedSubgroup
+										)
+									} label: {
+										HStack(spacing: 6) {
+											Text(trimmedSubgroup)
+												.font(.custom("Menlo", size: 12))
+												.foregroundColor(Color.black.opacity(0.75))
+
+											Spacer()
+
+											Image(systemName: appState.isSubgroupCollapsed(
+												assetClass: assetClass,
+												subgroup: trimmedSubgroup
+											) ? "chevron.right" : "chevron.down")
+											.font(.system(size: 10, weight: .bold))
+											.foregroundColor(Color.black.opacity(0.55))
+										}
 										.padding(.horizontal, 16)
 										.padding(.top, 4)
+									}
+									.buttonStyle(.plain)
 								}
 
-								let longs  = inSub.filter { $0.direction == .long }
-								let shorts = inSub.filter { $0.direction == .short }
+								let isSubgroupCollapsed = !trimmedSubgroup.isEmpty
+									&& appState.isSubgroupCollapsed(assetClass: assetClass, subgroup: trimmedSubgroup)
+
+								if !isSubgroupCollapsed {
+									let longs  = inSub.filter { $0.direction == .long }
+									let shorts = inSub.filter { $0.direction == .short }
 
 									// LONG-Block
-								if !longs.isEmpty {
-									Text("Long")
-										.font(.custom("Menlo", size: 11).weight(.medium))
-										.foregroundColor(Color.black.opacity(0.65))
+									if !longs.isEmpty {
+									Button {
+										appState.toggleDirection(
+											assetClass: assetClass,
+											subgroup: trimmedSubgroup,
+											direction: .long
+										)
+									} label: {
+										HStack(spacing: 6) {
+											Text("Long")
+												.font(.custom("Menlo", size: 11).weight(.medium))
+												.foregroundColor(Color.black.opacity(0.65))
+
+											Spacer()
+
+										Image(systemName: appState.isDirectionCollapsed(
+											assetClass: assetClass,
+											subgroup: trimmedSubgroup,
+											direction: .long
+										) ? "chevron.right" : "chevron.down")
+											.font(.system(size: 10, weight: .bold))
+											.foregroundColor(Color.black.opacity(0.55))
+										}
 										.padding(.horizontal, 18)
 										.padding(.top, 4)
+									}
+									.buttonStyle(.plain)
 
-									ForEach(longs) { instrument in
-										SidebarRow(
-											instrument: instrument,
-											isSelected: instrument.id == appState.selectedInstrumentID
-										)
-										.environmentObject(appState)
+									if !appState.isDirectionCollapsed(
+										assetClass: assetClass,
+										subgroup: trimmedSubgroup,
+										direction: .long
+									) {
+										ForEach(longs) { instrument in
+											SidebarRow(
+												instrument: instrument,
+												isSelected: instrument.id == appState.selectedInstrumentID
+											)
+											.environmentObject(appState)
+										}
 									}
 								}
 
 									// SHORT-Block
-								if !shorts.isEmpty {
-									Text("Short")
-										.font(.custom("Menlo", size: 11).weight(.medium))
-										.foregroundColor(Color.black.opacity(0.65))
+									if !shorts.isEmpty {
+									Button {
+										appState.toggleDirection(
+											assetClass: assetClass,
+											subgroup: trimmedSubgroup,
+											direction: .short
+										)
+									} label: {
+										HStack(spacing: 6) {
+											Text("Short")
+												.font(.custom("Menlo", size: 11).weight(.medium))
+												.foregroundColor(Color.black.opacity(0.65))
+
+											Spacer()
+
+										Image(systemName: appState.isDirectionCollapsed(
+											assetClass: assetClass,
+											subgroup: trimmedSubgroup,
+											direction: .short
+										) ? "chevron.right" : "chevron.down")
+											.font(.system(size: 10, weight: .bold))
+											.foregroundColor(Color.black.opacity(0.55))
+										}
 										.padding(.horizontal, 18)
 										.padding(.top, 6)
+									}
+									.buttonStyle(.plain)
 
-									ForEach(shorts) { instrument in
-										SidebarRow(
-											instrument: instrument,
-											isSelected: instrument.id == appState.selectedInstrumentID
-										)
-										.environmentObject(appState)
+									if !appState.isDirectionCollapsed(
+										assetClass: assetClass,
+										subgroup: trimmedSubgroup,
+										direction: .short
+									) {
+										ForEach(shorts) { instrument in
+											SidebarRow(
+												instrument: instrument,
+												isSelected: instrument.id == appState.selectedInstrumentID
+											)
+											.environmentObject(appState)
+										}
+									}
 									}
 								}
 							}
@@ -127,6 +207,6 @@ struct SidebarListArea: View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 		}
 		.scrollIndicators(.never)
-		.background(.white)
+		.background(Color.clear)
 	}
 }

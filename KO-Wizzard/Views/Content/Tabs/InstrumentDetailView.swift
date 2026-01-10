@@ -20,6 +20,7 @@ struct InstrumentDetailView: View {
 				.fontWeight(.bold)
 				.contentEmphasis()
 				.padding(.bottom, 4)
+				.padding(.leading, mode == .instrumentsCreate ? 20 : 0)
 
 			if let instrument = instrument {
 				detailCard(for: instrument)
@@ -27,10 +28,10 @@ struct InstrumentDetailView: View {
 				emptyState
 			}
 
-			Spacer(minLength: 0)
-		}
-        .frame(maxWidth: .infinity, alignment: .leading)
-        //.padding()
+		Spacer(minLength: 0)
+	}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(.vertical, mode == .instrumentsShowAndChange ? 16 : 0)
 		.font(.menlo(textStyle: .body))
 	}
 
@@ -100,8 +101,7 @@ struct InstrumentDetailView: View {
 		}
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-		.background(Color.secondary.opacity(0.08))
-		.cornerRadius(14)
+		.workspaceGradientBackground(cornerRadius: 14)
 	}
 
 		// MARK: - Rows

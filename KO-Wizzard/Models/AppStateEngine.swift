@@ -72,19 +72,19 @@ final class AppStateEngine: ObservableObject {
 		.favorite
 	]
 
-		// Landing-Button: "Instrument anlegen"
+	// Landing-Button: "Instrument anlegen"
 	func startInstrumentCreation() {
+		endEditSessionForNavigation(keepSelection: false)
 		resetDraftInstrument()
 		selectedTab = .instruments
 		workspaceMode = .instrumentsCreate
 		isLandingVisible = false
 	}
 
-		// Landing-Button: "Instrument anzeigen"
+	// Landing-Button: "Instrument anzeigen"
 	func showInstrumentList() {
-		selectedTab = .instruments
-		workspaceMode = .instrumentsShowAndChange
-		isLandingVisible = false
+		endEditSessionForNavigation(keepSelection: false)
+		enterShowAndChangeMode()
 	}
 
 	 func resetDraftInstrument() {
@@ -96,21 +96,18 @@ final class AppStateEngine: ObservableObject {
 
 		// MARK: - Top-Toolbar-Tabs (rechts: Instrument / Berechnung / Trade / Report)
 
-		/// Instrument-Tab oben rechts
+	/// Instrument-Tab oben rechts
 	func switchToInstruments() {
-		selectedTab = .instruments
-		workspaceMode = .instrumentsShowAndChange
-		isLandingVisible = false
+		endEditSessionForNavigation(keepSelection: false)
+		enterShowAndChangeMode()
 	}
 
-		/// Berechnung-Tab oben rechts
-		/// → hier: Create-Flow für Instrumente
+	/// Berechnung-Tab oben rechts
+	/// → hier: Create-Flow für Instrumente
 	func switchToCalculation() {
+		endEditSessionForNavigation(keepSelection: false)
 		selectedTab = .instruments
-		if workspaceMode != .instrumentsCreate {
-			resetDraftInstrument()
-		}
-		workspaceMode = .instrumentsCreate
+		workspaceMode = .instrumentCalculation
 		isLandingVisible = false
 	}
 
@@ -134,14 +131,28 @@ final class AppStateEngine: ObservableObject {
 		/// Globaler Collapse-Status für die Liste (Toolbar steuert das später)
 	@Published var isGlobalCollapsed: Bool = false
 
-		/// Einzelne Asset-Klassen einklappbar
+	/// Einzelne Asset-Klassen einklappbar
 	@Published private var collapsedAssetClasses: Set<AssetClass> = []
+	@Published private var collapsedDirections: Set<DirectionCollapseKey> = []
+	@Published private var collapsedSubgroups: Set<String> = []
+
+	private struct DirectionCollapseKey: Hashable {
+		let assetClass: AssetClass
+		let subgroup: String
+		let direction: Direction
+	}
+
+	private func subgroupKey(assetClass: AssetClass, subgroup: String) -> String {
+		let trimmed = subgroup.trimmingCharacters(in: .whitespacesAndNewlines)
+		return "\(assetClass.rawValue)|\(trimmed)"
+	}
 
 		/// Aktuell ausgewähltes Instrument (per ID)
 	@Published var selectedInstrumentID: UUID? = nil
 
-		/// Zuletzt gespeichertes Instrument (Neu oder geändert)
+	/// Zuletzt gespeichertes Instrument (Neu oder geändert)
 	@Published var lastSavedInstrumentID: UUID? = nil
+	private static let lastSavedInstrumentIDKey = "lastSavedInstrumentID"
 
 		/// Zuletzt im Show-&-Change-Modus angezeigtes Instrument
 	@Published var lastShownInstrumentID: UUID? = nil
@@ -150,6 +161,17 @@ final class AppStateEngine: ObservableObject {
 
 	init(instrumentStore: InstrumentStore = InstrumentStore()) {
 		self.instrumentStore = instrumentStore
+		if let raw = UserDefaults.standard.string(forKey: Self.lastSavedInstrumentIDKey),
+		   let id = UUID(uuidString: raw) {
+			lastSavedInstrumentID = id
+		}
+		if selectedInstrumentID == nil, let recent = mostRecentlyModifiedInstrument() {
+			selectedInstrumentID = recent.id
+			if lastSavedInstrumentID == nil {
+				lastSavedInstrumentID = recent.id
+				persistLastSavedInstrumentID(recent.id)
+			}
+		}
 	}
 
 		// Irgendwo bei den Published Properties
@@ -226,9 +248,11 @@ final class AppStateEngine: ObservableObject {
 		updated.lastModified = Date()
 		instrumentStore.update(updated)
 		lastSavedInstrumentID = updated.id
+		persistLastSavedInstrumentID(updated.id)
 
 		editingTargetID = nil
 		editingReturnStep = nil
+		selectedTab = .instruments
 		workspaceMode = .instrumentsShowAndChange
 		creationStep = .assetClass
 		resetDraftInstrument()
@@ -249,6 +273,33 @@ final class AppStateEngine: ObservableObject {
 		isLandingVisible = false
 	}
 
+	private func endEditSessionForNavigation(keepSelection: Bool) {
+		guard isEditingExistingInstrument else { return }
+		let targetID = editingTargetID
+		editingTargetID = nil
+		editingReturnStep = nil
+		resetDraftInstrument()
+		if keepSelection, let targetID {
+			selectedInstrumentID = targetID
+		}
+	}
+
+	private func persistLastSavedInstrumentID(_ id: UUID?) {
+		if let id {
+			UserDefaults.standard.set(id.uuidString, forKey: Self.lastSavedInstrumentIDKey)
+		} else {
+			UserDefaults.standard.removeObject(forKey: Self.lastSavedInstrumentIDKey)
+		}
+	}
+
+	private func mostRecentlyModifiedInstrument() -> Instrument? {
+		instruments.max { lhs, rhs in
+			let l = lhs.lastModified ?? .distantPast
+			let r = rhs.lastModified ?? .distantPast
+			return l < r
+		}
+	}
+
 		// MARK: - Public API für Instruments (rohe Daten)
 
 		/// Alle Instrumente aus dem Store
@@ -265,6 +316,7 @@ final class AppStateEngine: ObservableObject {
 
 			// NEU: letzte Speicherung merken
 		lastSavedInstrumentID = id
+		persistLastSavedInstrumentID(id)
 		selectedInstrumentID = id         // optional: direkt auswählen
 
 		return id
@@ -278,18 +330,25 @@ final class AppStateEngine: ObservableObject {
 
 			// NEU: letzte Speicherung merken
 		lastSavedInstrumentID = instrument.id
+		persistLastSavedInstrumentID(instrument.id)
 	}
 
 		/// Instrument löschen
 	func deleteInstrument(_ instrument: Instrument) {
 		instrumentStore.delete(instrument)
 		lastShownInstrumentID = nil
+		if lastSavedInstrumentID == instrument.id {
+			let recent = mostRecentlyModifiedInstrument()
+			lastSavedInstrumentID = recent?.id
+			persistLastSavedInstrumentID(recent?.id)
+		}
 	}
 
 		/// Create-Mode betreten:
 		/// - Draft ggf. resetten
 		/// - zuletzt gespeichertes Instrument in der Liste markiert lassen
 	func enterCreateMode() {
+		endEditSessionForNavigation(keepSelection: false)
 		selectedTab = .instruments
 		workspaceMode = .instrumentsCreate
 		isLandingVisible = false
@@ -308,12 +367,13 @@ final class AppStateEngine: ObservableObject {
 		selectedTab = .instruments
 		isLandingVisible = false
 
-		if let id = lastShownInstrumentID,
-		   instruments.contains(where: { $0.id == id }) {
-			selectedInstrumentID = id
-		} else if let id = lastSavedInstrumentID,
-				  instruments.contains(where: { $0.id == id }) {
-			selectedInstrumentID = id
+		if let recent = mostRecentlyModifiedInstrument() {
+			selectedInstrumentID = recent.id
+			if lastSavedInstrumentID == nil
+				|| !instruments.contains(where: { $0.id == lastSavedInstrumentID }) {
+				lastSavedInstrumentID = recent.id
+				persistLastSavedInstrumentID(recent.id)
+			}
 		} else if let first = instruments.first {
 			selectedInstrumentID = first.id
 		}
@@ -502,9 +562,6 @@ final class AppStateEngine: ObservableObject {
 		// MARK: - Collapse-Steuerung
 
 	func isAssetClassCollapsed(_ assetClass: AssetClass) -> Bool {
-		if isGlobalCollapsed {
-			return true
-		}
 		return collapsedAssetClasses.contains(assetClass)
 	}
 
@@ -514,10 +571,87 @@ final class AppStateEngine: ObservableObject {
 		} else {
 			collapsedAssetClasses.insert(assetClass)
 		}
+		recomputeGlobalCollapsedState()
 	}
 
 	func setGlobalCollapsed(_ flag: Bool) {
-		isGlobalCollapsed = flag
+		if flag {
+			collapsedAssetClasses = currentAssetClasses()
+			collapsedDirections = currentDirectionKeys()
+		} else {
+			collapsedAssetClasses.removeAll()
+			collapsedDirections.removeAll()
+		}
+		recomputeGlobalCollapsedState()
+	}
+
+	func isDirectionCollapsed(assetClass: AssetClass, subgroup: String, direction: Direction) -> Bool {
+		if isAssetClassCollapsed(assetClass) {
+			return true
+		}
+		let key = DirectionCollapseKey(
+			assetClass: assetClass,
+			subgroup: subgroup.trimmingCharacters(in: .whitespacesAndNewlines),
+			direction: direction
+		)
+		return collapsedDirections.contains(key)
+	}
+
+	func toggleDirection(assetClass: AssetClass, subgroup: String, direction: Direction) {
+		let key = DirectionCollapseKey(
+			assetClass: assetClass,
+			subgroup: subgroup.trimmingCharacters(in: .whitespacesAndNewlines),
+			direction: direction
+		)
+		if collapsedDirections.contains(key) {
+			collapsedDirections.remove(key)
+		} else {
+			collapsedDirections.insert(key)
+		}
+		recomputeGlobalCollapsedState()
+	}
+
+	func isSubgroupCollapsed(assetClass: AssetClass, subgroup: String) -> Bool {
+		let key = subgroupKey(assetClass: assetClass, subgroup: subgroup)
+		return collapsedSubgroups.contains(key)
+	}
+
+	func toggleSubgroup(assetClass: AssetClass, subgroup: String) {
+		let key = subgroupKey(assetClass: assetClass, subgroup: subgroup)
+		if collapsedSubgroups.contains(key) {
+			collapsedSubgroups.remove(key)
+		} else {
+			collapsedSubgroups.insert(key)
+		}
+		recomputeGlobalCollapsedState()
+	}
+
+	private func currentAssetClasses() -> Set<AssetClass> {
+		Set(filteredInstruments.map { $0.assetClass })
+	}
+
+	private func currentDirectionKeys() -> Set<DirectionCollapseKey> {
+		var keys: Set<DirectionCollapseKey> = []
+		for instrument in filteredInstruments {
+			let subgroup = (instrument.subgroup?.displayName ?? instrument.underlyingName)
+				.trimmingCharacters(in: .whitespacesAndNewlines)
+			let key = DirectionCollapseKey(
+				assetClass: instrument.assetClass,
+				subgroup: subgroup,
+				direction: instrument.direction
+			)
+			keys.insert(key)
+		}
+		return keys
+	}
+
+	private func recomputeGlobalCollapsedState() {
+		let assetClasses = currentAssetClasses()
+		if assetClasses.isEmpty {
+			isGlobalCollapsed = true
+			return
+		}
+		isGlobalCollapsed = assetClasses.isSubset(of: collapsedAssetClasses)
 	}
 
 		// MARK: - Auswahl

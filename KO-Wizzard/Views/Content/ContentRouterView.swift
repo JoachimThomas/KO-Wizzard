@@ -15,8 +15,8 @@ struct ContentRouterView: View {
 		Group {
 			switch appState.workspaceMode {
 
-				case .instrumentsCreate:
-					InstrumentCreateView()
+			case .instrumentsCreate:
+				InstrumentCreateView()
 
 				case .instrumentsShowAndChange:
 					InstrumentDetailView(
@@ -31,5 +31,6 @@ struct ContentRouterView: View {
 			}
 		}
 		.font(.menlo(textStyle: .body))
+		.padding(.horizontal, 18)
 	}
 }

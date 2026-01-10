@@ -190,23 +190,148 @@ final class InstrumentStore: ObservableObject {
 
 #if DEBUG
 	private func seedDummyInstrumentsIfNeeded() {
-		guard instruments.count < 5 else { return }
-		for i in 0..<30 {
+		var counter = 0
+		let baseDate = Date()
+		let underlyingsForAktie = ["Siemens", "SAP", "BMW"]
+
+		func formatBasis(_ value: Double) -> String {
+			if value < 10 {
+				return String(format: "%.3f", value)
+			}
+			if value < 1000 {
+				return String(format: "%.2f", value)
+			}
+			return String(format: "%.0f", value)
+		}
+
+		func baseValue(for subgroup: Subgroup?, assetClass: AssetClass, index: Int) -> Double {
+			if let subgroup {
+				switch subgroup {
+					case .dax: return 16000 + Double(index * 35)
+					case .dow: return 38000 + Double(index * 60)
+					case .sp500: return 4500 + Double(index * 10)
+					case .nasdaq: return 15000 + Double(index * 45)
+					case .russell2000: return 2000 + Double(index * 8)
+					case .eurUsd: return 1.08 + Double(index) * 0.002
+					case .usdJpy: return 145 + Double(index) * 0.2
+					case .gbpUsd: return 1.27 + Double(index) * 0.002
+					case .oil: return 80 + Double(index) * 0.5
+					case .gas: return 2.5 + Double(index) * 0.1
+					case .gold: return 2000 + Double(index) * 5
+					case .bitcoinUsd: return 43000 + Double(index) * 250
+					case .ethereumUsd: return 2300 + Double(index) * 40
+				}
+			}
+			switch assetClass {
+				case .aktie: return 120 + Double(index * 4)
+				case .igBarrier: return 5000 + Double(index * 30)
+				default: return 1000 + Double(index * 25)
+			}
+		}
+
+		func sanitizeIdentifier(_ value: String) -> String {
+			value
+				.replacingOccurrences(of: " ", with: "_")
+				.replacingOccurrences(of: "/", with: "-")
+				.replacingOccurrences(of: "–", with: "-")
+		}
+
+		func makeInstrument(
+			assetClass: AssetClass,
+			subgroup: Subgroup?,
+			underlying: String,
+			direction: Direction,
+			index: Int
+		) -> Instrument {
 			var inst = Instrument.empty()
-			inst.assetClass = .index
-			inst.subgroup = .dax
-			inst.underlyingName = "DAX"
-			inst.emittent = .hsbc
-			inst.direction = i % 2 == 0 ? .long : .short
-			let basis = 14500 + (i * 160 % 5000)
-			inst.basispreis = String(format: "%.0f", Double(basis))
+			inst.assetClass = assetClass
+			inst.subgroup = subgroup
+			inst.underlyingName = underlying
+			inst.emittent = assetClass == .igBarrier ? .igMarkets : .hsbc
+			inst.direction = direction
+			let basis = baseValue(for: subgroup, assetClass: assetClass, index: index)
+			inst.basispreis = formatBasis(basis)
 			inst.koSchwelle = inst.basispreis
-			inst.bezugsverhaeltnis = i % 3 == 0 ? "10" : (i % 3 == 1 ? "20" : "100")
-			inst.aufgeld = String(format: "%.2f", 1.5 + Double(i % 7))
-			inst.isin = "DUMMY\(100000000 + i)"
-			inst.name = "DUMMY DAX \(inst.direction.displayName) \(inst.basispreis)"
-			inst.isFavorite = i % 7 == 0
-			add(inst)
+			inst.bezugsverhaeltnis = "100"
+			inst.aufgeld = "10"
+			let token = sanitizeIdentifier(underlying)
+			inst.isin = "DUMMY_\(token)_\(direction.rawValue)_\(counter)"
+			inst.name = "DUMMY \(underlying) \(direction.displayName) \(inst.basispreis)"
+			inst.isFavorite = index % 5 == 0
+			inst.lastModified = baseDate.addingTimeInterval(-Double(counter * 60))
+			counter += 1
+			return inst
+		}
+
+		func addIfNeeded(_ instrument: Instrument) {
+			add(instrument)
+		}
+
+		func hasInstrument(assetClass: AssetClass, subgroup: Subgroup, direction: Direction) -> Bool {
+			instruments.contains { inst in
+				inst.assetClass == assetClass
+				&& inst.subgroup == subgroup
+				&& inst.direction == direction
+			}
+		}
+
+		func hasInstrumentUnderlying(assetClass: AssetClass, underlying: String, direction: Direction) -> Bool {
+			instruments.contains { inst in
+				inst.assetClass == assetClass
+				&& inst.subgroup == nil
+				&& inst.underlyingName == underlying
+				&& inst.direction == direction
+			}
+		}
+
+		for assetClass in AssetClass.allCases where assetClass != .none {
+			let subgroups = AssetClass.subgroupsTyped(for: assetClass)
+			if subgroups.isEmpty {
+				for (uIndex, underlying) in underlyingsForAktie.enumerated() {
+					let baseIndex = uIndex * 10
+					if !hasInstrumentUnderlying(assetClass: assetClass, underlying: underlying, direction: .long) {
+						addIfNeeded(makeInstrument(
+							assetClass: assetClass,
+							subgroup: nil,
+							underlying: underlying,
+							direction: .long,
+							index: baseIndex + 1
+						))
+					}
+					if !hasInstrumentUnderlying(assetClass: assetClass, underlying: underlying, direction: .short) {
+						addIfNeeded(makeInstrument(
+							assetClass: assetClass,
+							subgroup: nil,
+							underlying: underlying,
+							direction: .short,
+							index: baseIndex + 2
+						))
+					}
+				}
+			} else {
+				for (sIndex, subgroup) in subgroups.enumerated() {
+					let underlying = subgroup.displayName
+					let baseIndex = sIndex * 10
+					if !hasInstrument(assetClass: assetClass, subgroup: subgroup, direction: .long) {
+						addIfNeeded(makeInstrument(
+							assetClass: assetClass,
+							subgroup: subgroup,
+							underlying: underlying,
+							direction: .long,
+							index: baseIndex + 1
+						))
+					}
+					if !hasInstrument(assetClass: assetClass, subgroup: subgroup, direction: .short) {
+						addIfNeeded(makeInstrument(
+							assetClass: assetClass,
+							subgroup: subgroup,
+							underlying: underlying,
+							direction: .short,
+							index: baseIndex + 2
+						))
+					}
+				}
+			}
 		}
 	}
 #endif

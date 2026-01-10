@@ -32,9 +32,9 @@ struct InstrumentCalcView: View {
 				emptyState
 			}
 
-			Spacer(minLength: 0)
-		}
-		.padding()
+		Spacer(minLength: 0)
+	}
+		.padding(.vertical, 16)
 		.font(.menlo(textStyle: .body))
 		.sheet(isPresented: $showUnderlyingInput) {
 			ValueInputSheet(
@@ -133,8 +133,7 @@ struct InstrumentCalcView: View {
 						step: .favorite)
 		}
 		.padding()
-		.background(Color.secondary.opacity(0.08))
-		.cornerRadius(14)
+		.workspaceGradientBackground(cornerRadius: 14)
 	}
 
 		// MARK: - Calculation Card
@@ -159,8 +158,7 @@ struct InstrumentCalcView: View {
 			}
 		}
 		.padding()
-		.background(Color.secondary.opacity(0.08))
-		.cornerRadius(14)
+		.workspaceGradientBackground(cornerRadius: 14)
 	}
 
 		// MARK: - Rows
