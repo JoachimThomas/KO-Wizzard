@@ -20,7 +20,9 @@ struct InstrumentCalcView: View {
 		VStack(alignment: .leading, spacing: 12) {
 
 			Text(headerTitle)
-				.font(.headline)
+				.font(.menlo(textStyle: .headline))
+				.fontWeight(.bold)
+				.contentEmphasis()
 				.padding(.bottom, 4)
 
 			if let instrument = instrument {
@@ -33,6 +35,7 @@ struct InstrumentCalcView: View {
 			Spacer(minLength: 0)
 		}
 		.padding()
+		.font(.menlo(textStyle: .body))
 		.sheet(isPresented: $showUnderlyingInput) {
 			ValueInputSheet(
 				title: "Underlying eingeben",
@@ -112,14 +115,16 @@ struct InstrumentCalcView: View {
 
 			Divider()
 
-			editableRow("Isin", i.isin.isEmpty ? "—" : i.isin, step: .isin)
-			editableRow("Basispreis", i.basispreis.isEmpty ? "—" : i.basispreis, step: .basispreis)
+			editableRow("Isin", i.isin.isEmpty ? "—" : i.isin, step: .isin, emphasis: .identifier)
+			editableRow("Basispreis", i.basispreis.isEmpty ? "—" : i.basispreis, step: .basispreis, emphasis: .identifier)
 			editableRow("Bezugsverhältnis",
 						i.bezugsverhaeltnis.isEmpty ? "—" : i.bezugsverhaeltnis,
-						step: .bezugsverhaeltnis)
+						step: .bezugsverhaeltnis,
+						emphasis: .identifier)
 			editableRow("Aufgeld",
 						i.aufgeld.isEmpty ? "—" : i.aufgeld,
-						step: .aufgeld)
+						step: .aufgeld,
+						emphasis: .identifier)
 
 			Divider()
 
@@ -160,13 +165,18 @@ struct InstrumentCalcView: View {
 
 		// MARK: - Rows
 
-	private func staticRow(_ label: String, _ value: String) -> some View {
+	private func staticRow(
+		_ label: String,
+		_ value: String,
+		emphasis: ContentEmphasisKind = .standard
+	) -> some View {
 		HStack {
 			Text(label)
 				.foregroundColor(.secondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
+				.contentEmphasis(emphasis)
 			Spacer()
 		}
 	}
@@ -174,7 +184,8 @@ struct InstrumentCalcView: View {
 	private func editableRow(
 		_ label: String,
 		_ value: String,
-		step: AppStateEngine.InstrumentCreationStep
+		step: AppStateEngine.InstrumentCreationStep,
+		emphasis: ContentEmphasisKind = .standard
 	) -> some View {
 		HStack {
 			Text(label)
@@ -182,6 +193,7 @@ struct InstrumentCalcView: View {
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
+				.contentEmphasis(emphasis)
 			Spacer()
 		}
 		.contentShape(Rectangle())
@@ -203,6 +215,7 @@ struct InstrumentCalcView: View {
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
+				.contentEmphasis(.identifier)
 			Spacer()
 			Button(action: action) {
 				Image(systemName: icon)

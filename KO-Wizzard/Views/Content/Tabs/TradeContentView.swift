@@ -23,7 +23,7 @@ struct TradeContentView: View {
 		VStack(alignment: .leading, spacing: 16) {
 
 			Text("Trade erfassen")
-				.font(.headline)
+				.font(.menlo(textStyle: .headline))
 
 			Divider()
 
@@ -50,13 +50,14 @@ struct TradeContentView: View {
 			HStack {
 				Text("P&L:")
 				Spacer()
-				Text(pnlString)
-					.font(.headline)
+			Text(pnlString)
+					.font(.menlo(textStyle: .headline))
 			}
 
 			Spacer()
 		}
 		.padding()
+		.font(.menlo(textStyle: .body))
 	}
 
 		// MARK: - Instrument Info
@@ -65,7 +66,7 @@ struct TradeContentView: View {
 	private func instrumentInfo(_ i: Instrument) -> some View {
 		VStack(alignment: .leading, spacing: 4) {
 			Text(i.name)
-				.font(.headline)
+				.font(.menlo(textStyle: .headline))
 			Text("Isin: \(i.isin)")
 				.foregroundColor(.secondary)
 		}

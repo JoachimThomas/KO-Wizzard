@@ -12,21 +12,24 @@ struct ContentRouterView: View {
 	@EnvironmentObject var appState: AppStateEngine
 
 	var body: some View {
-		switch appState.workspaceMode {
+		Group {
+			switch appState.workspaceMode {
 
-			case .instrumentsCreate:
-				InstrumentCreateView()
+				case .instrumentsCreate:
+					InstrumentCreateView()
 
-			case .instrumentsShowAndChange:
-				InstrumentDetailView(
-					mode: .instrumentsShowAndChange,
-					instrument: appState.selectedInstrument
-				)
-			case .instrumentCalculation:
-				InstrumentCalcView(
-					instrument: appState.selectedInstrument
-				)
+				case .instrumentsShowAndChange:
+					InstrumentDetailView(
+						mode: .instrumentsShowAndChange,
+						instrument: appState.selectedInstrument
+					)
+				case .instrumentCalculation:
+					InstrumentCalcView(
+						instrument: appState.selectedInstrument
+					)
 
+			}
 		}
+		.font(.menlo(textStyle: .body))
 	}
 }

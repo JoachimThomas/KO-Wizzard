@@ -30,11 +30,11 @@ struct ValueInputSheet: View {
 		VStack(alignment: .leading, spacing: 16) {
 
 			Text(title)
-				.font(.headline)
+				.font(.menlo(textStyle: .headline))
 
 			if !message.isEmpty {
 				Text(message)
-					.font(.subheadline)
+					.font(.menlo(textStyle: .subheadline))
 					.foregroundColor(.secondary)
 			}
 
@@ -75,6 +75,7 @@ struct ValueInputSheet: View {
 		}
 		.padding()
 		.presentationDetents([.medium])
+		.font(.menlo(textStyle: .body))
 		.onAppear {
 			text = initialValue
 		}

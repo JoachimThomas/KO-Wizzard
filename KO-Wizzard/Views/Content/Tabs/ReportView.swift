@@ -16,15 +16,17 @@ struct ReportView: View {
 		VStack(alignment: .leading, spacing: 16) {
 
 			Text("Report Details")
-				.font(.title2)
+				.font(.menlo(textStyle: .title2))
 				.bold()
+				.contentEmphasis()
 
 			Text("Hier werden später die Kennzahlen, Filter und Listen für deine Trade-Auswertungen angezeigt.")
-				.font(.body)
+				.font(.menlo(textStyle: .body))
 				.foregroundColor(.secondary)
 
 			Spacer()
 		}
+		.font(.menlo(textStyle: .body))
 	}
 }
 

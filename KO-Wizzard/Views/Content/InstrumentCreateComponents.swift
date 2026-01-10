@@ -20,7 +20,7 @@ struct PickerStepView<T: Hashable>: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			Text(title)
-				.font(.subheadline)
+				.font(.menlo(textStyle: .subheadline))
 				.foregroundColor(.secondary)
 
 			Picker("", selection: Binding(

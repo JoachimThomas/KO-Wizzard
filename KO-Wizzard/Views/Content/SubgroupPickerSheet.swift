@@ -11,7 +11,7 @@ struct SubgroupPickerSheet: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			Text("Subgroup wählen")
-				.font(.headline)
+				.font(.menlo(textStyle: .headline))
 				.padding(.top, 12)
 
 			ScrollView {
@@ -50,5 +50,6 @@ struct SubgroupPickerSheet: View {
 		}
 		.padding(.horizontal, 16)
 		.frame(minWidth: 320, minHeight: 380)
+		.font(.menlo(textStyle: .body))
 	}
 }

@@ -16,7 +16,9 @@ struct InstrumentDetailView: View {
 		VStack(alignment: .leading, spacing: 12) {
 
 			Text(headerTitle)
-				.font(.headline)
+				.font(.menlo(textStyle: .headline))
+				.fontWeight(.bold)
+				.contentEmphasis()
 				.padding(.bottom, 4)
 
 			if let instrument = instrument {
@@ -27,7 +29,9 @@ struct InstrumentDetailView: View {
 
 			Spacer(minLength: 0)
 		}
-		.padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        //.padding()
+		.font(.menlo(textStyle: .body))
 	}
 
 		// MARK: - Header
@@ -77,14 +81,16 @@ struct InstrumentDetailView: View {
 
 			Divider()
 
-			editableRow("Isin", i.isin.isEmpty ? "—" : i.isin, step: .isin)
-			editableRow("Basispreis", i.basispreis.isEmpty ? "—" : i.basispreis, step: .basispreis)
+			editableRow("Isin", i.isin.isEmpty ? "—" : i.isin, step: .isin, emphasis: .identifier)
+			editableRow("Basispreis", i.basispreis.isEmpty ? "—" : i.basispreis, step: .basispreis, emphasis: .identifier)
 			editableRow("Bezugsverhältnis",
 						i.bezugsverhaeltnis.isEmpty ? "—" : i.bezugsverhaeltnis,
-						step: .bezugsverhaeltnis)
+						step: .bezugsverhaeltnis,
+						emphasis: .identifier)
 			editableRow("Aufgeld",
 						i.aufgeld.isEmpty ? "—" : i.aufgeld,
-						step: .aufgeld)
+						step: .aufgeld,
+						emphasis: .identifier)
 
 			Divider()
 
@@ -92,20 +98,26 @@ struct InstrumentDetailView: View {
 						i.isFavorite ? "★ Ja" : "– Nein",
 						step: .favorite)
 		}
-		.padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
 		.background(Color.secondary.opacity(0.08))
 		.cornerRadius(14)
 	}
 
 		// MARK: - Rows
 
-	private func staticRow(_ label: String, _ value: String) -> some View {
+	private func staticRow(
+		_ label: String,
+		_ value: String,
+		emphasis: ContentEmphasisKind = .standard
+	) -> some View {
 		HStack {
 			Text(label)
 				.foregroundColor(.secondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
+				.contentEmphasis(emphasis)
 			Spacer()
 		}
 	}
@@ -113,7 +125,8 @@ struct InstrumentDetailView: View {
 	private func editableRow(
 		_ label: String,
 		_ value: String,
-		step: AppStateEngine.InstrumentCreationStep
+		step: AppStateEngine.InstrumentCreationStep,
+		emphasis: ContentEmphasisKind = .standard
 	) -> some View {
 		HStack {
 			Text(label)
@@ -121,6 +134,7 @@ struct InstrumentDetailView: View {
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
+				.contentEmphasis(emphasis)
 			Spacer()
 		}
 		.contentShape(Rectangle())

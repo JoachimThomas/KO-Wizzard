@@ -39,11 +39,12 @@ struct SidebarView: View {
 	private var header: some View {
 		HStack(spacing: 8) {
 			Text("Instrumente")
-				.font(.system(size: 13, weight: .semibold))
+				.font(.custom("Menlo", size: 14).weight(.semibold))
+				.foregroundColor(Color.black.opacity(0.9))
 
 			Text("(\(appState.filteredInstruments.count))")
-				.font(.system(size: 11))
-				.opacity(0.65)
+				.font(.custom("Menlo", size: 12))
+				.foregroundColor(Color.black.opacity(0.65))
 
 			Spacer()
 		}
@@ -66,7 +67,7 @@ struct SidebarView: View {
 				TextField("Suche (Subgroup, isin, Richtung …)", text: $appState.searchText)
 					.textFieldStyle(.plain)
 					.foregroundColor(.primary)
-					.font(.system(size: 11))
+					.font(.custom("Menlo", size: 12))
 					.focused($searchIsFocused)
 
 				if !appState.searchText.isEmpty {

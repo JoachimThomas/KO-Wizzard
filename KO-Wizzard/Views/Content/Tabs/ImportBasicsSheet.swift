@@ -18,14 +18,14 @@ struct ImportBasicsSheet: View {
 		NavigationView {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("Webseitentext einfügen")
-					.font(.headline)
+					.font(.menlo(textStyle: .headline))
 
 				Text("Kopieren Sie den Produkttext (z. B. von HSBC, onvista, finanzen.net) und fügen Sie ihn hier ein. Die App versucht dann, die Basisdaten automatisch zu erkennen.")
-					.font(.footnote)
+					.font(.menlo(textStyle: .footnote))
 					.foregroundColor(.secondary)
 
 				TextEditor(text: $text)
-					.font(.system(size: 13, weight: .regular, design: .monospaced))
+					.font(.custom("Menlo", size: 13))
 					.frame(minHeight: 220)
 					.overlay(
 						RoundedRectangle(cornerRadius: 8)
@@ -34,7 +34,7 @@ struct ImportBasicsSheet: View {
 
 				if let error = errorMessage {
 					Text(error)
-						.font(.footnote)
+						.font(.menlo(textStyle: .footnote))
 						.foregroundColor(.red)
 				}
 
@@ -55,6 +55,7 @@ struct ImportBasicsSheet: View {
 				}
 			}
 			.padding()
+			.font(.menlo(textStyle: .body))
 			
 		}
 	}

@@ -18,6 +18,7 @@ struct InstrumentCreateView: View {
 					// 1. Flow oben
 				InstrumentCreateFlowView()
 					.environmentObject(appState)
+					.frame(maxWidth: .infinity)
 					.frame(height: geo.size.height * 0.38)
 					.padding(.horizontal)
 					.padding(.top)
@@ -28,6 +29,7 @@ struct InstrumentCreateView: View {
 					instrument: appState.draftInstrument
 				)
 				.environmentObject(appState)
+				.frame(maxWidth: .infinity)
 				.frame(height: geo.size.height * 0.58)
 				.padding(.horizontal)
 				.padding(.bottom)

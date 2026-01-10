@@ -34,13 +34,14 @@ struct SidebarRow: View {
 					)
 
 				Text(displayTitle)
-					.font(.system(size: 11, weight: isSelected ? .semibold : .regular))
+					.font(.custom("Menlo", size: 14).weight(isSelected ? .semibold : .regular))
+					.foregroundColor(Color.black.opacity(0.88))
 					.lineLimit(1)
 
 				Spacer(minLength: 0)
 			}
 			.padding(.horizontal, 18)
-			.padding(.vertical, 4)
+			.padding(.vertical, 6)
 			.background(
 				Group {
 					if isSelected {

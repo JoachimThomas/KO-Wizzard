@@ -13,7 +13,7 @@ struct SidebarListArea: View {
 
 	var body: some View {
 		ScrollView {
-			VStack(alignment: .leading, spacing: 6) {
+			VStack(alignment: .leading, spacing: 10) {
 
 				ForEach(appState.groupedInstruments, id: \.assetClass) { group in
 					let assetClass = group.assetClass
@@ -35,18 +35,19 @@ struct SidebarListArea: View {
 									.frame(width: 6, height: 6)
 
 								Text(assetClass.displayName)
-									.font(.system(size: 12, weight: .semibold))
+									.font(.custom("Menlo", size: 13).weight(.semibold))
+									.foregroundColor(Color.black.opacity(0.88))
 
 								Spacer()
 
 								Image(systemName: appState.isAssetClassCollapsed(assetClass)
 									  ? "chevron.right"
 									  : "chevron.down")
-								.font(.system(size: 11, weight: .bold))
-								.opacity(0.7)
+								.font(.system(size: 12, weight: .bold))
+								.foregroundColor(Color.black.opacity(0.65))
 							}
 							.padding(.horizontal, 10)
-							.padding(.vertical, 4)
+							.padding(.vertical, 6)
 						}
 						.buttonStyle(.plain)
 
@@ -73,10 +74,10 @@ struct SidebarListArea: View {
 
 								if !subgroupName.trimmingCharacters(in: .whitespaces).isEmpty {
 									Text(subgroupName)
-										.font(.system(size: 11))
-										.opacity(0.7)
+										.font(.custom("Menlo", size: 12))
+										.foregroundColor(Color.black.opacity(0.75))
 										.padding(.horizontal, 16)
-										.padding(.top, 2)
+										.padding(.top, 4)
 								}
 
 								let longs  = inSub.filter { $0.direction == .long }
@@ -85,10 +86,10 @@ struct SidebarListArea: View {
 									// LONG-Block
 								if !longs.isEmpty {
 									Text("Long")
-										.font(.system(size: 10, weight: .medium))
-										.opacity(0.55)
+										.font(.custom("Menlo", size: 11).weight(.medium))
+										.foregroundColor(Color.black.opacity(0.65))
 										.padding(.horizontal, 18)
-										.padding(.top, 2)
+										.padding(.top, 4)
 
 									ForEach(longs) { instrument in
 										SidebarRow(
@@ -102,10 +103,10 @@ struct SidebarListArea: View {
 									// SHORT-Block
 								if !shorts.isEmpty {
 									Text("Short")
-										.font(.system(size: 10, weight: .medium))
-										.opacity(0.55)
+										.font(.custom("Menlo", size: 11).weight(.medium))
+										.foregroundColor(Color.black.opacity(0.65))
 										.padding(.horizontal, 18)
-										.padding(.top, 4)
+										.padding(.top, 6)
 
 									ForEach(shorts) { instrument in
 										SidebarRow(

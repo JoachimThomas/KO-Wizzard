@@ -20,11 +20,12 @@ struct ReportsView: View {
 		VStack(alignment: .leading, spacing: 24) {
 
 			Text("Auswertungen")
-				.font(.largeTitle)
+				.font(.menlo(textStyle: .largeTitle))
 				.bold()
+				.contentEmphasis()
 
 			Text("Hier erscheinen später die Auswertungen deiner Trades nach Zeitraum (Woche/Monat/Jahr) und Export als CSV.")
-				.font(.body)
+				.font(.menlo(textStyle: .body))
 				.foregroundColor(.secondary)
 
 			Divider()
@@ -35,5 +36,6 @@ struct ReportsView: View {
 		}
 		.padding()
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.font(.menlo(textStyle: .body))
 	}
 }
