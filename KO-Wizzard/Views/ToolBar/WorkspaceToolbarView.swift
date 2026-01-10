@@ -11,11 +11,23 @@ import SwiftUI
 struct WorkspaceToolbarView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
-    @State private var showDeleteAlert = false
-    @State private var instrumentToDelete: Instrument?
+	@State private var showDeleteAlert = false
+	@State private var instrumentToDelete: Instrument?
+	@State private var isCreateHovered: Bool = false
+	@State private var isShowHovered: Bool = false
+	@State private var isCalcHovered: Bool = false
+	@State private var isAllHovered: Bool = false
+	@State private var isFavoritesHovered: Bool = false
+	@State private var isRecentHovered: Bool = false
+	@State private var isCollapseHovered: Bool = false
+	@State private var isCreateHoveredLeft: Bool = false
+	@State private var isEditHovered: Bool = false
+	@State private var isDeleteHovered: Bool = false
 
 	
 	var body: some View {
+		let sidebarWidth: CGFloat = 300
+
 		HStack(spacing: 16) {
 
 				// LINKER BEREICH ≈ Sidebar-Breite
@@ -25,54 +37,93 @@ struct WorkspaceToolbarView: View {
 				Button {
 					appState.showFavoritesOnly = false
 				} label: {
-					Image(systemName: "chart.line.uptrend.xyaxis")
-						.imageScale(.large)
+					toolbarIcon(systemName: "chart.line.uptrend.xyaxis", isHovered: isAllHovered)
 				}
+				.buttonStyle(ToolbarIconStyle())
+				.focusable(false)
+				.focusEffectDisabled(true)
 				.help("Alle Instrumente anzeigen")
+				.onHover { hovering in
+					isAllHovered = hovering
+				}
 
 					// Favoriten-Ansicht
 				Button {
 					appState.showFavoritesOnly = true
 				} label: {
-					Image(systemName: appState.showFavoritesOnly ? "star.fill" : "star")
-						.imageScale(.large)
+					toolbarIcon(
+						systemName: appState.showFavoritesOnly ? "star.fill" : "star",
+						isHovered: isFavoritesHovered
+					)
 				}
+				.buttonStyle(ToolbarIconStyle())
+				.focusable(false)
+				.focusEffectDisabled(true)
 				.help("Nur Favoriten anzeigen")
+				.onHover { hovering in
+					isFavoritesHovered = hovering
+				}
 					// Verlauf, die letzten 10
 				Button {
 					appState.showRecentOnly.toggle()
 				} label: {
-					Image(systemName: "clock")
-						.imageScale(.large)
+					toolbarIcon(systemName: "clock", isHovered: isRecentHovered)
 				}
+				.buttonStyle(ToolbarIconStyle())
+				.focusable(false)
+				.focusEffectDisabled(true)
 				.help("Verlauf der letzten 10 Listeneinträge anzeigen")
+				.onHover { hovering in
+					isRecentHovered = hovering
+				}
 
 					// Assetklassen Zuklappen / Aufklappen
 				Button {
 					appState.setGlobalCollapsed(!appState.isGlobalCollapsed)
 				} label: {
-					Image(systemName: appState.isGlobalCollapsed ? "book.closed" : "book")
-						.imageScale(.large)
+					toolbarIcon(
+						systemName: appState.isGlobalCollapsed ? "book.closed" : "book",
+						isHovered: isCollapseHovered
+					)
 				}
+				.buttonStyle(ToolbarIconStyle())
+				.focusable(false)
+				.focusEffectDisabled(true)
 				.help(appState.isGlobalCollapsed ? "Alle Assetklassen expandieren" : "Alle Assetklassen einklappen")
+				.onHover { hovering in
+					isCollapseHovered = hovering
+				}
 
 					// Neues Instrument
 				Button {
 					appState.enterCreateMode()
 				} label: {
-					Image(systemName: "document.badge.plus")
-						.imageScale(.large)
+					toolbarIcon(systemName: "document.badge.plus", isHovered: isCreateHoveredLeft)
 				}
+				.buttonStyle(ToolbarIconStyle())
+				.focusable(false)
+				.focusEffectDisabled(true)
 				.help("Neues Instrument anlegen")
+				.onHover { hovering in
+					isCreateHoveredLeft = hovering
+				}
 
 					// Instrument ändern
 				Button {
 					appState.enterCreateMode()
 				} label: {
-					Image(systemName:"slider.horizontal.2.arrow.trianglehead.counterclockwise")
-						.imageScale(.large)
+					toolbarIcon(
+						systemName: "slider.horizontal.2.arrow.trianglehead.counterclockwise",
+						isHovered: isEditHovered
+					)
 				}
+				.buttonStyle(ToolbarIconStyle())
+				.focusable(false)
+				.focusEffectDisabled(true)
 				.help("Instrument ändern")
+				.onHover { hovering in
+					isEditHovered = hovering
+				}
 
 					// Instrument löschen
 				Button {
@@ -81,52 +132,64 @@ struct WorkspaceToolbarView: View {
                     instrumentToDelete = inst
                     showDeleteAlert = true
 				} label: {
-					Image(systemName: "document.on.trash")
-						.imageScale(.large)
+					toolbarIcon(systemName: "document.on.trash", isHovered: isDeleteHovered)
 				}
+				.buttonStyle(ToolbarIconStyle())
+				.focusable(false)
+				.focusEffectDisabled(true)
 				.help("Instrument löschen")
+				.onHover { hovering in
+					isDeleteHovered = hovering
+				}
 
 			}
 
-			.frame(width: 300, alignment: .leading)
+			.frame(width: sidebarWidth, alignment: .leading)
 					.padding(.leading, -20)
 
-
-				Spacer()
-
-					// RECHTER BEREICH – Tabs: Instrument / Berechnung / Trade / Report
-				HStack(spacing: 8) {
+					// MITTLERER BEREICH – Tabs zentriert über dem Content
+			ZStack {
+				HStack(spacing: 18) {
 					topTabButton(
-						title: "Instrument",
-						isActive: appState.workspaceMode == .instrumentsShowAndChange
-						|| appState.workspaceMode == .instrumentsCreate
+						title: "Asset anlegen",
+						icon: "doc.badge.plus",
+						isActive: appState.workspaceMode == .instrumentsCreate,
+						isHovered: isCreateHovered
 					) {
-						appState.switchToInstruments()
+						appState.enterCreateMode()
+					}
+					.onHover { hovering in
+						isCreateHovered = hovering
 					}
 
 					topTabButton(
-						title: "Berechnung",
-						isActive: appState.workspaceMode == .instrumentCalculation
+						title: "Asset Ansicht",
+						icon: "eye.fill",
+						isActive: appState.workspaceMode == .instrumentsShowAndChange,
+						isHovered: isShowHovered
+					) {
+						appState.switchToInstruments()
+					}
+					.onHover { hovering in
+						isShowHovered = hovering
+					}
+
+					topTabButton(
+						title: "Berechnen",
+						icon: "function",
+						isActive: appState.workspaceMode == .instrumentCalculation,
+						isHovered: isCalcHovered
 					) {
 						appState.selectedTab = .instruments
 						appState.workspaceMode = .instrumentCalculation
 						appState.isLandingVisible = false
 					}
-
-					topTabButton(
-						title: "Trade",
-						isActive: appState.workspaceMode == .instrumentsTrade
-					) {
-						appState.switchToTrades()
-					}
-
-					topTabButton(
-						title: "Report",
-						isActive: appState.workspaceMode == .reports
-					) {
-						appState.switchToReports()
+					.onHover { hovering in
+						isCalcHovered = hovering
 					}
 				}
+			}
+			.frame(maxWidth: .infinity, alignment: .center)
             }
             .alert("Achtung!", isPresented: $showDeleteAlert, presenting: instrumentToDelete) { inst in
                 Button("Löschen", role: .destructive) {
@@ -142,18 +205,120 @@ struct WorkspaceToolbarView: View {
 		}
 	}
 
-	private func topTabButton(title: String, isActive: Bool, action: @escaping () -> Void) -> some View {
+	private func topTabButton(
+		title: String,
+		icon: String,
+		isActive: Bool,
+		isHovered: Bool,
+		action: @escaping () -> Void
+	) -> some View {
 		Button(action: action) {
-			Text(title)
-				.font(.subheadline)
-				.fontWeight(.semibold)
-				.padding(.horizontal, 12)
-				.padding(.vertical, 6)
-				.background(
-					RoundedRectangle(cornerRadius: 8)
-						.fill(isActive ? Color.accentColor.opacity(0.2) : Color.clear)
-				)
+			HStack(spacing: 8) {
+				ZStack {
+					Circle()
+						.fill(
+							LinearGradient(
+								colors: [Color.blue.opacity(0.9), Color.blue.opacity(0.55)],
+								startPoint: .topLeading,
+								endPoint: .bottomTrailing
+							)
+						)
+						.shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+						.overlay(
+							Circle()
+								.stroke(Color.white.opacity(0.18), lineWidth: 1)
+						)
+
+	Circle()
+		.stroke(Color(red: 1.0, green: 0.62, blue: 0.04).opacity(isHovered ? 0.75 : 0), lineWidth: 2)
+		.blur(radius: isHovered ? 1 : 2)
+		.animation(.easeInOut(duration: 0.14), value: isHovered)
+
+					Circle()
+						.fill(
+							RadialGradient(
+								colors: [Color.white.opacity(0.18), Color.clear],
+								center: .topLeading,
+								startRadius: 2,
+								endRadius: 14
+							)
+						)
+						.blendMode(.screen)
+
+					Image(systemName: icon)
+						.font(.system(size: 13, weight: .semibold))
+						.foregroundColor(.white)
+				}
+				.frame(width: 26, height: 26)
+
+				Text(title)
+					.font(.subheadline)
+					.fontWeight(.semibold)
+					.foregroundColor(isActive ? .primary : .secondary)
+			}
+			.padding(.horizontal, 10)
+			.padding(.vertical, 6)
+			.background(
+				RoundedRectangle(cornerRadius: 10)
+					.fill(isActive ? Color.accentColor.opacity(0.12) : Color.clear)
+			)
 		}
-		.buttonStyle(.bordered)
+		.buttonStyle(PressableToolbarStyle())
+		.focusable(false)
+		.focusEffectDisabled(true)
 	}
 
+
+private struct PressableToolbarStyle: ButtonStyle {
+	func makeBody(configuration: Configuration) -> some View {
+		configuration.label
+			.scaleEffect(configuration.isPressed ? 0.98 : 1)
+			.animation(.easeInOut(duration: 0.12), value: configuration.isPressed)
+	}
+}
+
+private struct ToolbarIconStyle: ButtonStyle {
+	func makeBody(configuration: Configuration) -> some View {
+		configuration.label
+			.scaleEffect(configuration.isPressed ? 0.96 : 1)
+			.animation(.easeInOut(duration: 0.12), value: configuration.isPressed)
+	}
+}
+
+private func toolbarIcon(systemName: String, isHovered: Bool) -> some View {
+	ZStack {
+		Circle()
+			.fill(
+				LinearGradient(
+					colors: [Color.blue.opacity(0.9), Color.blue.opacity(0.6)],
+					startPoint: .topLeading,
+					endPoint: .bottomTrailing
+				)
+			)
+			.shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 2)
+
+		Circle()
+			.stroke(Color.white.opacity(0.18), lineWidth: 1)
+
+	Circle()
+		.stroke(Color(red: 1.0, green: 0.62, blue: 0.04).opacity(isHovered ? 0.75 : 0), lineWidth: 2)
+		.blur(radius: isHovered ? 1 : 2)
+		.animation(.easeInOut(duration: 0.14), value: isHovered)
+
+		Circle()
+			.fill(
+				RadialGradient(
+					colors: [Color.white.opacity(0.2), Color.clear],
+					center: .topLeading,
+					startRadius: 2,
+					endRadius: 12
+				)
+			)
+			.blendMode(.screen)
+
+		Image(systemName: systemName)
+			.font(.system(size: 12, weight: .semibold))
+			.foregroundColor(.white)
+	}
+	.frame(width: 30, height: 30)
+}

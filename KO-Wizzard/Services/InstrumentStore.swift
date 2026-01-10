@@ -24,6 +24,10 @@ final class InstrumentStore: ObservableObject {
 		// öffentlich lesbar, aber nur intern beschreibbar
 	@Published private(set) var instruments: [Instrument] = []
 
+	var instrumentCount: Int {
+		instruments.count
+	}
+
 	private let fileURL: URL
 	private var cancellables = Set<AnyCancellable>()
 

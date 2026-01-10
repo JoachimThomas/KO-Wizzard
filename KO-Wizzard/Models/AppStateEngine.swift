@@ -13,8 +13,6 @@ final class AppStateEngine: ObservableObject {
 
 	enum RootTab: Hashable {
 		case instruments
-		case trades
-		case reports
 	}
 
 	@Published var selectedTab: RootTab = .instruments
@@ -29,8 +27,6 @@ final class AppStateEngine: ObservableObject {
 		case instrumentsCreate          // "create Instrument"
 		case instrumentsShowAndChange   // "show & change Instrument"
 		case instrumentCalculation      // Calculations
-		case instrumentsTrade           // "tradeInstrument"
-		case reports                    // Auswertung
 	}
 
 		/// Steuert, welcher Inhalt im Workspace angezeigt wird
@@ -77,20 +73,6 @@ final class AppStateEngine: ObservableObject {
 		isLandingVisible = false
 	}
 
-		// Landing-Button: "Trade erfassen"
-	func startTradeCreation() {
-		selectedTab = .trades
-		workspaceMode = .instrumentsTrade
-		isLandingVisible = false
-	}
-
-		// Landing-Button: "Auswertung"
-	func showReports() {
-		selectedTab = .reports
-		workspaceMode = .reports
-		isLandingVisible = false
-	}
-
 	 func resetDraftInstrument() {
 		draftInstrument = .empty()
 		creationStep = .assetClass
@@ -115,20 +97,6 @@ final class AppStateEngine: ObservableObject {
 			resetDraftInstrument()
 		}
 		workspaceMode = .instrumentsCreate
-		isLandingVisible = false
-	}
-
-		/// Trade-Tab oben rechts
-	func switchToTrades() {
-		selectedTab = .trades
-		workspaceMode = .instrumentsTrade
-		isLandingVisible = false
-	}
-
-		/// Report-Tab oben rechts
-	func switchToReports() {
-		selectedTab = .reports
-		workspaceMode = .reports
 		isLandingVisible = false
 	}
 
@@ -514,5 +482,4 @@ extension AppStateEngine {
 		isLandingVisible = false
 	}
 }
-
 

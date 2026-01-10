@@ -40,10 +40,6 @@ struct InstrumentDetailView: View {
 				return "Instrument – Details"
 			case .instrumentCalculation:
 				return "Instrument – Berechnung"
-			case .instrumentsTrade:
-				return "Instrument – Auswahl"
-			case .reports:
-				return "Instrument"
 		}
 	}
 
@@ -144,4 +140,3 @@ struct InstrumentDetailView: View {
 		.frame(maxWidth: .infinity, alignment: .leading)
 	}
 }
-

@@ -27,13 +27,6 @@ struct ContentRouterView: View {
 					instrument: appState.selectedInstrument
 				)
 
-			case .instrumentsTrade:
-				TradeContentView()
-					.environmentObject(appState)
-
-			case .reports:
-				ReportsView()
-					.environmentObject(appState)
 		}
 	}
 }

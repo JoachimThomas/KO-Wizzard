@@ -75,10 +75,6 @@ struct InstrumentCalcView: View {
 				return "Instrument – Details"
 			case .instrumentCalculation:
 				return "Instrument – Berechnung"
-			case .instrumentsTrade:
-				return "Instrument – Auswahl"
-			case .reports:
-				return "Instrument"
 		}
 	}
 
