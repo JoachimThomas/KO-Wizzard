@@ -38,8 +38,9 @@ struct WorkspaceToolbarView: View {
 						.imageScale(.large)
 				}
 				.help("Nur Favoriten anzeigen")
-					// Verlauf, die letzten 10
+				// Verlauf, die letzten 10
 				Button {
+					appState.showFavoritesOnly = false
 					appState.showRecentOnly.toggle()
 				} label: {
 					Image(systemName: "clock")
@@ -156,4 +157,3 @@ struct WorkspaceToolbarView: View {
 		}
 		.buttonStyle(.bordered)
 	}
-
