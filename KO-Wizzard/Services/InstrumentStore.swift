@@ -42,6 +42,9 @@ final class InstrumentStore: ObservableObject {
 		}
 
 		load()
+#if DEBUG
+		seedDummyInstrumentsIfNeeded()
+#endif
 		setupAutosave()
 	}
 
@@ -184,4 +187,27 @@ final class InstrumentStore: ObservableObject {
 	func allInstruments() -> [Instrument] {
 		instruments
 	}
+
+#if DEBUG
+	private func seedDummyInstrumentsIfNeeded() {
+		guard instruments.count < 5 else { return }
+		for i in 0..<30 {
+			var inst = Instrument.empty()
+			inst.assetClass = .index
+			inst.subgroup = .dax
+			inst.underlyingName = "DAX"
+			inst.emittent = .hsbc
+			inst.direction = i % 2 == 0 ? .long : .short
+			let basis = 14500 + (i * 160 % 5000)
+			inst.basispreis = String(format: "%.0f", Double(basis))
+			inst.koSchwelle = inst.basispreis
+			inst.bezugsverhaeltnis = i % 3 == 0 ? "10" : (i % 3 == 1 ? "20" : "100")
+			inst.aufgeld = String(format: "%.2f", 1.5 + Double(i % 7))
+			inst.isin = "DUMMY\(100000000 + i)"
+			inst.name = "DUMMY DAX \(inst.direction.displayName) \(inst.basispreis)"
+			inst.isFavorite = i % 7 == 0
+			add(inst)
+		}
+	}
+#endif
 }
