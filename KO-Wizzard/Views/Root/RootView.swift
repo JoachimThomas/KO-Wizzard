@@ -50,6 +50,7 @@ struct RootView: View {
         }
             // System-Hintergrund der Toolbar ausblenden
         .toolbarBackground(.hidden, for: .windowToolbar)
+        .toolbarBackground(.hidden, for: .automatic)
     }
 }
 

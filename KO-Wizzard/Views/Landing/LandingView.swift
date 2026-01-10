@@ -22,7 +22,7 @@ struct LandingView: View {
                         .scaledToFill()
                         .ignoresSafeArea()
                 )
-                .clipped() // Schneidet Überhänge ab
+                //.clipped() // Schneidet Überhänge ab
 
             Rectangle()
                 .fill(
