@@ -13,67 +13,71 @@ struct LandingView: View {
 	@State private var isShowHovered: Bool = false
 	@State private var isCalcHovered: Bool = false
 
-	var body: some View {
-		ZStack(alignment: .topLeading) {
-			Image("Chart")
-				.resizable()
-				.scaledToFill()
-				.ignoresSafeArea()
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            Color.clear // Dient als Anker für die Fenstergröße
+                .background(
+                    Image("Chart")
+                        .resizable()
+                        .scaledToFill()
+                        .ignoresSafeArea()
+                )
+                .clipped() // Schneidet Überhänge ab
 
-			Rectangle()
-				.fill(
-					LinearGradient(
-						colors: [
-							Color.black.opacity(0.55),
-							Color.black.opacity(0.15),
-							Color.black.opacity(0.0)
-						],
-						startPoint: .topLeading,
-						endPoint: .bottomTrailing
-					)
-				)
-				.ignoresSafeArea()
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.black.opacity(0.55),
+                            Color.black.opacity(0.15),
+                            Color.black.opacity(0.0)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .ignoresSafeArea()
 
-			VStack(alignment: .leading, spacing: 24) {
-				glossyLandingButton(
-					icon: "doc.badge.plus",
-					isHovered: isCreateHovered
-				) {
-					appState.enterCreateMode()
-				}
-				.onHover { hovering in
-					isCreateHovered = hovering
-				}
+            VStack(alignment: .leading, spacing: 24) {
+                glossyLandingButton(
+                    icon: "doc.badge.plus",
+                    isHovered: isCreateHovered
+                ) {
+                    appState.enterCreateMode()
+                }
+                .onHover { hovering in
+                    isCreateHovered = hovering
+                }
 
-				glossyLandingButton(
-					icon: "eye",
-					isHovered: isShowHovered
-				) {
-					appState.enterShowAndChangeMode()
-				}
-				.onHover { hovering in
-					isShowHovered = hovering
-				}
+                glossyLandingButton(
+                    icon: "eye",
+                    isHovered: isShowHovered
+                ) {
+                    appState.enterShowAndChangeMode()
+                }
+                .onHover { hovering in
+                    isShowHovered = hovering
+                }
 
-				glossyLandingButton(
-					icon: "function",
-					isHovered: isCalcHovered
-				) {
-					appState.selectedTab = .instruments
-					appState.workspaceMode = .instrumentCalculation
-					appState.isLandingVisible = false
-				}
-				.onHover { hovering in
-					isCalcHovered = hovering
-				}
+                glossyLandingButton(
+                    icon: "function",
+                    isHovered: isCalcHovered
+                ) {
+                    appState.selectedTab = .instruments
+                    appState.workspaceMode = .instrumentCalculation
+                    appState.isLandingVisible = false
+                }
+                .onHover { hovering in
+                    isCalcHovered = hovering
+                }
 
-				Spacer()
-			}
-			.padding(.top, 70)
-			.padding(.leading, 80)
-			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-		}
-	}
+                Spacer()
+            }
+            .padding(.top, 70)
+            .padding(.leading, 80)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+    }
 
 	private func glossyLandingButton(
 		icon: String,
