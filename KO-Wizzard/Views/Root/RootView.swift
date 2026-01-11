@@ -5,12 +5,19 @@ import UserNotifications
 struct RootView: View {
 
     @EnvironmentObject var appState: AppStateEngine
-	@Environment(\.appTheme) private var theme
+	@Environment(\.appTheme) private var baseTheme
+	@Environment(\.colorScheme) private var colorScheme
 #if DEBUG
 	@AppStorage("debugThemeMode") private var debugThemeModeRaw: String = ThemeMode.system.rawValue
 #endif
 
+	private var resolvedTheme: AppTheme {
+		guard baseTheme.mode == .system else { return baseTheme }
+		return AppTheme(mode: colorScheme == .dark ? .dark : .light)
+	}
+
     var body: some View {
+		let theme = resolvedTheme
         ZStack(alignment: .top) {
                 // 1. Der eigentliche Content der App
             Group {
@@ -41,6 +48,7 @@ struct RootView: View {
             .ignoresSafeArea(.container, edges: .top)
             .allowsHitTesting(false)
         }
+		.appTheme(theme)
 #if DEBUG
 		.overlay(alignment: .bottomTrailing) {
 			debugThemeControl

@@ -61,6 +61,7 @@ private struct WorkspaceGradientBackground: ViewModifier {
 					}
 				}
 			}
+			.allowsHitTesting(false)
 		)
 	}
 }

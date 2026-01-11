@@ -32,6 +32,7 @@ struct WorkspaceView: View {
 				Color.clear
 					.preference(key: WorkspaceSizePreferenceKey.self, value: proxy.size)
 			}
+			.allowsHitTesting(false)
 		)
 		.onPreferenceChange(WorkspaceSizePreferenceKey.self) { newValue in
 			workspaceSize = newValue

@@ -51,6 +51,7 @@ struct WorkspaceBodyView: View {
 				theme.gradients.footer(theme.colors)
 					.blendMode(.multiply) // Sorgt für organische Verschmelzung
             }
+			.allowsHitTesting(false)
         )
     }
 
