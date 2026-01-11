@@ -8,6 +8,7 @@ import SwiftUI
 struct InstrumentCalcView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 
 	let instrument: Instrument?
 	private let mode: NavigationController.WorkspaceMode = .instrumentCalculation
@@ -132,8 +133,8 @@ struct InstrumentCalcView: View {
 						i.isFavorite ? "★ Ja" : "– Nein",
 						step: .favorite)
 		}
-		.padding()
-		.workspaceGradientBackground(cornerRadius: 14)
+		.padding(theme.metrics.paddingLarge)
+		.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
 	}
 
 		// MARK: - Calculation Card
@@ -157,8 +158,8 @@ struct InstrumentCalcView: View {
 				showCertificateInput = true
 			}
 		}
-		.padding()
-		.workspaceGradientBackground(cornerRadius: 14)
+		.padding(theme.metrics.paddingLarge)
+		.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
 	}
 
 		// MARK: - Rows
