@@ -17,38 +17,39 @@ struct RootView: View {
 
     var body: some View {
 		let theme = resolvedTheme
-        ZStack(alignment: .top) {
-                // 1. Der eigentliche Content der App
-            Group {
-                if appState.navigation.isLandingVisible {
-                    LandingView()
-                } else {
-                    WorkspaceView()
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+		GeometryReader { proxy in
+			let topInset = max(0, theme.metrics.titlebarHeight - proxy.safeAreaInsets.top)
+			ZStack(alignment: .top) {
+					// 1. Der eigentliche Content der App
+				Group {
+					if appState.navigation.isLandingVisible {
+						LandingView()
+					} else {
+						WorkspaceView()
+					}
+				}
+				.padding(.top, topInset)
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                // 2. Die eingefärbte Titlebar mit Material und dunklerem Verlauf
-            Rectangle()
-                .fill(.ultraThinMaterial) // Basis-Material für den Glas-Effekt
-                .overlay(
-					theme.gradients.titlebar(theme.colors)
-                    .blendMode(theme.chromeBlendMode) // Natürliche Verschmelzung je Modus
-                )
-                .frame(height: theme.metrics.titlebarHeight) // Feste Höhe der macOS Titlebar
-                .ignoresSafeArea(.container, edges: .top) // Füllt denBereich hinter den Buttons
-                .allowsHitTesting(false)
-                // Optional: Eine feine Trennlinie zum Content
-            VStack {
-                Spacer().frame(height: theme.metrics.titlebarHeight)
-                Divider().opacity(theme.effects.titlebarDividerOpacity)
-                Spacer()
-            }
-            .ignoresSafeArea(.container, edges: .top)
-            .allowsHitTesting(false)
-        }
-		.safeAreaInset(edge: .top) {
-			Color.clear.frame(height: theme.metrics.titlebarHeight)
+					// 2. Die eingefärbte Titlebar mit Material und dunklerem Verlauf
+				Rectangle()
+					.fill(.ultraThinMaterial) // Basis-Material für den Glas-Effekt
+					.overlay(
+						theme.gradients.titlebar(theme.colors)
+						.blendMode(theme.chromeBlendMode) // Natürliche Verschmelzung je Modus
+					)
+					.frame(height: theme.metrics.titlebarHeight) // Feste Höhe der macOS Titlebar
+					.ignoresSafeArea(.container, edges: .top) // Füllt denBereich hinter den Buttons
+					.allowsHitTesting(false)
+					// Optional: Eine feine Trennlinie zum Content
+				VStack {
+					Spacer().frame(height: theme.metrics.titlebarHeight)
+					Divider().opacity(theme.effects.titlebarDividerOpacity)
+					Spacer()
+				}
+				.ignoresSafeArea(.container, edges: .top)
+				.allowsHitTesting(false)
+			}
 		}
 		.appTheme(theme)
 		.tint(theme.colors.chromeAccent)
