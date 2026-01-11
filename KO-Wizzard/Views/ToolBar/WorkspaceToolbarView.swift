@@ -156,18 +156,6 @@ struct WorkspaceToolbarView: View {
 			ZStack {
 				HStack(spacing: 18) {
 					topTabButton(
-						title: "Asset Anlage",
-						icon: "doc.badge.plus",
-						isActive: appState.workspaceMode == .instrumentsCreate,
-						isHovered: isCreateHovered
-					) {
-						appState.enterCreateMode()
-					}
-					.onHover { hovering in
-						isCreateHovered = hovering
-					}
-
-					topTabButton(
 						title: "Asset Ansicht",
 						icon: "eye.fill",
 						isActive: appState.workspaceMode == .instrumentsShowAndChange,
@@ -177,6 +165,18 @@ struct WorkspaceToolbarView: View {
 					}
 					.onHover { hovering in
 						isShowHovered = hovering
+					}
+
+					topTabButton(
+						title: "Asset Anlage",
+						icon: "doc.badge.plus",
+						isActive: appState.workspaceMode == .instrumentsCreate,
+						isHovered: isCreateHovered
+					) {
+						appState.enterCreateMode()
+					}
+					.onHover { hovering in
+						isCreateHovered = hovering
 					}
 
 					topTabButton(

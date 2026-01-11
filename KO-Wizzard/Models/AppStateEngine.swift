@@ -152,6 +152,7 @@ final class AppStateEngine: ObservableObject {
 				persistLastSavedInstrumentID(recent.id)
 			}
 		}
+		setInitialCollapseState()
 	}
 
 		// Irgendwo bei den Published Properties
@@ -629,6 +630,45 @@ final class AppStateEngine: ObservableObject {
 			return
 		}
 		isGlobalCollapsed = assetClasses.isSubset(of: collapsedAssetClasses)
+	}
+
+	private func setInitialCollapseState() {
+		let assetClasses = currentAssetClasses()
+		guard let selected = selectedInstrument else {
+			collapsedAssetClasses = assetClasses
+			collapsedSubgroups.removeAll()
+			collapsedDirections.removeAll()
+			recomputeGlobalCollapsedState()
+			return
+		}
+
+		collapsedAssetClasses = assetClasses
+		collapsedAssetClasses.remove(selected.assetClass)
+
+		let subgroupName = (selected.subgroup?.displayName ?? selected.underlyingName)
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+		let allSubgroupKeys = Set(filteredInstruments.map { instrument in
+			let name = (instrument.subgroup?.displayName ?? instrument.underlyingName)
+				.trimmingCharacters(in: .whitespacesAndNewlines)
+			return subgroupKey(assetClass: instrument.assetClass, subgroup: name)
+		})
+		collapsedSubgroups = allSubgroupKeys
+		if !subgroupName.isEmpty {
+			collapsedSubgroups.remove(subgroupKey(assetClass: selected.assetClass, subgroup: subgroupName))
+		}
+
+		let allDirectionKeys = currentDirectionKeys()
+		collapsedDirections = allDirectionKeys
+		if !subgroupName.isEmpty {
+			let selectedKey = DirectionCollapseKey(
+				assetClass: selected.assetClass,
+				subgroup: subgroupName,
+				direction: selected.direction
+			)
+			collapsedDirections.remove(selectedKey)
+		}
+
+		recomputeGlobalCollapsedState()
 	}
 
 		// MARK: - Auswahl
