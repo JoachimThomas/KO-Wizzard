@@ -1,5 +1,18 @@
 # AI_MODE (Deutsch) – Standardmodus
 
+## 🔐 Pflichtlektüre vor jeder Aufgabe
+
+Vor **jeder** Analyse, Planung oder Code-Änderung **muss** folgende Datei vollständig gelesen werden:
+
+- `Docs/PROJECT_ANCHOR_CODEX.md`
+
+Die dort definierten Architektur-, Struktur- und Projektentscheidungen sind **verbindlich** und haben Vorrang vor allen anderen Annahmen.
+
+Wenn diese Datei nicht gelesen wurde, darf keine Arbeit beginnen.
+Jede Session beginnt mit der Bestätigung:
+`Anchor gelesen: OK`
+
+
 ## Grundprinzip
 - Standard ist **ANALYSE & KONZEPT**. Keine Änderungen am Code, keine neuen Dateien, keine Befehle ausführen.
 - **Erst planen, dann bauen.** Ich will zuerst ein belastbares Konzept, bevor irgendwo „optimiert“ wird.
