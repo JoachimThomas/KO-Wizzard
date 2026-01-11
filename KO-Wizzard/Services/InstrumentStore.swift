@@ -103,52 +103,6 @@ final class InstrumentStore: ObservableObject {
 		try data.write(to: fileURL, options: [.atomic])
 	}
 
-		// MARK: - Validation
-
-		/// Basispreis & Aufgeld: nur Ziffern + optionales Komma
-	private func isValidDecimalString(_ value: String, allowEmpty: Bool = false) -> Bool {
-		let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-
-		if trimmed.isEmpty {
-			return allowEmpty ? true : false
-		}
-
-		if trimmed == "0" || trimmed == "0,0" || trimmed == "0,00" {
-			return false
-		}
-
-		let pattern = #"^[0-9]+(,[0-9]+)?$"#
-		return trimmed.range(of: pattern, options: .regularExpression) != nil
-	}
-
-		/// Minimal-Validierung wie gewünscht:
-		/// - Instrument darf nicht komplett leer/0 sein
-		/// - Basispreis: Pflicht, nur Zahlen + Komma
-		/// - Aufgeld: optional, wenn gesetzt → nur Zahlen + Komma
-	func isValid(_ instrument: Instrument) -> Bool {
-
-		let hasSubgroup = (instrument.subgroup != nil)
-
-		let hasIsin = !instrument.isin
-			.trimmingCharacters(in: .whitespacesAndNewlines)
-			.isEmpty
-
-		let hasUnderlying = !instrument.underlyingName
-			.trimmingCharacters(in: .whitespacesAndNewlines)
-			.isEmpty
-
-		let hasCoreData = hasSubgroup || hasIsin || hasUnderlying
-
-		guard hasCoreData else {
-			return false
-		}
-
-		let basisOK = isValidDecimalString(instrument.basispreis, allowEmpty: false)
-		let aufgeldOK = isValidDecimalString(instrument.aufgeld, allowEmpty: true)
-
-		return basisOK && aufgeldOK
-	}
-
 		// MARK: - CRUD
 
 		/// Fügt ein neues Instrument hinzu und gibt dessen ID zurück.
@@ -172,14 +126,6 @@ final class InstrumentStore: ObservableObject {
 
 	func delete(_ instrument: Instrument) {
 		instruments.removeAll { $0.id == instrument.id }
-	}
-
-	func delete(at offsets: IndexSet) {
-		instruments.remove(atOffsets: offsets)
-	}
-
-	func move(from source: IndexSet, to destination: Int) {
-		instruments.move(fromOffsets: source, toOffset: destination)
 	}
 
 		// MARK: - Helper

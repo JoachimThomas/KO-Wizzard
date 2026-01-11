@@ -120,25 +120,4 @@ extension Instrument {
 		Self.parseNumber(aufgeld)
 	}
 
-		/// KO-Distanz in Prozent bezogen auf den Underlying-Kurs
-	func koDistancePercent(underlying: Double?) -> Double? {
-		guard let u = underlying,
-			  let ko = koSchwelleValue,
-			  abs(u) > 1e-12 else { return nil }
-		return abs((u - ko) / u) * 100.0
-	}
-
-		/// Vorschlag für den Anzeigenamen (z.B. in Listen/Sidebar)
-	func suggestedSidebarTitle() -> String {
-		let dir = direction.displayName
-		let bp  = Instrument.compact(basispreisValue)
-
-		if !underlyingName.trimmingCharacters(in: .whitespaces).isEmpty {
-			return "\(underlyingName) \(dir) \(bp)"
-		}
-		if !isin.trimmingCharacters(in: .whitespaces).isEmpty {
-			return "\(isin.uppercased()) \(dir) \(bp)"
-		}
-		return "\(emittent.displayName) \(dir) \(bp)"
-	}
 }

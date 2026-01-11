@@ -59,14 +59,13 @@ struct LandingView: View {
                     isShowHovered = hovering
                 }
 
-                glossyLandingButton(
-                    icon: "function",
-                    isHovered: isCalcHovered
-                ) {
-                    appState.selectedTab = .instruments
-                    appState.workspaceMode = .instrumentCalculation
-                    appState.isLandingVisible = false
-                }
+				glossyLandingButton(
+					icon: "function",
+					isHovered: isCalcHovered
+				) {
+					appState.workspaceMode = .instrumentCalculation
+					appState.isLandingVisible = false
+				}
                 .onHover { hovering in
                     isCalcHovered = hovering
                 }

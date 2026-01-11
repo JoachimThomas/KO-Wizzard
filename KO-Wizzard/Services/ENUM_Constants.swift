@@ -42,17 +42,6 @@ enum AssetClass: String, CaseIterable, Identifiable, Codable {
 		}
 	}
 
-
-
-		/// Vorschläge für Subgroup-Auswahl (Dropdown etc.) – liefert weiterhin Strings,
-		/// basiert intern aber auf dem typisierten Subgroup-Enum.
-	static func subgroups(for asset: AssetClass) -> [String] {
-		subgroupsTyped(for: asset).map { $0.displayName }
-	}
-
-
-
-
 		// tolerantes Decoding
 	init(from decoder: Decoder) throws {
 		let c = try decoder.singleValueContainer()
@@ -329,49 +318,6 @@ enum Emittent: String, CaseIterable, Identifiable, Codable {
 	]
 }
 
-	// MARK: - Broker
-
-enum Broker: String, CaseIterable, Identifiable, Codable {
-	case tradeRepublic
-	case finanzenNetZero
-	case igMarkets
-	case other
-	
-
-	var id: String { rawValue }
-
-	var displayName: String {
-		switch self {
-			case .tradeRepublic:  return "TradeRepublic"
-			case .finanzenNetZero:return "Finanzen.net Zero"
-			case .igMarkets:      return "IG Markets"
-			case .other:          return "Sonstiger Broker"
-
-		}
-	}
-
-	init(from decoder: Decoder) throws {
-		let c = try decoder.singleValueContainer()
-		let raw = try c.decode(String.self)
-		let key = normalizedKey(raw)
-
-		switch key {
-			case "traderepublic", "tr":
-				self = .tradeRepublic
-			case "finanzennetzero", "finanzennet", "fnz", "zero":
-				self = .finanzenNetZero
-			case "ig", "igmarkets", "ig-markets":
-				self = .igMarkets
-			default:
-				self = .other
-		}
-	}
-
-	func encode(to encoder: Encoder) throws {
-		var c = encoder.singleValueContainer()
-		try c.encode(self.rawValue)
-	}
-}
 	// MARK: - Bezugsverhältnis (Ratio)
 
 enum RatioOption: String, CaseIterable, Identifiable, Codable {
@@ -398,4 +344,3 @@ enum RatioOption: String, CaseIterable, Identifiable, Codable {
 		}
 	}
 }
-

@@ -9,18 +9,6 @@ import Combine
 
 final class AppStateEngine: ObservableObject {
 
-		// MARK: - (Legacy) Tabs – aktuell nur noch logisch
-
-	enum RootTab: Hashable {
-		case instruments
-	}
-
-	@Published var selectedTab: RootTab = .instruments
-
-	func selectTab(_ tab: RootTab) {
-		selectedTab = tab
-	}
-
 		// MARK: - Workspace-Modus (Hauptzustände im Workspace)
 
 	enum WorkspaceMode: Hashable {
@@ -76,15 +64,8 @@ final class AppStateEngine: ObservableObject {
 	func startInstrumentCreation() {
 		endEditSessionForNavigation(keepSelection: false)
 		resetDraftInstrument()
-		selectedTab = .instruments
 		workspaceMode = .instrumentsCreate
 		isLandingVisible = false
-	}
-
-	// Landing-Button: "Instrument anzeigen"
-	func showInstrumentList() {
-		endEditSessionForNavigation(keepSelection: false)
-		enterShowAndChangeMode()
 	}
 
 	 func resetDraftInstrument() {
@@ -106,7 +87,6 @@ final class AppStateEngine: ObservableObject {
 	/// → hier: Create-Flow für Instrumente
 	func switchToCalculation() {
 		endEditSessionForNavigation(keepSelection: false)
-		selectedTab = .instruments
 		workspaceMode = .instrumentCalculation
 		isLandingVisible = false
 	}
@@ -252,7 +232,6 @@ final class AppStateEngine: ObservableObject {
 
 		editingTargetID = nil
 		editingReturnStep = nil
-		selectedTab = .instruments
 		workspaceMode = .instrumentsShowAndChange
 		creationStep = .assetClass
 		resetDraftInstrument()
@@ -349,7 +328,6 @@ final class AppStateEngine: ObservableObject {
 		/// - zuletzt gespeichertes Instrument in der Liste markiert lassen
 	func enterCreateMode() {
 		endEditSessionForNavigation(keepSelection: false)
-		selectedTab = .instruments
 		workspaceMode = .instrumentsCreate
 		isLandingVisible = false
 		resetDraftInstrument()
@@ -364,7 +342,6 @@ final class AppStateEngine: ObservableObject {
 		/// - sonst: zuletzt gespeichertes
 		/// - sonst: erstes vorhandenes
 	func enterShowAndChangeMode() {
-		selectedTab = .instruments
 		isLandingVisible = false
 
 		if let recent = mostRecentlyModifiedInstrument() {
