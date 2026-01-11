@@ -136,10 +136,12 @@ struct Metrics {
 
 struct Gradients {
 	func titlebar(_ colors: AppColors) -> LinearGradient {
-		LinearGradient(
+		let topOpacity = colors.mode == .dark ? 0.95 : 0.8
+		let bottomOpacity = colors.mode == .dark ? 0.7 : 0.5
+		return LinearGradient(
 			colors: [
-				colors.chromeAccent.opacity(0.8),
-				colors.chromeAccent.opacity(0.5)
+				colors.chromeAccent.opacity(topOpacity),
+				colors.chromeAccent.opacity(bottomOpacity)
 			],
 			startPoint: .top,
 			endPoint: .bottom
@@ -147,10 +149,12 @@ struct Gradients {
 	}
 
 	func footer(_ colors: AppColors) -> LinearGradient {
-		LinearGradient(
+		let topOpacity = colors.mode == .dark ? 0.65 : 0.5
+		let bottomOpacity = colors.mode == .dark ? 0.95 : 0.8
+		return LinearGradient(
 			colors: [
-				colors.chromeAccent.opacity(0.5),
-				colors.chromeAccent.opacity(0.8)
+				colors.chromeAccent.opacity(topOpacity),
+				colors.chromeAccent.opacity(bottomOpacity)
 			],
 			startPoint: .top,
 			endPoint: .bottom
@@ -207,6 +211,7 @@ struct AppTheme {
 	var metrics: Metrics { Metrics() }
 	var gradients: Gradients { Gradients() }
 	var effects: Effects { Effects() }
+	var chromeBlendMode: BlendMode { mode == .dark ? .screen : .multiply }
 
 	init(mode: ThemeMode = .system) {
 		self.mode = mode

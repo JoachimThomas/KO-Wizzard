@@ -49,7 +49,7 @@ struct WorkspaceBodyView: View {
 
                     // 2. Der spezifische, invertierte Farbverlauf als Overlay
 				theme.gradients.footer(theme.colors)
-					.blendMode(.multiply) // Sorgt für organische Verschmelzung
+					.blendMode(theme.chromeBlendMode) // Sorgt für organische Verschmelzung
             }
 			.allowsHitTesting(false)
         )

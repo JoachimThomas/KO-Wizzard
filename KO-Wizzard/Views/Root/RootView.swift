@@ -34,7 +34,7 @@ struct RootView: View {
                 .fill(.ultraThinMaterial) // Basis-Material für den Glas-Effekt
                 .overlay(
 					theme.gradients.titlebar(theme.colors)
-                    .blendMode(.multiply) // Natürliche Verschmelzung mit dem Material
+                    .blendMode(theme.chromeBlendMode) // Natürliche Verschmelzung je Modus
                 )
                 .frame(height: theme.metrics.titlebarHeight) // Feste Höhe der macOS Titlebar
                 .ignoresSafeArea(.container, edges: .top) // Füllt denBereich hinter den Buttons
@@ -49,6 +49,7 @@ struct RootView: View {
             .allowsHitTesting(false)
         }
 		.appTheme(theme)
+		.tint(theme.colors.chromeAccent)
 #if DEBUG
 		.overlay(alignment: .bottomTrailing) {
 			debugThemeControl
