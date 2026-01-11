@@ -10,17 +10,18 @@ import SwiftUI
 struct SidebarListArea: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 
 	var body: some View {
 		ScrollView {
-			VStack(alignment: .leading, spacing: 10) {
+			VStack(alignment: .leading, spacing: theme.metrics.sidebarListSpacing) {
 
 				ForEach(appState.list.groupedInstruments, id: \.assetClass) { group in
 					let assetClass = group.assetClass
 					let instruments = group.instruments
 
 						// komplette Gruppe pro AssetClass
-					VStack(alignment: .leading, spacing: 4) {
+					VStack(alignment: .leading, spacing: theme.metrics.sidebarGroupSpacing) {
 
 							// AssetClass-Header
 						Button {
@@ -30,13 +31,13 @@ struct SidebarListArea: View {
 									// Punkt zeigt: hier lebt was
 								Circle()
 									.fill(instruments.isEmpty
-										  ? Color.gray.opacity(0.3)
-										  : Color.green.opacity(0.9))
+										  ? theme.colors.sidebarIndicatorEmpty
+										  : theme.colors.sidebarIndicatorActive)
 									.frame(width: 6, height: 6)
 
 								Text(assetClass.displayName)
-									.font(.custom("Menlo", size: 13).weight(.semibold))
-									.foregroundColor(Color.black.opacity(0.88))
+									.font(theme.fonts.sidebarHeader)
+									.foregroundColor(theme.colors.sidebarHeaderText)
 
 								Spacer()
 
@@ -44,10 +45,10 @@ struct SidebarListArea: View {
 									  ? "chevron.right"
 									  : "chevron.down")
 								.font(.system(size: 12, weight: .bold))
-								.foregroundColor(Color.black.opacity(0.65))
+								.foregroundColor(theme.colors.sidebarChevron)
 							}
-							.padding(.horizontal, 10)
-							.padding(.vertical, 6)
+							.padding(.horizontal, theme.metrics.sidebarGroupPaddingH)
+							.padding(.vertical, theme.metrics.sidebarGroupPaddingV)
 						}
 						.buttonStyle(.plain)
 
@@ -83,8 +84,8 @@ struct SidebarListArea: View {
 									} label: {
 										HStack(spacing: 6) {
 											Text(trimmedSubgroup)
-												.font(.custom("Menlo", size: 12))
-												.foregroundColor(Color.black.opacity(0.75))
+												.font(theme.fonts.sidebarSubgroup)
+												.foregroundColor(theme.colors.sidebarSubgroupText)
 
 											Spacer()
 
@@ -93,10 +94,10 @@ struct SidebarListArea: View {
 												subgroup: trimmedSubgroup
 											) ? "chevron.right" : "chevron.down")
 											.font(.system(size: 10, weight: .bold))
-											.foregroundColor(Color.black.opacity(0.55))
+											.foregroundColor(theme.colors.sidebarChevronMuted)
 										}
-										.padding(.horizontal, 16)
-										.padding(.top, 4)
+										.padding(.horizontal, theme.metrics.sidebarSubgroupPaddingH)
+										.padding(.top, theme.metrics.sidebarSubgroupPaddingTop)
 									}
 									.buttonStyle(.plain)
 								}
@@ -119,8 +120,8 @@ struct SidebarListArea: View {
 									} label: {
 										HStack(spacing: 6) {
 											Text("Long")
-												.font(.custom("Menlo", size: 11).weight(.medium))
-												.foregroundColor(Color.black.opacity(0.65))
+												.font(theme.fonts.sidebarDirection)
+												.foregroundColor(theme.colors.sidebarDirectionText)
 
 											Spacer()
 
@@ -130,10 +131,10 @@ struct SidebarListArea: View {
 											direction: .long
 										) ? "chevron.right" : "chevron.down")
 											.font(.system(size: 10, weight: .bold))
-											.foregroundColor(Color.black.opacity(0.55))
+											.foregroundColor(theme.colors.sidebarChevronMuted)
 										}
-										.padding(.horizontal, 18)
-										.padding(.top, 4)
+										.padding(.horizontal, theme.metrics.sidebarDirectionPaddingH)
+										.padding(.top, theme.metrics.sidebarDirectionPaddingTop)
 									}
 									.buttonStyle(.plain)
 
@@ -163,8 +164,8 @@ struct SidebarListArea: View {
 									} label: {
 										HStack(spacing: 6) {
 											Text("Short")
-												.font(.custom("Menlo", size: 11).weight(.medium))
-												.foregroundColor(Color.black.opacity(0.65))
+												.font(theme.fonts.sidebarDirection)
+												.foregroundColor(theme.colors.sidebarDirectionText)
 
 											Spacer()
 
@@ -174,10 +175,10 @@ struct SidebarListArea: View {
 											direction: .short
 										) ? "chevron.right" : "chevron.down")
 											.font(.system(size: 10, weight: .bold))
-											.foregroundColor(Color.black.opacity(0.55))
+											.foregroundColor(theme.colors.sidebarChevronMuted)
 										}
-										.padding(.horizontal, 18)
-										.padding(.top, 6)
+										.padding(.horizontal, theme.metrics.sidebarDirectionPaddingH)
+										.padding(.top, theme.metrics.sidebarDirectionPaddingTopAlt)
 									}
 									.buttonStyle(.plain)
 
@@ -203,7 +204,7 @@ struct SidebarListArea: View {
 
 				Spacer(minLength: 12)
 			}
-			.padding(.vertical, 8)
+			.padding(.vertical, theme.metrics.sidebarFooterPaddingV)
 			.frame(maxWidth: .infinity, alignment: .leading)
 		}
 		.scrollIndicators(.never)

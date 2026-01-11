@@ -23,6 +23,15 @@ struct AppColors {
 	var sidebarSelection: Color { Color.black.opacity(0.08) }
 	var sidebarSearchBackground: Color { Color.white.opacity(0.08) }
 	var sidebarText: Color { Color.black.opacity(0.88) }
+	var sidebarHeaderText: Color { Color.black.opacity(0.88) }
+	var sidebarSubgroupText: Color { Color.black.opacity(0.75) }
+	var sidebarDirectionText: Color { Color.black.opacity(0.65) }
+	var sidebarChevron: Color { Color.black.opacity(0.65) }
+	var sidebarChevronMuted: Color { Color.black.opacity(0.55) }
+	var sidebarIndicatorEmpty: Color { Color.gray.opacity(0.3) }
+	var sidebarIndicatorActive: Color { Color.green.opacity(0.9) }
+	var sidebarIndicatorFavorite: Color { .yellow }
+	var sidebarIndicatorRecent: Color { .red }
 	var divider: Color { Color.primary.opacity(0.2) }
 	var strokeLight: Color { Color.white.opacity(0.18) }
 	var highlightLight: Color { Color.white.opacity(0.2) }
@@ -41,6 +50,9 @@ struct AppFonts {
 	var footerSmall: Font { .custom("Menlo", size: 11) }
 	var toolbarIcon: Font { .system(size: 12, weight: .semibold) }
 	var toolbarTab: Font { .subheadline.weight(.semibold) }
+	var sidebarHeader: Font { .custom("Menlo", size: 13).weight(.semibold) }
+	var sidebarSubgroup: Font { .custom("Menlo", size: 12) }
+	var sidebarDirection: Font { .custom("Menlo", size: 11).weight(.medium) }
 }
 
 struct Metrics {
@@ -59,6 +71,16 @@ struct Metrics {
 	var sidebarSearchPaddingH: CGFloat { 8 }
 	var sidebarSearchPaddingTop: CGFloat { 8 }
 	var sidebarSearchPaddingBottom: CGFloat { 6 }
+	var sidebarListSpacing: CGFloat { 10 }
+	var sidebarGroupSpacing: CGFloat { 4 }
+	var sidebarGroupPaddingH: CGFloat { 10 }
+	var sidebarGroupPaddingV: CGFloat { 6 }
+	var sidebarSubgroupPaddingH: CGFloat { 16 }
+	var sidebarSubgroupPaddingTop: CGFloat { 4 }
+	var sidebarDirectionPaddingH: CGFloat { 18 }
+	var sidebarDirectionPaddingTop: CGFloat { 4 }
+	var sidebarDirectionPaddingTopAlt: CGFloat { 6 }
+	var sidebarFooterPaddingV: CGFloat { 8 }
 	var toolbarTabCornerRadius: CGFloat { 10 }
 	var toolbarTabPaddingH: CGFloat { 10 }
 	var toolbarTabPaddingV: CGFloat { 6 }

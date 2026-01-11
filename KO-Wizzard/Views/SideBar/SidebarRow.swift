@@ -22,13 +22,15 @@ struct SidebarRow: View {
 			HStack(spacing: 8) {
 
 				Circle()
-					.fill(instrument.isFavorite ? Color.yellow : Color.green)
+					.fill(instrument.isFavorite
+						? theme.colors.sidebarIndicatorFavorite
+						: theme.colors.sidebarIndicatorActive)
 					.frame(width: 6, height: 6)
 					.overlay(
 						Group {
 							if instrument.id == appState.lastSavedInstrumentID {
 								Circle()
-									.fill(Color.red)
+									.fill(theme.colors.sidebarIndicatorRecent)
 									.frame(width: 8, height: 8)
 							}
 						}
