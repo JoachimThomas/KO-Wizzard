@@ -10,6 +10,7 @@ import SwiftUI
 struct SidebarRow: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 
 	let instrument: Instrument
 	let isSelected: Bool
@@ -35,18 +36,18 @@ struct SidebarRow: View {
 
 				Text(displayTitle)
 					.font(.custom("Menlo", size: 14).weight(isSelected ? .semibold : .regular))
-					.foregroundColor(Color.black.opacity(0.88))
+					.foregroundColor(theme.colors.sidebarText)
 					.lineLimit(1)
 
 				Spacer(minLength: 0)
 			}
-			.padding(.horizontal, 18)
-			.padding(.vertical, 6)
+			.padding(.horizontal, theme.metrics.sidebarRowPaddingH)
+			.padding(.vertical, theme.metrics.sidebarRowPaddingV)
 			.background(
 				Group {
 					if isSelected {
-						RoundedRectangle(cornerRadius: 6)
-							.fill(Color.white.opacity(0.10))
+						RoundedRectangle(cornerRadius: theme.metrics.sidebarRowCornerRadius)
+							.fill(theme.colors.sidebarSelection)
 					} else {
 						Color.clear
 					}

@@ -20,7 +20,9 @@ struct AppColors {
 	var textPrimary: Color { .primary }
 	var textSecondary: Color { .secondary }
 	var cardBackground: Color { Color.secondary.opacity(0.05) }
-	var sidebarSelection: Color { Color.gray.opacity(0.12) }
+	var sidebarSelection: Color { Color.white.opacity(0.10) }
+	var sidebarSearchBackground: Color { Color.white.opacity(0.08) }
+	var sidebarText: Color { Color.black.opacity(0.88) }
 	var divider: Color { Color.primary.opacity(0.2) }
 	var strokeLight: Color { Color.white.opacity(0.18) }
 	var highlightLight: Color { Color.white.opacity(0.2) }
@@ -46,6 +48,15 @@ struct Metrics {
 	var sheetCornerRadius: CGFloat { 8 }
 	var toolbarHeight: CGFloat { 48 }
 	var sidebarWidth: CGFloat { 300 }
+	var sidebarRowCornerRadius: CGFloat { 6 }
+	var sidebarRowPaddingH: CGFloat { 18 }
+	var sidebarRowPaddingV: CGFloat { 6 }
+	var sidebarSearchCornerRadius: CGFloat { 6 }
+	var sidebarSearchHeight: CGFloat { 30 }
+	var sidebarSearchIconSize: CGFloat { 11 }
+	var sidebarSearchPaddingH: CGFloat { 8 }
+	var sidebarSearchPaddingTop: CGFloat { 8 }
+	var sidebarSearchPaddingBottom: CGFloat { 6 }
 	var paddingSmall: CGFloat { 8 }
 	var paddingMedium: CGFloat { 12 }
 	var paddingLarge: CGFloat { 16 }
