@@ -24,24 +24,17 @@ struct InstrumentCalcView: View {
 	@State private var lastCopiedLabel: String?
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 12) {
-
-			Text(headerTitle)
-				.font(theme.fonts.headline)
-				.fontWeight(.bold)
-				.contentEmphasis()
-				.padding(.bottom, 4)
+		VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
+			titleCard("Asset-Kursberechnungen")
 
 			if let instrument = instrument {
-				detailCard(for: instrument)
-				calculationCard()
+				mainCard(for: instrument)
 			} else {
 				emptyState
 			}
 
-		Spacer(minLength: 0)
-	}
-		.padding(.vertical, 16)
+			Spacer(minLength: 0)
+		}
 		.font(theme.fonts.body)
 		.sheet(isPresented: $showUnderlyingInput) {
 			ValueInputSheet(
@@ -75,23 +68,20 @@ struct InstrumentCalcView: View {
 		}
 	}
 
-		// MARK: - Header
-
-	private var headerTitle: String {
-		switch mode {
-			case .instrumentsCreate:
-				return "Instrument – Vorschau"
-			case .instrumentsShowAndChange:
-				return "Instrument – Details"
-			case .instrumentCalculation:
-				return "Instrument – Berechnung"
-		}
+	private func titleCard(_ title: String) -> some View {
+		Text(title)
+			.font(theme.fonts.headline)
+			.fontWeight(.bold)
+			.contentEmphasis()
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(theme.metrics.paddingLarge)
+			.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
 	}
 
 	// MARK: - Detail-Card
 
 	@ViewBuilder
-	private func detailCard(for i: Instrument) -> some View {
+	private func detailContent(for i: Instrument) -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 
 				// Name nur Anzeige, nicht direkt editierbar
@@ -139,14 +129,12 @@ struct InstrumentCalcView: View {
 						i.isFavorite ? "★ Ja" : "– Nein",
 						step: .favorite)
 		}
-		.padding(theme.metrics.paddingLarge)
-		.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
 	}
 
 		// MARK: - Calculation Card
 
 	@ViewBuilder
-	private func calculationCard() -> some View {
+	private func calculationContent() -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 			calculationRow(
 				label: "Underlying",
@@ -163,6 +151,14 @@ struct InstrumentCalcView: View {
 			) {
 				showCertificateInput = true
 			}
+		}
+	}
+
+	private func mainCard(for instrument: Instrument) -> some View {
+		VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
+			detailContent(for: instrument)
+			Divider()
+			calculationContent()
 		}
 		.padding(theme.metrics.paddingLarge)
 		.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)

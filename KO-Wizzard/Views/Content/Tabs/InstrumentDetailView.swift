@@ -12,48 +12,40 @@ struct InstrumentDetailView: View {
 
 	let mode: NavigationController.WorkspaceMode
 	let instrument: Instrument?
+	let showsCard: Bool
+	let usesInternalPadding: Bool
+
+	init(
+		mode: NavigationController.WorkspaceMode,
+		instrument: Instrument?,
+		showsCard: Bool = true,
+		usesInternalPadding: Bool = true
+	) {
+		self.mode = mode
+		self.instrument = instrument
+		self.showsCard = showsCard
+		self.usesInternalPadding = usesInternalPadding
+	}
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
-
-			Text(headerTitle)
-				.font(theme.fonts.headline)
-				.fontWeight(.bold)
-				.contentEmphasis()
-				.padding(.bottom, 4)
-				.padding(.leading, mode == .instrumentsCreate ? 20 : 0)
-
 			if let instrument = instrument {
 				detailCard(for: instrument)
 			} else {
 				emptyState
 			}
-
-		Spacer(minLength: 0)
-	}
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.padding(.vertical, mode == .instrumentsShowAndChange ? 16 : 0)
-		.font(theme.fonts.body)
-	}
-
-		// MARK: - Header
-
-	private var headerTitle: String {
-		switch mode {
-			case .instrumentsCreate:
-				return "Instrument – Vorschau"
-			case .instrumentsShowAndChange:
-				return "Instrument – Details"
-			case .instrumentCalculation:
-				return "Instrument – Berechnung"
+			Spacer(minLength: 0)
 		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.font(theme.fonts.body)
 	}
 
 		// MARK: - Detail-Card
 
 	@ViewBuilder
 	private func detailCard(for i: Instrument) -> some View {
-		VStack(alignment: .leading, spacing: 10) {
+		let contentPadding = usesInternalPadding ? theme.metrics.paddingLarge : 0
+		let content = VStack(alignment: .leading, spacing: 10) {
 
 				// Name nur Anzeige, nicht direkt editierbar
 			staticRow("Name", i.name)
@@ -100,9 +92,15 @@ struct InstrumentDetailView: View {
 						i.isFavorite ? "★ Ja" : "– Nein",
 						step: .favorite)
 		}
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(theme.metrics.paddingLarge)
-		.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(contentPadding)
+
+		if showsCard {
+			content
+				.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
+		} else {
+			content
+		}
 	}
 
 		// MARK: - Rows

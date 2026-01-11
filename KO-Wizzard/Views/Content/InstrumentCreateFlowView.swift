@@ -17,6 +17,9 @@ struct InstrumentCreateFlowView: View {
 	@EnvironmentObject var appState: AppStateEngine
 	@Environment(\.appTheme) private var theme
 
+	let showsCard: Bool
+	let usesInternalPadding: Bool
+
 		// Welches Eingabe-Sheet ist aktiv?
 	@State private var activeSheet: SheetType?
 
@@ -36,6 +39,11 @@ struct InstrumentCreateFlowView: View {
 
 	@State private var importState: ImportState = .idle
 	@State private var importedRawText: String = ""
+
+	init(showsCard: Bool = true, usesInternalPadding: Bool = true) {
+		self.showsCard = showsCard
+		self.usesInternalPadding = usesInternalPadding
+	}
 
 	enum SheetType: Identifiable {
 		case stockName
@@ -58,66 +66,46 @@ struct InstrumentCreateFlowView: View {
 	}
 
 	var body: some View {
-		ZStack {
-			VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
-
-				HStack {
-					Text("Neueingabe – Schritt für Schritt")
-						.font(theme.fonts.headline)
-						.fontWeight(.bold)
-						.contentEmphasis()
-
-					Spacer()
-
-					Button {
-						handleImportButtonTap()
-					} label: {
-						Label(importButtonTitle, systemImage: "arrow.down.doc")
-							.font(theme.fonts.importButton)
-							.contentEmphasis()
-					}
-					.buttonStyle(.bordered)
-				}
-
-				Divider()
-
-				switch appState.draft.creationStep {
-
-					case .assetClass:
-						assetClassStep
-
-					case .subgroup:
-						subgroupStep
-
-					case .emittent:
-						emittentStep
-
-					case .direction:
-						directionStep
-
-					case .isin:
-						isinStep
-
-					case .basispreis:
-						basispreisStep
-
-					case .bezugsverhaeltnis:
-						ratioStep
-
-					case .aufgeld:
-						aufgeldStep
-
-					case .favorite:
-						favoriteStep
-
-					case .done:
-						doneStep
-				}
+		let contentPadding = usesInternalPadding ? theme.metrics.spacingLarge : 0
+		let content = VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
+			switch appState.draft.creationStep {
+				case .assetClass:
+					assetClassStep
+				case .subgroup:
+					subgroupStep
+				case .emittent:
+					emittentStep
+				case .direction:
+					directionStep
+				case .isin:
+					isinStep
+				case .basispreis:
+					basispreisStep
+				case .bezugsverhaeltnis:
+					ratioStep
+				case .aufgeld:
+					aufgeldStep
+				case .favorite:
+					favoriteStep
+				case .done:
+					doneStep
 			}
-			.padding(theme.metrics.spacingLarge)
+			HStack {
+				Spacer()
+				importButton
+			}
 		}
-        .frame(maxWidth: .infinity, alignment: .leading) 
-		.workspaceGradientBackground(cornerRadius: theme.metrics.panelCornerRadius)
+		.padding(contentPadding)
+
+		Group {
+			if showsCard {
+				content
+					.workspaceGradientBackground(cornerRadius: theme.metrics.panelCornerRadius)
+			} else {
+				content
+			}
+		}
+        .frame(maxWidth: .infinity, alignment: .leading)
 		.font(theme.fonts.body)
 		.onAppear {
 			appState.ensureAllowedEditStepIfNeeded()
@@ -150,6 +138,18 @@ struct InstrumentCreateFlowView: View {
 				}
 			}
 		}
+	}
+
+	private var importButton: some View {
+		Button {
+			handleImportButtonTap()
+		} label: {
+			Label(importButtonTitle, systemImage: "arrow.down.doc")
+				.font(theme.fonts.importButton)
+				.contentEmphasis()
+		}
+		.buttonStyle(.bordered)
+		.help("Komplett-Import eines Assets")
 	}
 
 		// MARK: - Edit vs Normal Flow

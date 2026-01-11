@@ -19,11 +19,14 @@ struct ContentRouterView: View {
 			case .instrumentsCreate:
 				InstrumentCreateView()
 
-				case .instrumentsShowAndChange:
+			case .instrumentsShowAndChange:
+				VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
+					titleCard("Asset-Details")
 					InstrumentDetailView(
 						mode: .instrumentsShowAndChange,
 						instrument: appState.selectedInstrument
 					)
+				}
 				case .instrumentCalculation:
 					InstrumentCalcView(
 						instrument: appState.selectedInstrument
@@ -33,5 +36,15 @@ struct ContentRouterView: View {
 		}
 		.font(theme.fonts.body)
 		.padding(.horizontal, theme.metrics.contentPaddingH)
+	}
+
+	private func titleCard(_ title: String) -> some View {
+		Text(title)
+			.font(theme.fonts.headline)
+			.fontWeight(.bold)
+			.contentEmphasis()
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(theme.metrics.paddingLarge)
+			.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
 	}
 }
