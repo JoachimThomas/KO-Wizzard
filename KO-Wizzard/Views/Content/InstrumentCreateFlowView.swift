@@ -15,6 +15,7 @@ import AppKit
 struct InstrumentCreateFlowView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 
 		// Welches Eingabe-Sheet ist aktiv?
 	@State private var activeSheet: SheetType?
@@ -58,7 +59,7 @@ struct InstrumentCreateFlowView: View {
 
 	var body: some View {
 		ZStack {
-			VStack(alignment: .leading, spacing: 20) {
+			VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
 
 				HStack {
 					Text("Neueingabe – Schritt für Schritt")
@@ -113,10 +114,10 @@ struct InstrumentCreateFlowView: View {
 						doneStep
 				}
 			}
-			.padding(20)
+			.padding(theme.metrics.spacingLarge)
 		}
         .frame(maxWidth: .infinity, alignment: .leading) 
-		.workspaceGradientBackground(cornerRadius: 16)
+		.workspaceGradientBackground(cornerRadius: theme.metrics.panelCornerRadius)
 		.font(.menlo(textStyle: .body))
 		.onAppear {
 			appState.ensureAllowedEditStepIfNeeded()
@@ -217,7 +218,8 @@ struct InstrumentCreateFlowView: View {
 					title: "Aktienname",
 					value: name.isEmpty
 					? "Noch kein Aktienname eingegeben"
-					: name
+					: name,
+					theme: theme
 				) {
 					activeSheet = .stockName
 				}
@@ -251,9 +253,9 @@ struct InstrumentCreateFlowView: View {
 						Image(systemName: "chevron.down")
 							.foregroundColor(.secondary)
 					}
-					.padding(8)
-					.background(Color.secondary.opacity(0.08))
-					.cornerRadius(8)
+					.padding(theme.metrics.paddingSmall)
+					.background(theme.colors.inputBackground)
+					.cornerRadius(theme.metrics.sheetCornerRadius)
 				}
 				.onAppear {
 					if isEditing {
@@ -326,7 +328,8 @@ struct InstrumentCreateFlowView: View {
 					title: "isin",
 					value: appState.draft.draftInstrument.isin.isEmpty
 					? "Noch keine Isin eingegeben"
-					: appState.draft.draftInstrument.isin
+					: appState.draft.draftInstrument.isin,
+					theme: theme
 				) {
 					activeSheet = .isin
 				}
@@ -362,7 +365,8 @@ struct InstrumentCreateFlowView: View {
 				title: "Basispreis",
 				value: appState.draft.draftInstrument.basispreis.isEmpty
 				? "Noch kein Basispreis eingegeben"
-				: appState.draft.draftInstrument.basispreis
+				: appState.draft.draftInstrument.basispreis,
+				theme: theme
 			) {
 				activeSheet = .basispreis
 			}
@@ -470,7 +474,8 @@ struct InstrumentCreateFlowView: View {
 					title: "Aufgeld",
 					value: appState.draft.draftInstrument.aufgeld.isEmpty
 					? "Noch kein Aufgeld eingegeben"
-					: appState.draft.draftInstrument.aufgeld
+					: appState.draft.draftInstrument.aufgeld,
+					theme: theme
 				) {
 					activeSheet = .aufgeld
 				}

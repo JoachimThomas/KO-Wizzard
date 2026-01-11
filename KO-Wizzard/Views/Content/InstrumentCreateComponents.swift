@@ -65,7 +65,12 @@ func pickerStep<T: Hashable>(
 }
 
 	/// Standardisierter Button für Sheet-basierte Eingaben
-func sheetInputButton(title: String, value: String, action: @escaping () -> Void) -> some View {
+func sheetInputButton(
+	title: String,
+	value: String,
+	theme: AppTheme,
+	action: @escaping () -> Void
+) -> some View {
 	Button(action: action) {
 		HStack {
 			Text(title)
@@ -73,8 +78,8 @@ func sheetInputButton(title: String, value: String, action: @escaping () -> Void
 			Text(value.isEmpty ? "–" : value)
 				.foregroundColor(.secondary)
 		}
-		.padding(8)
-		.background(Color.secondary.opacity(0.08))
-		.cornerRadius(8)
+		.padding(theme.metrics.paddingSmall)
+		.background(theme.colors.inputBackground)
+		.cornerRadius(theme.metrics.sheetCornerRadius)
 	}
 }

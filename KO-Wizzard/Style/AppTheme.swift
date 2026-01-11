@@ -25,6 +25,7 @@ struct AppColors {
 	var strokeLight: Color { Color.white.opacity(0.18) }
 	var highlightLight: Color { Color.white.opacity(0.2) }
 	var footerText: Color { .white }
+	var inputBackground: Color { Color.secondary.opacity(0.08) }
 }
 
 struct AppFonts {
@@ -41,6 +42,7 @@ struct AppFonts {
 
 struct Metrics {
 	var cardCornerRadius: CGFloat { 14 }
+	var panelCornerRadius: CGFloat { 16 }
 	var sheetCornerRadius: CGFloat { 8 }
 	var toolbarHeight: CGFloat { 48 }
 	var sidebarWidth: CGFloat { 300 }
