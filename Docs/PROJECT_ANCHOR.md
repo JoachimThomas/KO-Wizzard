@@ -32,3 +32,17 @@ Die App ist funktional vollständig und stabil.
 - Jeder Schritt: Commit + Push
 - Erst Analyse → dann Umsetzung
 - Keine „kreativen Abkürzungen“
+
+### Letzter Stand
+
+• Überblick
+
+  - Neue Controller-Schicht: KO-Wizzard/Controllers/NavigationController.swift, KO-Wizzard/Controllers/
+    InstrumentDraftController.swift, KO-Wizzard/Controllers/InstrumentListController.swift, KO-Wizzard/Controllers/
+    SidebarCollapseController.swift.
+  - AppStateEngine als Orchestrator: KO-Wizzard/Models/AppStateEngine.swift hält jetzt die Sub‑Controller und forwardet
+    objectWillChange.
+  - Views umgestellt: alle Zugriffe auf Navigation/Draft/List/Collapse laufen nun über appState.navigation, appState.draft,
+    appState.list, appState.collapse.
+  - Build: xcodebuild -project KO-Wizzard.xcodeproj -scheme KO-Wizzard -configuration Debug -destination 'platform=macOS'
+    build erfolgreich.
