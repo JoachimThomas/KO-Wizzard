@@ -25,6 +25,7 @@ struct AppColors {
 
 	var primaryBlue: Color { Color(red: 0.0, green: 0.48, blue: 1.0) }
 	var accentOrange: Color { Color(red: 1.0, green: 0.62, blue: 0.04) }
+	var chromeAccent: Color { resolve(light: primaryBlue, dark: accentOrange) }
 	var actionBlue: Color { resolve(light: .blue, dark: .blue) }
 	var alertRed: Color { .red }
 	var alertRedMuted: Color { resolve(light: Color.red.opacity(0.8), dark: Color.red.opacity(0.8)) }
@@ -64,7 +65,7 @@ struct AppColors {
 		resolve(light: Color.secondary.opacity(0.08), dark: Color.white.opacity(0.1))
 	}
 	var toolbarTabActiveBackground: Color {
-		resolve(light: Color.accentColor.opacity(0.12), dark: Color.accentColor.opacity(0.25))
+		resolve(light: Color.accentColor.opacity(0.12), dark: accentOrange.opacity(0.25))
 	}
 	var toolbarIconForeground: Color { resolve(light: .white, dark: .white) }
 }
@@ -137,8 +138,8 @@ struct Gradients {
 	func titlebar(_ colors: AppColors) -> LinearGradient {
 		LinearGradient(
 			colors: [
-				colors.primaryBlue.opacity(0.8),
-				colors.primaryBlue.opacity(0.5)
+				colors.chromeAccent.opacity(0.8),
+				colors.chromeAccent.opacity(0.5)
 			],
 			startPoint: .top,
 			endPoint: .bottom
@@ -148,8 +149,8 @@ struct Gradients {
 	func footer(_ colors: AppColors) -> LinearGradient {
 		LinearGradient(
 			colors: [
-				colors.primaryBlue.opacity(0.5),
-				colors.primaryBlue.opacity(0.8)
+				colors.chromeAccent.opacity(0.5),
+				colors.chromeAccent.opacity(0.8)
 			],
 			startPoint: .top,
 			endPoint: .bottom
@@ -158,7 +159,7 @@ struct Gradients {
 
 	func toolbarIcon(_ colors: AppColors) -> LinearGradient {
 		LinearGradient(
-			colors: [colors.primaryBlue.opacity(0.9), colors.primaryBlue.opacity(0.6)],
+			colors: [colors.chromeAccent.opacity(0.9), colors.chromeAccent.opacity(0.6)],
 			startPoint: .topLeading,
 			endPoint: .bottomTrailing
 		)
@@ -175,7 +176,7 @@ struct Gradients {
 
 	func landingButton(_ colors: AppColors) -> LinearGradient {
 		LinearGradient(
-			colors: [colors.primaryBlue.opacity(0.95), colors.primaryBlue.opacity(0.65)],
+			colors: [colors.chromeAccent.opacity(0.95), colors.chromeAccent.opacity(0.65)],
 			startPoint: .topLeading,
 			endPoint: .bottomTrailing
 		)

@@ -243,8 +243,8 @@ struct WorkspaceToolbarView: View {
 						.fill(
 							LinearGradient(
 								colors: [
-									theme.colors.primaryBlue.opacity(0.9),
-									theme.colors.primaryBlue.opacity(0.55)
+									theme.colors.chromeAccent.opacity(0.9),
+									theme.colors.chromeAccent.opacity(0.55)
 								],
 								startPoint: .topLeading,
 								endPoint: .bottomTrailing
