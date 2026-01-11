@@ -31,6 +31,11 @@ struct SidebarView: View {
 		.frame(width: 280)
 		.frame(maxHeight: .infinity, alignment: .top)
 		.workspaceGradientBackground()
+		.clipShape(RoundedRectangle(cornerRadius: theme.metrics.panelCornerRadius))
+		.overlay(
+			RoundedRectangle(cornerRadius: theme.metrics.panelCornerRadius)
+				.stroke(theme.colors.strokeLight, lineWidth: 1)
+		)
 	}
 
 		// MARK: - Suche

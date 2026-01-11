@@ -74,8 +74,10 @@ struct InstrumentCalcView: View {
 			.fontWeight(.bold)
 			.contentEmphasis()
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding(theme.metrics.paddingLarge)
+			.padding(.horizontal, theme.metrics.paddingLarge)
+			.frame(height: theme.metrics.sidebarSearchHeight)
 			.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
+			.padding(.top, theme.metrics.sidebarSearchPaddingTop)
 	}
 
 	// MARK: - Detail-Card

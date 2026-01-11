@@ -90,10 +90,6 @@ struct InstrumentCreateFlowView: View {
 				case .done:
 					doneStep
 			}
-			HStack {
-				Spacer()
-				importButton
-			}
 		}
 		.padding(contentPadding)
 
@@ -152,6 +148,16 @@ struct InstrumentCreateFlowView: View {
 		.help("Komplett-Import eines Assets")
 	}
 
+	private func stepRowWithImport<Content: View>(
+		@ViewBuilder content: () -> Content
+	) -> some View {
+		HStack(alignment: .bottom, spacing: theme.metrics.spacingMedium) {
+			content()
+				.frame(maxWidth: .infinity, alignment: .leading)
+			importButton
+		}
+	}
+
 		// MARK: - Edit vs Normal Flow
 
 	private var isEditing: Bool {
@@ -172,32 +178,34 @@ struct InstrumentCreateFlowView: View {
 
 	@ViewBuilder
 	private var assetClassStep: some View {
-		pickerStep(
-			title: "1. Assetklasse wählen",
-			values: AssetClass.allCases.map { ($0, $0.displayName) },
-			selected: nil,
-			onSelect: { value in
-				appState.updateDraft { draft in
-					draft.assetClass = value
-					draft.subgroup = nil          // vorher: ""
-					draft.underlyingName = ""     // bleibt String, wird später aus Subgroup gesetzt
-					
-					if value == .igBarrier {
-						draft.emittent = .igMarkets
-						draft.isin = ""
-						draft.bezugsverhaeltnis = ""
-						draft.aufgeld = "0"
-					} else {
-						draft.emittent = .none
-						draft.isin = ""
-						draft.bezugsverhaeltnis = ""
-						draft.aufgeld = ""
+		stepRowWithImport {
+			pickerStep(
+				title: "1. Assetklasse wählen",
+				values: AssetClass.allCases.map { ($0, $0.displayName) },
+				selected: nil,
+				onSelect: { value in
+					appState.updateDraft { draft in
+						draft.assetClass = value
+						draft.subgroup = nil          // vorher: ""
+						draft.underlyingName = ""     // bleibt String, wird später aus Subgroup gesetzt
+						
+						if value == .igBarrier {
+							draft.emittent = .igMarkets
+							draft.isin = ""
+							draft.bezugsverhaeltnis = ""
+							draft.aufgeld = "0"
+						} else {
+							draft.emittent = .none
+							draft.isin = ""
+							draft.bezugsverhaeltnis = ""
+							draft.aufgeld = ""
+						}
 					}
+					
+					goNextOrReturn(default: .subgroup)
 				}
-				
-				goNextOrReturn(default: .subgroup)
-			}
-		)
+			)
+		}
 	}
 
 	@ViewBuilder
@@ -235,32 +243,34 @@ struct InstrumentCreateFlowView: View {
 		} else {
 
 				// *** NEU: Subgroup per Sheet statt Picker ***
-			VStack(alignment: .leading, spacing: 12) {
-				Text("2. Subgroup wählen")
-					.font(theme.fonts.subheadline)
-					.foregroundColor(theme.colors.textSecondary)
-				
-				let subgroupName = appState.draft.draftInstrument.subgroup?.displayName ?? ""
-				
-				Button {
-					showSubgroupSheet = true
-				} label: {
-					HStack {
-						Text(subgroupName.isEmpty
-							 ? "Noch keine Subgroup gewählt"
-							 : subgroupName)
-						Spacer()
-						Image(systemName: "chevron.down")
-							.foregroundColor(theme.colors.textSecondary)
+			stepRowWithImport {
+				VStack(alignment: .leading, spacing: 12) {
+					Text("2. Subgroup wählen")
+						.font(theme.fonts.subheadline)
+						.foregroundColor(theme.colors.textSecondary)
+					
+					let subgroupName = appState.draft.draftInstrument.subgroup?.displayName ?? ""
+					
+					Button {
+						showSubgroupSheet = true
+					} label: {
+						HStack {
+							Text(subgroupName.isEmpty
+								 ? "Noch keine Subgroup gewählt"
+								 : subgroupName)
+							Spacer()
+							Image(systemName: "chevron.down")
+								.foregroundColor(theme.colors.textSecondary)
+						}
+						.padding(theme.metrics.paddingSmall)
+						.background(theme.colors.inputBackground)
+						.cornerRadius(theme.metrics.sheetCornerRadius)
 					}
-					.padding(theme.metrics.paddingSmall)
-					.background(theme.colors.inputBackground)
-					.cornerRadius(theme.metrics.sheetCornerRadius)
-				}
-				.onAppear {
-					if isEditing {
-						DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-							showSubgroupSheet = true
+					.onAppear {
+						if isEditing {
+							DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+								showSubgroupSheet = true
+							}
 						}
 					}
 				}
