@@ -20,7 +20,7 @@ struct AppColors {
 	var textPrimary: Color { .primary }
 	var textSecondary: Color { .secondary }
 	var cardBackground: Color { Color.secondary.opacity(0.05) }
-	var sidebarSelection: Color { Color.white.opacity(0.10) }
+	var sidebarSelection: Color { Color.black.opacity(0.08) }
 	var sidebarSearchBackground: Color { Color.white.opacity(0.08) }
 	var sidebarText: Color { Color.black.opacity(0.88) }
 	var divider: Color { Color.primary.opacity(0.2) }
