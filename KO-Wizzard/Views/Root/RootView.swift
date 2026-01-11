@@ -50,6 +50,12 @@ struct RootView: View {
 				.ignoresSafeArea(.container, edges: .top)
 				.allowsHitTesting(false)
 			}
+			.overlay(
+				Rectangle()
+					.stroke(theme.colors.windowBorder, lineWidth: theme.metrics.windowBorderWidth)
+					.ignoresSafeArea()
+					.allowsHitTesting(false)
+			)
 		}
 		.appTheme(theme)
 		.tint(theme.colors.chromeAccent)

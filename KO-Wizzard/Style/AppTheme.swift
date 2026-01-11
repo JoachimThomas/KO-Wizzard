@@ -61,6 +61,9 @@ struct AppColors {
 	var divider: Color { resolve(light: Color.primary.opacity(0.2), dark: Color.white.opacity(0.2)) }
 	var strokeLight: Color { resolve(light: Color.white.opacity(0.18), dark: Color.white.opacity(0.16)) }
 	var highlightLight: Color { resolve(light: Color.white.opacity(0.2), dark: Color.white.opacity(0.2)) }
+	var windowBorder: Color {
+		resolve(light: Color.black.opacity(0.08), dark: Color.white.opacity(0.15))
+	}
 	var footerText: Color { resolve(light: .white, dark: .white) }
 	var inputBackground: Color {
 		resolve(light: Color.secondary.opacity(0.08), dark: Color.white.opacity(0.1))
@@ -122,6 +125,7 @@ struct Metrics {
 	var toolbarTabPaddingV: CGFloat { 6 }
 	var toolbarTabIconSize: CGFloat { 13 }
 	var toolbarTabIconCircle: CGFloat { 26 }
+	var windowBorderWidth: CGFloat { 1 }
 	var paddingSmall: CGFloat { 8 }
 	var paddingMedium: CGFloat { 12 }
 	var paddingLarge: CGFloat { 16 }
