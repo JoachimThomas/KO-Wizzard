@@ -32,19 +32,19 @@ struct AppColors {
 	var textPrimary: Color { resolve(light: .primary, dark: .primary) }
 	var textSecondary: Color { resolve(light: .secondary, dark: .secondary) }
 	var cardBackground: Color {
-		resolve(light: Color.secondary.opacity(0.05), dark: Color.white.opacity(0.06))
-	}
-	var workspaceGradientTop: Color {
-		resolve(light: Color.secondary.opacity(0.03), dark: Color.white.opacity(0.03))
-	}
-	var workspaceGradientBottom: Color {
 		resolve(light: Color.secondary.opacity(0.05), dark: Color.white.opacity(0.05))
 	}
+	var workspaceGradientTop: Color {
+		resolve(light: Color.secondary.opacity(0.03), dark: Color(red: 0.10, green: 0.11, blue: 0.12))
+	}
+	var workspaceGradientBottom: Color {
+		resolve(light: Color.secondary.opacity(0.05), dark: Color(red: 0.07, green: 0.08, blue: 0.09))
+	}
 	var sidebarSelection: Color {
-		resolve(light: Color.black.opacity(0.08), dark: Color.white.opacity(0.08))
+		resolve(light: Color.black.opacity(0.08), dark: Color.black.opacity(0.35))
 	}
 	var sidebarSearchBackground: Color {
-		resolve(light: Color.white.opacity(0.08), dark: Color.white.opacity(0.06))
+		resolve(light: Color.white.opacity(0.08), dark: Color.white.opacity(0.1))
 	}
 	var sidebarText: Color { resolve(light: Color.black.opacity(0.88), dark: Color.white.opacity(0.9)) }
 	var sidebarHeaderText: Color { resolve(light: Color.black.opacity(0.88), dark: Color.white.opacity(0.9)) }
@@ -57,14 +57,14 @@ struct AppColors {
 	var sidebarIndicatorFavorite: Color { resolve(light: .yellow, dark: .yellow) }
 	var sidebarIndicatorRecent: Color { resolve(light: .red, dark: .red) }
 	var divider: Color { resolve(light: Color.primary.opacity(0.2), dark: Color.white.opacity(0.2)) }
-	var strokeLight: Color { resolve(light: Color.white.opacity(0.18), dark: Color.white.opacity(0.2)) }
-	var highlightLight: Color { resolve(light: Color.white.opacity(0.2), dark: Color.white.opacity(0.25)) }
+	var strokeLight: Color { resolve(light: Color.white.opacity(0.18), dark: Color.white.opacity(0.16)) }
+	var highlightLight: Color { resolve(light: Color.white.opacity(0.2), dark: Color.white.opacity(0.2)) }
 	var footerText: Color { resolve(light: .white, dark: .white) }
 	var inputBackground: Color {
-		resolve(light: Color.secondary.opacity(0.08), dark: Color.white.opacity(0.08))
+		resolve(light: Color.secondary.opacity(0.08), dark: Color.white.opacity(0.1))
 	}
 	var toolbarTabActiveBackground: Color {
-		resolve(light: Color.accentColor.opacity(0.12), dark: Color.accentColor.opacity(0.2))
+		resolve(light: Color.accentColor.opacity(0.12), dark: Color.accentColor.opacity(0.25))
 	}
 	var toolbarIconForeground: Color { resolve(light: .white, dark: .white) }
 }
