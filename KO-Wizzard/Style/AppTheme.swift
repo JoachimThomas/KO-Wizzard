@@ -49,7 +49,7 @@ struct Metrics {
 }
 
 struct Gradients {
-	var titlebar(_ colors: AppColors) -> LinearGradient {
+	func titlebar(_ colors: AppColors) -> LinearGradient {
 		LinearGradient(
 			colors: [
 				colors.primaryBlue.opacity(0.8),
@@ -60,7 +60,7 @@ struct Gradients {
 		)
 	}
 
-	var footer(_ colors: AppColors) -> LinearGradient {
+	func footer(_ colors: AppColors) -> LinearGradient {
 		LinearGradient(
 			colors: [
 				colors.primaryBlue.opacity(0.5),
@@ -71,7 +71,7 @@ struct Gradients {
 		)
 	}
 
-	var toolbarIcon(_ colors: AppColors) -> LinearGradient {
+	func toolbarIcon(_ colors: AppColors) -> LinearGradient {
 		LinearGradient(
 			colors: [colors.primaryBlue.opacity(0.9), colors.primaryBlue.opacity(0.6)],
 			startPoint: .topLeading,
@@ -79,7 +79,7 @@ struct Gradients {
 		)
 	}
 
-	var landingButton(_ colors: AppColors) -> LinearGradient {
+	func landingButton(_ colors: AppColors) -> LinearGradient {
 		LinearGradient(
 			colors: [colors.primaryBlue.opacity(0.95), colors.primaryBlue.opacity(0.65)],
 			startPoint: .topLeading,

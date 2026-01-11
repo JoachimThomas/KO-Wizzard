@@ -35,7 +35,7 @@ struct AppTitlebarOverlayStyle: ViewModifier {
 
 	func body(content: Content) -> some View {
 		content
-			.fill(.ultraThinMaterial)
+			.background(.ultraThinMaterial)
 			.overlay(
 				theme.gradients.titlebar(theme.colors)
 					.blendMode(.multiply)
