@@ -153,13 +153,73 @@ und darf **niemals** versuchen:
 
 ---
 
-## 🧾 Standard-Output bei Meilenstein-Abschluss
+## 🧾 ProjectSummary bei „Meilenstein erledigt“ (verbindlich)
 
-Wenn ich schreibe: **„Meilenstein erledigt“**, muss Codex immer ausgeben:
+Wenn ich exakt schreibe: **„Meilenstein erledigt“**, dann muss Codex IMMER folgendes tun — in genau dieser Reihenfolge:
 
-- `git status` (soll clean sein)  
-- letzter Commit-Hash: `git rev-parse --short HEAD`  
-- **exakten Terminalbefehl**, den **ICH** zum Pushen ausführe
+### 1) Anchor lesen
+- `Docs/PROJECT_ANCHOR_CODEX.md` vollständig lesen.
+- Danach bestätigen: `Anchor gelesen: OK`
+
+### 2) Projektstand erfassen (nur lesen/analysieren)
+Codex erstellt eine ProjectSummary, die den **aktuellen Stand nach diesem Meilenstein** so beschreibt, dass ein späteres Lesen des Anchors sofort Klarheit gibt.
+Dazu darf Codex repo-lokal lesen (keine Remote-Operationen).
+
+### 3) Summary an Anchor anhängen
+Codex hängt die Summary **als neuen Abschnitt am Ende** von `Docs/PROJECT_ANCHOR_CODEX.md` an.
+Format (zwingend):
+
+#### ✅ Milestone Summary — YYYY-MM-DD HH:MM (Local)
+- **Branch:** <branch>
+- **Commit:** <short-hash>
+- **Tag (optional):** <tagname oder "—">
+- **Status:** Build green / App runs / git status clean
+
+##### Scope (was war das Ziel?)
+- 1–3 Sätze: Problem/Ziel dieses Meilensteins.
+
+##### Changes (was wurde geändert?)
+- Bullet-Liste der wichtigsten Änderungen (max. 8–12 Punkte).
+- Fokus: Verhalten/Features/UX, nicht „ich habe Code umsortiert“.
+
+##### Files touched (Whitelist / Überblick)
+- Liste aller geänderten Dateien (kurz, pfadgenau).
+- Optional: neue Dateien + gelöschte Dateien separat nennen.
+
+##### Architecture impact (nur wenn relevant)
+- Was hat sich an Struktur/Controller/State/Flow geändert?
+- Welche Komponenten sind jetzt „Source of Truth“?
+
+##### Behavior / UX notes
+- Was sieht der Nutzer jetzt konkret anders?
+- Wichtige Defaults: Startmodus, Auswahlverhalten, Sidebar-Collapse-Startzustand, etc.
+
+##### Known limitations / TODO (max 5)
+- Nur echte offene Punkte, keine Wunschliste.
+
+##### Verification (zwingend)
+- Build/Run: wie geprüft?
+  - z.B. „Xcode Build succeeded“ oder „xcodebuild ... build ok“
+- Kurzer Sanity-Check: 2–4 Stichpunkte, was getestet wurde.
+
+### 4) Git-Abschlussblock (lokal, ohne Rückfragen)
+Nur wenn Build grün und keine offenen Fragen:
+1) `git status`
+2) `git add -A`
+3) `git commit -m "<präzise Message (DE)>"` (ohne push)
+4) `git status` (muss clean sein)
+
+### 5) Abschlussausgabe im Chat (zwingend)
+Codex gibt am Ende immer aus:
+- `git status` Ergebnis (clean)
+- `git rev-parse --short HEAD`
+- Exakter Push-Befehl für mich (nur anzeigen, nicht ausführen), z.B.:
+  `git push --set-upstream origin <branch>`
+
+### Regeln
+- Keine Remote-Write-Operationen (kein push/gh).
+- Keine weiteren Codeänderungen während der Summary-Phase.
+- Wenn `Docs/PROJECT_ANCHOR_CODEX.md` nicht schreibbar ist: STOP und melden.
 
 ---
 

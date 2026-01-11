@@ -37,7 +37,7 @@ struct SidebarRow: View {
 					)
 
 				Text(displayTitle)
-					.font(.custom("Menlo", size: 14).weight(isSelected ? .semibold : .regular))
+					.font(theme.fonts.sidebarRow.weight(isSelected ? .semibold : .regular))
 					.foregroundColor(theme.colors.sidebarText)
 					.lineLimit(1)
 

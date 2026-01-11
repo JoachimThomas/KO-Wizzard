@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentRouterView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 
 	var body: some View {
 		Group {
@@ -30,7 +31,7 @@ struct ContentRouterView: View {
 
 			}
 		}
-		.font(.menlo(textStyle: .body))
-		.padding(.horizontal, 18)
+		.font(theme.fonts.body)
+		.padding(.horizontal, theme.metrics.contentPaddingH)
 	}
 }

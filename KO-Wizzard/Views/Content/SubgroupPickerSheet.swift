@@ -7,15 +7,16 @@ struct SubgroupPickerSheet: View {
 	let onSelect: (Subgroup) -> Void
 
 	@Environment(\.dismiss) private var dismiss
+	@Environment(\.appTheme) private var theme
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 12) {
+		VStack(alignment: .leading, spacing: theme.metrics.paddingMedium) {
 			Text("Subgroup wählen")
-				.font(.menlo(textStyle: .headline))
-				.padding(.top, 12)
+				.font(theme.fonts.headline)
+				.padding(.top, theme.metrics.paddingMedium)
 
 			ScrollView {
-				VStack(alignment: .leading, spacing: 8) {
+				VStack(alignment: .leading, spacing: theme.metrics.paddingSmall) {
 					ForEach(subgroups) { item in
 						let isSelected = (item == current)
 
@@ -30,12 +31,12 @@ struct SubgroupPickerSheet: View {
 									Image(systemName: "checkmark")
 								}
 							}
-							.padding(.vertical, 4)
+							.padding(.vertical, theme.metrics.paddingXSmall)
 						}
 						.buttonStyle(.plain)
 					}
 				}
-				.padding(.vertical, 8)
+				.padding(.vertical, theme.metrics.paddingSmall)
 			}
 
 			Divider()
@@ -46,10 +47,10 @@ struct SubgroupPickerSheet: View {
 					dismiss()
 				}
 			}
-			.padding(.bottom, 10)
+			.padding(.bottom, theme.metrics.paddingTight)
 		}
-		.padding(.horizontal, 16)
-		.frame(minWidth: 320, minHeight: 380)
-		.font(.menlo(textStyle: .body))
+		.padding(.horizontal, theme.metrics.paddingLarge)
+		.frame(minWidth: theme.metrics.sheetMinWidth, minHeight: theme.metrics.sheetMinHeight)
+		.font(theme.fonts.body)
 	}
 }

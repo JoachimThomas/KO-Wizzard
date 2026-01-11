@@ -20,6 +20,8 @@ struct AppColors {
 	var textPrimary: Color { .primary }
 	var textSecondary: Color { .secondary }
 	var cardBackground: Color { Color.secondary.opacity(0.05) }
+	var workspaceGradientTop: Color { Color.secondary.opacity(0.03) }
+	var workspaceGradientBottom: Color { Color.secondary.opacity(0.05) }
 	var sidebarSelection: Color { Color.black.opacity(0.08) }
 	var sidebarSearchBackground: Color { Color.white.opacity(0.08) }
 	var sidebarText: Color { Color.black.opacity(0.88) }
@@ -50,6 +52,8 @@ struct AppFonts {
 	var footerSmall: Font { .custom("Menlo", size: 11) }
 	var toolbarIcon: Font { .system(size: 12, weight: .semibold) }
 	var toolbarTab: Font { .subheadline.weight(.semibold) }
+	var importButton: Font { .custom("Menlo", size: 12).weight(.medium) }
+	var sidebarRow: Font { .custom("Menlo", size: 14) }
 	var sidebarHeader: Font { .custom("Menlo", size: 13).weight(.semibold) }
 	var sidebarSubgroup: Font { .custom("Menlo", size: 12) }
 	var sidebarDirection: Font { .custom("Menlo", size: 11).weight(.medium) }
@@ -89,6 +93,11 @@ struct Metrics {
 	var paddingSmall: CGFloat { 8 }
 	var paddingMedium: CGFloat { 12 }
 	var paddingLarge: CGFloat { 16 }
+	var paddingXSmall: CGFloat { 4 }
+	var paddingTight: CGFloat { 10 }
+	var contentPaddingH: CGFloat { 18 }
+	var sheetMinWidth: CGFloat { 320 }
+	var sheetMinHeight: CGFloat { 380 }
 	var spacingSmall: CGFloat { 8 }
 	var spacingMedium: CGFloat { 12 }
 	var spacingLarge: CGFloat { 20 }

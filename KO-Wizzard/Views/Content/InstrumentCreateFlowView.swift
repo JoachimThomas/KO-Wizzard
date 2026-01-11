@@ -73,7 +73,7 @@ struct InstrumentCreateFlowView: View {
 						handleImportButtonTap()
 					} label: {
 						Label(importButtonTitle, systemImage: "arrow.down.doc")
-							.font(.custom("Menlo", size: 12).weight(.medium))
+							.font(theme.fonts.importButton)
 							.contentEmphasis()
 					}
 					.buttonStyle(.bordered)

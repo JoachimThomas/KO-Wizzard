@@ -33,6 +33,7 @@ private enum WorkspaceGradient {
 
 private struct WorkspaceGradientBackground: ViewModifier {
 	@Environment(\.workspaceSize) private var workspaceSize
+	@Environment(\.appTheme) private var theme
 	let cornerRadius: CGFloat?
 
 	func body(content: Content) -> some View {
@@ -44,7 +45,10 @@ private struct WorkspaceGradientBackground: ViewModifier {
 				let endY = (height - frame.minY) / max(height, 1)
 
 				let gradient = LinearGradient(
-					colors: WorkspaceGradient.colors,
+					colors: [
+						theme.colors.workspaceGradientTop,
+						theme.colors.workspaceGradientBottom
+					],
 					startPoint: UnitPoint(x: 0.5, y: startY),
 					endPoint: UnitPoint(x: 0.5, y: endY)
 				)
