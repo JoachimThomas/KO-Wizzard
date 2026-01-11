@@ -9,7 +9,7 @@ struct InstrumentDetailView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
 
-	let mode: AppStateEngine.WorkspaceMode
+	let mode: NavigationController.WorkspaceMode
 	let instrument: Instrument?
 
 	var body: some View {
@@ -125,7 +125,7 @@ struct InstrumentDetailView: View {
 	private func editableRow(
 		_ label: String,
 		_ value: String,
-		step: AppStateEngine.InstrumentCreationStep,
+		step: InstrumentDraftController.InstrumentCreationStep,
 		emphasis: ContentEmphasisKind = .standard
 	) -> some View {
 		HStack {

@@ -57,7 +57,7 @@ struct SidebarRow: View {
 	}
 
 	private var displayTitle: String {
-		let title = appState.instrumentListTitle(for: instrument)
+		let title = appState.list.instrumentListTitle(for: instrument)
 		return title.isEmpty ? instrument.name : title
 	}
 }

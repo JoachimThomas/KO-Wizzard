@@ -15,7 +15,7 @@ struct SidebarListArea: View {
 		ScrollView {
 			VStack(alignment: .leading, spacing: 10) {
 
-				ForEach(appState.groupedInstruments, id: \.assetClass) { group in
+				ForEach(appState.list.groupedInstruments, id: \.assetClass) { group in
 					let assetClass = group.assetClass
 					let instruments = group.instruments
 
@@ -24,7 +24,7 @@ struct SidebarListArea: View {
 
 							// AssetClass-Header
 						Button {
-							appState.toggleAssetClass(assetClass)
+							appState.collapse.toggleAssetClass(assetClass)
 						} label: {
 							HStack(spacing: 8) {
 									// Punkt zeigt: hier lebt was
@@ -40,7 +40,7 @@ struct SidebarListArea: View {
 
 								Spacer()
 
-								Image(systemName: appState.isAssetClassCollapsed(assetClass)
+								Image(systemName: appState.collapse.isAssetClassCollapsed(assetClass)
 									  ? "chevron.right"
 									  : "chevron.down")
 								.font(.system(size: 12, weight: .bold))
@@ -52,7 +52,7 @@ struct SidebarListArea: View {
 						.buttonStyle(.plain)
 
 							// Inhalte: nur wenn NICHT eingeklappt
-						if !appState.isAssetClassCollapsed(assetClass) {
+						if !appState.collapse.isAssetClassCollapsed(assetClass) {
 
 								// nach Subgroup / Underlying gruppieren
 							let subgroupNames: [String] = Array(
@@ -76,7 +76,7 @@ struct SidebarListArea: View {
 
 								if !trimmedSubgroup.isEmpty {
 									Button {
-										appState.toggleSubgroup(
+										appState.collapse.toggleSubgroup(
 											assetClass: assetClass,
 											subgroup: trimmedSubgroup
 										)
@@ -88,7 +88,7 @@ struct SidebarListArea: View {
 
 											Spacer()
 
-											Image(systemName: appState.isSubgroupCollapsed(
+											Image(systemName: appState.collapse.isSubgroupCollapsed(
 												assetClass: assetClass,
 												subgroup: trimmedSubgroup
 											) ? "chevron.right" : "chevron.down")
@@ -102,7 +102,7 @@ struct SidebarListArea: View {
 								}
 
 								let isSubgroupCollapsed = !trimmedSubgroup.isEmpty
-									&& appState.isSubgroupCollapsed(assetClass: assetClass, subgroup: trimmedSubgroup)
+									&& appState.collapse.isSubgroupCollapsed(assetClass: assetClass, subgroup: trimmedSubgroup)
 
 								if !isSubgroupCollapsed {
 									let longs  = inSub.filter { $0.direction == .long }
@@ -111,7 +111,7 @@ struct SidebarListArea: View {
 									// LONG-Block
 									if !longs.isEmpty {
 									Button {
-										appState.toggleDirection(
+										appState.collapse.toggleDirection(
 											assetClass: assetClass,
 											subgroup: trimmedSubgroup,
 											direction: .long
@@ -124,7 +124,7 @@ struct SidebarListArea: View {
 
 											Spacer()
 
-										Image(systemName: appState.isDirectionCollapsed(
+										Image(systemName: appState.collapse.isDirectionCollapsed(
 											assetClass: assetClass,
 											subgroup: trimmedSubgroup,
 											direction: .long
@@ -137,7 +137,7 @@ struct SidebarListArea: View {
 									}
 									.buttonStyle(.plain)
 
-									if !appState.isDirectionCollapsed(
+									if !appState.collapse.isDirectionCollapsed(
 										assetClass: assetClass,
 										subgroup: trimmedSubgroup,
 										direction: .long
@@ -155,7 +155,7 @@ struct SidebarListArea: View {
 									// SHORT-Block
 									if !shorts.isEmpty {
 									Button {
-										appState.toggleDirection(
+										appState.collapse.toggleDirection(
 											assetClass: assetClass,
 											subgroup: trimmedSubgroup,
 											direction: .short
@@ -168,7 +168,7 @@ struct SidebarListArea: View {
 
 											Spacer()
 
-										Image(systemName: appState.isDirectionCollapsed(
+										Image(systemName: appState.collapse.isDirectionCollapsed(
 											assetClass: assetClass,
 											subgroup: trimmedSubgroup,
 											direction: .short
@@ -181,7 +181,7 @@ struct SidebarListArea: View {
 									}
 									.buttonStyle(.plain)
 
-									if !appState.isDirectionCollapsed(
+									if !appState.collapse.isDirectionCollapsed(
 										assetClass: assetClass,
 										subgroup: trimmedSubgroup,
 										direction: .short

@@ -14,7 +14,7 @@ struct RootView: View {
         ZStack(alignment: .top) {
                 // 1. Der eigentliche Content der App
             Group {
-                if appState.isLandingVisible {
+                if appState.navigation.isLandingVisible {
                     LandingView()
                 } else {
                     WorkspaceView()

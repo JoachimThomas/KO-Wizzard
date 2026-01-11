@@ -13,7 +13,7 @@ struct ContentRouterView: View {
 
 	var body: some View {
 		Group {
-			switch appState.workspaceMode {
+			switch appState.navigation.workspaceMode {
 
 			case .instrumentsCreate:
 				InstrumentCreateView()

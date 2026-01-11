@@ -35,8 +35,8 @@ struct WorkspaceToolbarView: View {
 
 					//Alle Ansicht
 				Button {
-					appState.showFavoritesOnly = false
-					appState.showRecentOnly = false
+					appState.list.showFavoritesOnly = false
+					appState.list.showRecentOnly = false
 				} label: {
 					toolbarIcon(systemName: "chart.line.uptrend.xyaxis", isHovered: isAllHovered)
 				}
@@ -50,10 +50,10 @@ struct WorkspaceToolbarView: View {
 
 				// Favoriten-Ansicht
 				Button {
-					appState.showFavoritesOnly.toggle()
+					appState.list.showFavoritesOnly.toggle()
 				} label: {
 					toolbarIcon(
-						systemName: appState.showFavoritesOnly ? "star.fill" : "star",
+						systemName: appState.list.showFavoritesOnly ? "star.fill" : "star",
 						isHovered: isFavoritesHovered
 					)
 				}
@@ -66,11 +66,11 @@ struct WorkspaceToolbarView: View {
 				}
 					// Verlauf, die letzten 10
 				Button {
-					if appState.showRecentOnly {
-						appState.showRecentOnly = false
+					if appState.list.showRecentOnly {
+						appState.list.showRecentOnly = false
 					} else {
-						appState.showFavoritesOnly = false
-						appState.showRecentOnly = true
+						appState.list.showFavoritesOnly = false
+						appState.list.showRecentOnly = true
 					}
 				} label: {
 					toolbarIcon(systemName: "clock", isHovered: isRecentHovered)
@@ -85,17 +85,17 @@ struct WorkspaceToolbarView: View {
 
 					// Assetklassen Zuklappen / Aufklappen
 				Button {
-					appState.setGlobalCollapsed(!appState.isGlobalCollapsed)
+					appState.collapse.setGlobalCollapsed(!appState.collapse.isGlobalCollapsed)
 				} label: {
 					toolbarIcon(
-						systemName: appState.isGlobalCollapsed ? "book" : "book.closed",
+						systemName: appState.collapse.isGlobalCollapsed ? "book" : "book.closed",
 						isHovered: isCollapseHovered
 					)
 				}
 				.buttonStyle(ToolbarIconStyle())
 				.focusable(false)
 				.focusEffectDisabled(true)
-				.help(appState.isGlobalCollapsed ? "Alle Assetklassen expandieren" : "Alle Assetklassen einklappen")
+				.help(appState.collapse.isGlobalCollapsed ? "Alle Assetklassen expandieren" : "Alle Assetklassen einklappen")
 				.onHover { hovering in
 					isCollapseHovered = hovering
 				}
@@ -158,7 +158,7 @@ struct WorkspaceToolbarView: View {
 					topTabButton(
 						title: "Asset Ansicht",
 						icon: "eye.fill",
-						isActive: appState.workspaceMode == .instrumentsShowAndChange,
+						isActive: appState.navigation.workspaceMode == .instrumentsShowAndChange,
 						isHovered: isShowHovered
 					) {
 						appState.switchToInstruments()
@@ -170,7 +170,7 @@ struct WorkspaceToolbarView: View {
 					topTabButton(
 						title: "Asset Anlage",
 						icon: "doc.badge.plus",
-						isActive: appState.workspaceMode == .instrumentsCreate,
+						isActive: appState.navigation.workspaceMode == .instrumentsCreate,
 						isHovered: isCreateHovered
 					) {
 						appState.enterCreateMode()
@@ -182,7 +182,7 @@ struct WorkspaceToolbarView: View {
 					topTabButton(
 						title: "Asset Berechnen",
 						icon: "function",
-						isActive: appState.workspaceMode == .instrumentCalculation,
+						isActive: appState.navigation.workspaceMode == .instrumentCalculation,
 						isHovered: isCalcHovered
 					) {
 						appState.switchToCalculation()

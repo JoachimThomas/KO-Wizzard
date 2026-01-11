@@ -17,7 +17,7 @@ struct InstrumentCreateView: View {
 				.environmentObject(appState)
 			InstrumentDetailView(
 				mode: .instrumentsCreate,
-				instrument: appState.draftInstrument
+				instrument: appState.draft.draftInstrument
 			)
 			.environmentObject(appState)
 		}

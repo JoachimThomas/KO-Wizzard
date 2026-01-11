@@ -31,7 +31,7 @@ struct WorkspaceBodyView: View {
     private let appBlue = Color(red: 0.0, green: 0.48, blue: 1.0)
 
 	private var footer: some View {
-		let isEditing = appState.isEditingExistingInstrument
+		let isEditing = appState.draft.isEditingExistingInstrument
 
 		return HStack {
 			Text("Wizard – \(appState.instrumentStore.instrumentCount) Assets geladen")
@@ -66,7 +66,7 @@ struct WorkspaceBodyView: View {
 
 
 	private var modeLabel: String {
-		switch appState.workspaceMode {
+		switch appState.navigation.workspaceMode {
 			case .instrumentsCreate:
 				return "Asset anlegen"
 			case .instrumentsShowAndChange:

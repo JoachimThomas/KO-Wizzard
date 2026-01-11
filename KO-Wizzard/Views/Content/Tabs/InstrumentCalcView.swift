@@ -10,7 +10,7 @@ struct InstrumentCalcView: View {
 	@EnvironmentObject var appState: AppStateEngine
 
 	let instrument: Instrument?
-	private let mode: AppStateEngine.WorkspaceMode = .instrumentCalculation
+	private let mode: NavigationController.WorkspaceMode = .instrumentCalculation
 	@State private var showUnderlyingInput: Bool = false
 	@State private var showCertificateInput: Bool = false
 	@State private var underlyingValue: String = "—"
@@ -182,7 +182,7 @@ struct InstrumentCalcView: View {
 	private func editableRow(
 		_ label: String,
 		_ value: String,
-		step: AppStateEngine.InstrumentCreationStep,
+		step: InstrumentDraftController.InstrumentCreationStep,
 		emphasis: ContentEmphasisKind = .standard
 	) -> some View {
 		HStack {

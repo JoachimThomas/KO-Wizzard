@@ -44,15 +44,15 @@ struct SidebarView: View {
 					.font(.system(size: 11))
 					.opacity(0.7)
 
-				TextField("Suche (Subgroup, isin, Richtung …)", text: $appState.searchText)
+				TextField("Suche (Subgroup, isin, Richtung …)", text: $appState.list.searchText)
 					.textFieldStyle(.plain)
 					.foregroundColor(.primary)
 					.font(.custom("Menlo", size: 12))
 					.focused($searchIsFocused)
 
-				if !appState.searchText.isEmpty {
+				if !appState.list.searchText.isEmpty {
 					Button {
-						appState.searchText = ""
+						appState.list.searchText = ""
 					} label: {
 						Image(systemName: "xmark.circle.fill")
 							.font(.system(size: 11))

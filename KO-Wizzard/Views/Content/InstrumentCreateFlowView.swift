@@ -80,7 +80,7 @@ struct InstrumentCreateFlowView: View {
 
 				Divider()
 
-				switch appState.creationStep {
+				switch appState.draft.creationStep {
 
 					case .assetClass:
 						assetClassStep
@@ -121,7 +121,7 @@ struct InstrumentCreateFlowView: View {
 		.onAppear {
 			appState.ensureAllowedEditStepIfNeeded()
 		}
-		.onChange(of: appState.creationStep) { _, _ in
+		.onChange(of: appState.draft.creationStep) { _, _ in
 			appState.ensureAllowedEditStepIfNeeded()
 		}
 		.onAppear {
@@ -133,7 +133,7 @@ struct InstrumentCreateFlowView: View {
 		.sheet(isPresented: $showSubgroupSheet) {
 			SubgroupPickerSheet(
 				subgroups: appState.draftSubgroups,               // [Subgroup]
-				current: appState.draftInstrument.subgroup        // Subgroup?
+				current: appState.draft.draftInstrument.subgroup        // Subgroup?
 			) { selected in                                      // Subgroup
 				appState.updateDraft { draft in
 					draft.subgroup = selected
@@ -142,10 +142,10 @@ struct InstrumentCreateFlowView: View {
 
 				if isEditing {
 					appState.finishEditingStepIfNeeded()
-				} else if appState.draftInstrument.assetClass == .igBarrier {
-					appState.creationStep = .direction
+				} else if appState.draft.draftInstrument.assetClass == .igBarrier {
+					appState.draft.creationStep = .direction
 				} else {
-					appState.creationStep = .emittent
+					appState.draft.creationStep = .emittent
 				}
 			}
 		}
@@ -154,16 +154,16 @@ struct InstrumentCreateFlowView: View {
 		// MARK: - Edit vs Normal Flow
 
 	private var isEditing: Bool {
-		appState.editingReturnStep != nil
+		appState.draft.editingReturnStep != nil
 	}
 
 	private func goNextOrReturn(
-		default next: AppStateEngine.InstrumentCreationStep
+		default next: InstrumentDraftController.InstrumentCreationStep
 	) {
 		if isEditing {
 			appState.finishEditingStepIfNeeded()
 		} else {
-			appState.creationStep = next
+			appState.draft.creationStep = next
 		}
 	}
 
@@ -202,7 +202,7 @@ struct InstrumentCreateFlowView: View {
 	@ViewBuilder
 	private var subgroupStep: some View {
 
-		if appState.draftInstrument.assetClass == .aktie {
+		if appState.draft.draftInstrument.assetClass == .aktie {
 
 			VStack(alignment: .leading, spacing: 12) {
 				Text("2. Aktienname eingeben")
@@ -210,7 +210,7 @@ struct InstrumentCreateFlowView: View {
 					.foregroundColor(.secondary)
 
 					// Der frei eingegebene Name steckt jetzt ausschließlich in underlyingName
-				let name = appState.draftInstrument.underlyingName
+				let name = appState.draft.draftInstrument.underlyingName
 					.trimmingCharacters(in: .whitespaces)
 
 				sheetInputButton(
@@ -238,7 +238,7 @@ struct InstrumentCreateFlowView: View {
 					.font(.menlo(textStyle: .subheadline))
 					.foregroundColor(.secondary)
 				
-				let subgroupName = appState.draftInstrument.subgroup?.displayName ?? ""
+				let subgroupName = appState.draft.draftInstrument.subgroup?.displayName ?? ""
 				
 				Button {
 					showSubgroupSheet = true
@@ -268,7 +268,7 @@ struct InstrumentCreateFlowView: View {
 
 	@ViewBuilder
 	private var emittentStep: some View {
-		if appState.draftInstrument.assetClass == .igBarrier {
+		if appState.draft.draftInstrument.assetClass == .igBarrier {
 			EmptyView()
 		} else {
 			pickerStep(
@@ -301,12 +301,12 @@ struct InstrumentCreateFlowView: View {
 
 				if isEditing {
 					appState.finishEditingStepIfNeeded()
-				} else if appState.draftInstrument.assetClass == .igBarrier {
-					appState.creationStep = .basispreis
+				} else if appState.draft.draftInstrument.assetClass == .igBarrier {
+					appState.draft.creationStep = .basispreis
 				} else if appState.draftNeedsisin {
-					appState.creationStep = .isin
+					appState.draft.creationStep = .isin
 				} else {
-					appState.creationStep = .basispreis
+					appState.draft.creationStep = .basispreis
 				}
 			}
 		)
@@ -314,7 +314,7 @@ struct InstrumentCreateFlowView: View {
 
 	@ViewBuilder
 	private var isinStep: some View {
-		if appState.draftInstrument.assetClass == .igBarrier {
+		if appState.draft.draftInstrument.assetClass == .igBarrier {
 			EmptyView()
 		} else {
 			VStack(alignment: .leading, spacing: 12) {
@@ -324,9 +324,9 @@ struct InstrumentCreateFlowView: View {
 
 				sheetInputButton(
 					title: "isin",
-					value: appState.draftInstrument.isin.isEmpty
+					value: appState.draft.draftInstrument.isin.isEmpty
 					? "Noch keine Isin eingegeben"
-					: appState.draftInstrument.isin
+					: appState.draft.draftInstrument.isin
 				) {
 					activeSheet = .isin
 				}
@@ -344,7 +344,7 @@ struct InstrumentCreateFlowView: View {
 	@ViewBuilder
 	private var basispreisStep: some View {
 		let titleText: String = {
-			if appState.draftInstrument.assetClass == .igBarrier {
+			if appState.draft.draftInstrument.assetClass == .igBarrier {
 				return "5. Basispreis eingeben"
 			} else if appState.draftNeedsisin {
 				return "6. Basispreis eingeben"
@@ -360,9 +360,9 @@ struct InstrumentCreateFlowView: View {
 
 			sheetInputButton(
 				title: "Basispreis",
-				value: appState.draftInstrument.basispreis.isEmpty
+				value: appState.draft.draftInstrument.basispreis.isEmpty
 				? "Noch kein Basispreis eingegeben"
-				: appState.draftInstrument.basispreis
+				: appState.draft.draftInstrument.basispreis
 			) {
 				activeSheet = .basispreis
 			}
@@ -378,7 +378,7 @@ struct InstrumentCreateFlowView: View {
 
 	@ViewBuilder
 	private var ratioStep: some View {
-		if appState.draftInstrument.assetClass == .igBarrier {
+		if appState.draft.draftInstrument.assetClass == .igBarrier {
 			EmptyView()
 		} else {
 			VStack(alignment: .leading, spacing: 12) {
@@ -415,7 +415,7 @@ struct InstrumentCreateFlowView: View {
 					HStack {
 						Spacer()
 						Button("Übernehmen") {
-							let currentValue = appState.draftInstrument.bezugsverhaeltnis
+							let currentValue = appState.draft.draftInstrument.bezugsverhaeltnis
 								.trimmingCharacters(in: .whitespacesAndNewlines)
 
 							if localRatio == .custom && currentValue.isEmpty {
@@ -439,14 +439,14 @@ struct InstrumentCreateFlowView: View {
 				}
 			}
 			.onAppear {
-				localRatio = ratioOptionForValue(appState.draftInstrument.bezugsverhaeltnis)
+				localRatio = ratioOptionForValue(appState.draft.draftInstrument.bezugsverhaeltnis)
 			}
 		}
 	}
 
 	@ViewBuilder
 	private var aufgeldStep: some View {
-		if appState.draftInstrument.assetClass == .igBarrier {
+		if appState.draft.draftInstrument.assetClass == .igBarrier {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("Aufgeld wird für IG-Barrier automatisch auf 0 gesetzt.")
 					.font(.menlo(textStyle: .subheadline))
@@ -468,9 +468,9 @@ struct InstrumentCreateFlowView: View {
 
 				sheetInputButton(
 					title: "Aufgeld",
-					value: appState.draftInstrument.aufgeld.isEmpty
+					value: appState.draft.draftInstrument.aufgeld.isEmpty
 					? "Noch kein Aufgeld eingegeben"
-					: appState.draftInstrument.aufgeld
+					: appState.draft.draftInstrument.aufgeld
 				) {
 					activeSheet = .aufgeld
 				}
@@ -492,7 +492,7 @@ struct InstrumentCreateFlowView: View {
 				.foregroundColor(.secondary)
 
 			Toggle("Favorit", isOn: Binding(
-				get: { appState.draftInstrument.isFavorite },
+				get: { appState.draft.draftInstrument.isFavorite },
 				set: { newValue in
 					appState.updateDraft { $0.isFavorite = newValue }
 				}
@@ -502,7 +502,7 @@ struct InstrumentCreateFlowView: View {
 				Spacer()
 				Button("Weiter") {
 					if appState.isEditingExistingInstrument {
-						appState.creationStep = .done
+						appState.draft.creationStep = .done
 					} else {
 						goNextOrReturn(default: .done)
 					}
@@ -563,7 +563,7 @@ struct InstrumentCreateFlowView: View {
 					title: "Aktienname",
 					message: "Bitte geben Sie den Aktiennamen ein!",
 					kind: .stockName,
-					initialValue: appState.draftInstrument.underlyingName
+					initialValue: appState.draft.draftInstrument.underlyingName
 				) { value in
 					appState.updateDraft {
 						$0.subgroup = nil                 // kein Enum, freier Aktienname
@@ -575,7 +575,7 @@ struct InstrumentCreateFlowView: View {
 					if isEditing {
 						appState.finishEditingStepIfNeeded()
 					} else {
-						appState.creationStep = .emittent
+						appState.draft.creationStep = .emittent
 					}
 				} onCancel: {
 					activeSheet = nil
@@ -587,7 +587,7 @@ struct InstrumentCreateFlowView: View {
 					title: "isin",
 					message: "Bitte geben Sie die isin ein.",
 					kind: .isin,
-					initialValue: appState.draftInstrument.isin
+					initialValue: appState.draft.draftInstrument.isin
 				) { value in
 					appState.updateDraft { $0.isin = value }
 					activeSheet = nil
@@ -595,7 +595,7 @@ struct InstrumentCreateFlowView: View {
 					if isEditing {
 						appState.finishEditingStepIfNeeded()
 					} else {
-						appState.creationStep = .basispreis
+						appState.draft.creationStep = .basispreis
 					}
 				} onCancel: {
 					activeSheet = nil
@@ -607,19 +607,19 @@ struct InstrumentCreateFlowView: View {
 					title: "Basispreis",
 					message: "Bitte geben Sie den Basispreis ein.",
 					kind: .numeric,
-					initialValue: appState.draftInstrument.basispreis
+					initialValue: appState.draft.draftInstrument.basispreis
 				) { value in
 					appState.updateDraft { $0.basispreis = value }
 					activeSheet = nil
 
 					if isEditing {
 						appState.finishEditingStepIfNeeded()
-					} else if appState.draftInstrument.assetClass == .igBarrier {
-						appState.creationStep = .favorite
+					} else if appState.draft.draftInstrument.assetClass == .igBarrier {
+						appState.draft.creationStep = .favorite
 					} else if appState.draftNeedsRatio {
-						appState.creationStep = .bezugsverhaeltnis
+						appState.draft.creationStep = .bezugsverhaeltnis
 					} else {
-						appState.creationStep = .aufgeld
+						appState.draft.creationStep = .aufgeld
 					}
 				} onCancel: {
 					activeSheet = nil
@@ -631,7 +631,7 @@ struct InstrumentCreateFlowView: View {
 					title: "Aufgeld",
 					message: "Bitte geben Sie das Aufgeld ein.",
 					kind: .numeric,
-					initialValue: appState.draftInstrument.aufgeld
+					initialValue: appState.draft.draftInstrument.aufgeld
 				) { value in
 					appState.updateDraft { $0.aufgeld = value }
 					activeSheet = nil
@@ -647,7 +647,7 @@ struct InstrumentCreateFlowView: View {
 					title: "Individuelles Bezugsverhältnis",
 					message: "Bitte geben Sie den Nenner des Bezugsverhältnisses ein (z. B. 10 für 1 : 10).",
 					kind: .numeric,
-					initialValue: customRatioInitialValue(from: appState.draftInstrument.bezugsverhaeltnis)
+					initialValue: customRatioInitialValue(from: appState.draft.draftInstrument.bezugsverhaeltnis)
 				) { value in
 					let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
 					let normalized = trimmed.replacingOccurrences(of: ",", with: ".")
@@ -665,7 +665,7 @@ struct InstrumentCreateFlowView: View {
 					goNextOrReturn(default: .aufgeld)
 				} onCancel: {
 					activeSheet = nil
-					localRatio = ratioOptionForValue(appState.draftInstrument.bezugsverhaeltnis)
+					localRatio = ratioOptionForValue(appState.draft.draftInstrument.bezugsverhaeltnis)
 					cancelEditIfNeeded()
 				}
 
@@ -717,7 +717,7 @@ struct InstrumentCreateFlowView: View {
 
 
 	private var isDraftValid: Bool {
-		let d = appState.draftInstrument
+		let d = appState.draft.draftInstrument
 
 			// 1) Subgroup / UnderlyingName prüfen
 		switch d.assetClass {
@@ -776,7 +776,7 @@ struct InstrumentCreateFlowView: View {
 	}
 
 	private func syncLocalFromDraftIfNeeded() {
-		localRatio = ratioOptionForValue(appState.draftInstrument.bezugsverhaeltnis)
+		localRatio = ratioOptionForValue(appState.draft.draftInstrument.bezugsverhaeltnis)
 	}
 
 	private func cancelEditIfNeeded() {
@@ -841,6 +841,6 @@ private func runBasicsImport(with raw: String, appState: AppStateEngine) {
 		// Flow „wie gehabt“ weiterführen:
 		// Hier z.B. direkt zu Favorit springen,
 		// oder wenn du willst zu .done.
-	appState.creationStep = .favorite
+	appState.draft.creationStep = .favorite
 }
 	

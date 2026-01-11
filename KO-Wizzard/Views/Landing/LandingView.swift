@@ -63,8 +63,8 @@ struct LandingView: View {
 					icon: "function",
 					isHovered: isCalcHovered
 				) {
-					appState.workspaceMode = .instrumentCalculation
-					appState.isLandingVisible = false
+					appState.navigation.workspaceMode = .instrumentCalculation
+					appState.navigation.isLandingVisible = false
 				}
                 .onHover { hovering in
                     isCalcHovered = hovering
