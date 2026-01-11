@@ -12,8 +12,7 @@ struct RootView: View {
 #endif
 
 	private var resolvedTheme: AppTheme {
-		guard baseTheme.mode == .system else { return baseTheme }
-		return AppTheme(mode: colorScheme == .dark ? .dark : .light)
+		AppTheme(mode: baseTheme.mode, systemColorScheme: colorScheme)
 	}
 
     var body: some View {

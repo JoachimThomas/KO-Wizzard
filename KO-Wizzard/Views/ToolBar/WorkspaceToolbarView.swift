@@ -263,7 +263,7 @@ struct WorkspaceToolbarView: View {
 
 	Circle()
 		.stroke(
-			theme.colors.accentOrange.opacity(isHovered ? theme.effects.hoverGlowOpacity : 0),
+			theme.colors.glowRing.opacity(isHovered ? theme.effects.hoverGlowOpacity : 0),
 			lineWidth: 2
 		)
 		.blur(radius: isHovered ? 1 : 2)
@@ -340,7 +340,7 @@ private func toolbarIcon(systemName: String, isHovered: Bool, theme: AppTheme) -
 
 	Circle()
 		.stroke(
-			theme.colors.accentOrange.opacity(isHovered ? theme.effects.hoverGlowOpacity : 0),
+			theme.colors.glowRing.opacity(isHovered ? theme.effects.hoverGlowOpacity : 0),
 			lineWidth: 2
 		)
 		.blur(radius: isHovered ? 1 : 2)

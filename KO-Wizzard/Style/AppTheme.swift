@@ -25,6 +25,7 @@ struct AppColors {
 
 	var primaryBlue: Color { Color(red: 0.0, green: 0.48, blue: 1.0) }
 	var accentOrange: Color { Color(red: 1.0, green: 0.62, blue: 0.04) }
+	var glowRing: Color { resolve(light: accentOrange, dark: primaryBlue) }
 	var chromeAccent: Color { resolve(light: primaryBlue, dark: accentOrange) }
 	var actionBlue: Color { resolve(light: .blue, dark: .blue) }
 	var alertRed: Color { .red }
@@ -196,25 +197,35 @@ struct Effects {
 		(Color.black.opacity(0.25), 6, 0, 4)
 	}
 
-	var hoverGlowOpacity: Double { 0.75 }
+	var hoverGlowOpacity: Double { 0.95 }
 	var titlebarDividerOpacity: Double { 0.3 }
-	var pressScaleSmall: CGFloat { 0.98 }
-	var pressScaleMedium: CGFloat { 0.96 }
+	var pressScaleSmall: CGFloat { 0.97 }
+	var pressScaleMedium: CGFloat { 0.94 }
 	var pressAnimation: Animation { .easeInOut(duration: 0.12) }
 	var hoverAnimation: Animation { .easeInOut(duration: 0.14) }
 }
 
 struct AppTheme {
 	var mode: ThemeMode = .system
-	var colors: AppColors { AppColors(mode: mode) }
+	var systemColorScheme: ColorScheme? = nil
+	var resolvedMode: ThemeMode {
+		switch mode {
+		case .system:
+			return systemColorScheme == .dark ? .dark : .light
+		case .light, .dark:
+			return mode
+		}
+	}
+	var colors: AppColors { AppColors(mode: resolvedMode) }
 	var fonts: AppFonts { AppFonts(mode: mode) }
 	var metrics: Metrics { Metrics() }
 	var gradients: Gradients { Gradients() }
 	var effects: Effects { Effects() }
-	var chromeBlendMode: BlendMode { mode == .dark ? .screen : .multiply }
+	var chromeBlendMode: BlendMode { resolvedMode == .dark ? .screen : .multiply }
 
-	init(mode: ThemeMode = .system) {
+	init(mode: ThemeMode = .system, systemColorScheme: ColorScheme? = nil) {
 		self.mode = mode
+		self.systemColorScheme = systemColorScheme
 	}
 }
 
