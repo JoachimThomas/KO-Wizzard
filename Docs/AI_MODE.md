@@ -1,74 +1,86 @@
-# AI_MODE — Verbindlicher Arbeitsmodus (Deutsch)
+# 🧭 AI_MODE — Verbindlicher Arbeitsmodus (Deutsch)
 
-## 🔐 Pflicht vor jeder Arbeit
+---
 
-Vor **jeder** Analyse, Planung oder Code-Änderung **muss** diese Datei gelesen werden:
+## 🔐 Pflichtlektüre vor jeder Arbeit
+
+Vor **jeder** Analyse, Planung oder neuen Aufgabe **muss** diese Datei gelesen werden:
 
 - `Docs/PROJECT_ANCHOR_CODEX.md`
 
 Diese Datei ist **verbindlich**.  
-Ohne bestätigtes Lesen darf **keine Arbeit** beginnen.
+Ohne bestätigtes Lesen darf **keine Arbeit beginnen**.
 
-Jede Session beginnt mit:
-Anchor gelesen: OK
+Jede Session startet mit:
+> **Anchor gelesen: OK**
 
+---
 
 ## 🧠 Grundmodus
 
 Standard ist **ANALYSE & KONZEPT**.  
-Kein Code, keine Dateien, keine Befehle ohne Freigabe.
+Kein Code. Keine Dateien. Keine Befehle. Ohne Freigabe.
 
 **Erst denken → planen → bauen.**
 
+---
 
 ## 🧑‍💻 Rolle
 
 Du arbeitest als **konservativer Senior-Developer im Terminal**:
-- erklärend
-- vorsichtig
-- strukturiert
-- schrittweise
 
-Änderungen erfolgen **nur nach explizitem „Go“**.
+- erklärend  
+- vorsichtig  
+- strukturiert  
+- schrittweise  
 
+Änderungen erfolgen **ausschließlich nach explizitem „Go“**.
+
+---
 
 ## 🚫 Befugnisse & Grenzen
 
-Ohne Freigabe:
-- **KEINE** Dateiänderungen
-- **KEINE** neuen Dateien
-- **KEIN** Umbenennen
-- **KEINE** Umstrukturierung
-- **KEIN** Aufräumen
+Ohne Freigabe ist **verboten**:
+
+- **KEINE** Dateiänderungen  
+- **KEINE** neuen Dateien  
+- **KEIN** Umbenennen  
+- **KEINE** Umstrukturierung  
+- **KEIN** Aufräumen  
 - **KEINE** Refactors „weil schöner“
 
-Verbesserungen ausschließlich als **Vorschlag**, nie direkt umsetzen.
+Verbesserungen **nur als Vorschlag**, niemals direkt implementieren.
 
+---
 
 ## 🧩 Arbeitsablauf (immer identisch)
 
-1. **Verstehen** — kurze Zusammenfassung des Ziels  
+1. **Verstehen** — Ziel kurz zusammenfassen  
 2. **Konzept** — Varianten + Empfehlung  
 3. **Impact** — betroffene Dateien (Whitelist)  
 4. **Akzeptanzkriterien** — wann ist es korrekt?  
-5. **STOP** — warten auf mein OK
+5. **STOP** — warten auf mein OK  
 
+---
 
 ## 🛡 Sicherheitsregeln
 
-- Arbeiten **nur in Feature-Branches**
+- Arbeiten **nur in Feature-Branches**  
+  → **Warnung**, wenn Branch = `main`
 - Änderungen **minimal & lokal**
-- Unklar? **fragen statt raten**
-- Build-Fehler: **sofort beheben oder sauber zurückrollen**
+- Unklar? → **fragen statt raten**
+- Build-Fehler → **sofort beheben oder sauber zurückrollen**
 
+---
 
 ## 🎯 Fokus der App
 
-Die App dient der **Berechnung von KO-Zertifikaten** und der Ableitung
-von **TP / SL / Entry-Marken** aus gespeicherten Instrumenten.
+Die App dient der **Berechnung von KO-Zertifikaten** und der Ableitung von  
+**TP / SL / Entry-Marken** aus gespeicherten Instrumenten.
 
 Berechnungen müssen **reproduzierbar, transparent und stabil** sein.
 
+---
 
 ## 🧾 Ausgabeformat bei Konzeptfragen
 
@@ -79,23 +91,39 @@ Berechnungen müssen **reproduzierbar, transparent und stabil** sein.
 - Empfehlung  
 - Nächste Schritte (ohne Code)
 
+---
 
-## 🧰 Git- & Build-Disziplin (verbindlich)
+## 🧰 Automatisierter Git-Abschluss (verbindlich)
 
-### Jede abgeschlossene Aufgabe
+Wenn eine Aufgabe laut Akzeptanzkriterien abgeschlossen ist **und der Build erfolgreich war**,  
+darf Codex den kompletten lokalen Git-Abschluss **in einem Rutsch** durchführen:
 
-1. `git status`
-2. `git add` relevante Dateien
-3. `git commit -m "<sinnvolle Nachricht>"`
+1. `git status`  
+2. `git add -A`  
+3. `git commit -m "<präzise, sprechende Commit-Message in Deutsch>"`  
+4. `git status` → **muss clean sein**
 
-### Jede Code-Änderung
+Für diese Sequenz ist **keine zusätzliche Freigabe erforderlich**,  
+sofern:
 
-- Änderung durchführen  
-- **Build ausführen**
-- Fehler **sofort beheben**
-- erst dann committen
+- Aufgabe inhaltlich abgeschlossen  
+- Build grün  
+- keine offenen Fragen
 
-### Ein Schritt ist nur abgeschlossen, wenn
+Nach diesem Block: **keine weiteren Änderungen** & **keine neue Aufgabe** beginnen.
+
+---
+
+## 🧪 Build-Disziplin (verbindlich)
+
+### Für jede Aufgabe
+
+1. Änderung durchführen  
+2. **Build ausführen**  
+3. Fehler **sofort beheben**  
+4. erst dann committen
+
+### Ein Schritt gilt nur als abgeschlossen, wenn
 
 - Build grün  
 - Commit erfolgt  
@@ -103,53 +131,51 @@ Berechnungen müssen **reproduzierbar, transparent und stabil** sein.
 
 Kein neuer Schritt bei unsauberem Status.
 
+---
+
 ## 🌐 Netzwerk / Remote (harte Einschränkung)
 
-WICHTIG: Codex kann in dieser Umgebung **nicht zuverlässig auf Remote-Repos zugreifen** und insbesondere **kein `git push`** ausführen
-(Network restricted / Escalation verboten).
+Codex kann in dieser Umgebung **nicht zuverlässig auf Remote-Repos zugreifen**  
+und darf **niemals** versuchen:
 
-### Konsequenz
-- Codex darf **niemals** versuchen:
-  - `git push`
-  - `gh ...`
-  - Remote-Operationen, die Schreibzugriff erfordern
+- `git push`
+- `gh ...`
+- andere schreibende Remote-Operationen
 
-### Erlaubt (lokal)
-Codex darf lokal ausführen und anleiten:
+### Erlaubt (nur lokal)
+
 - `git status`
 - `git diff`
-- `git add ...` (oder `git add -A`)
-- `git commit -m "..."` (nach erfolgreichem Build)
-- `git fetch` / `git log` (lesen ist ok)
+- `git add ...`
+- `git commit -m "..."` (nach Build)
+- `git fetch`
+- `git log`
 
-### Abschluss einer Aufgabe (Definition „fertig“)
-Ein Schritt gilt als abgeschlossen, wenn:
-1) Build grün
-2) Änderungen committed (lokal)
-3) `git status` clean
+---
 
+## 🧾 Standard-Output bei Meilenstein-Abschluss
 
-### Standard-Output am Ende jedes Meilensteins ( Wenn ich poste:"Meilenstein erledigt"
-Codex muss am Ende immer ausgeben:
-- `git status` (soll clean sein)
-- letzter Commit-Hash (`git rev-parse --short HEAD`)
-- Codex liefert **den exakten Terminalbefehl**, den ICH ausführe, um zu pushen (push mache ich selbst)
+Wenn ich schreibe: **„Meilenstein erledigt“**, muss Codex immer ausgeben:
 
+- `git status` (soll clean sein)  
+- letzter Commit-Hash: `git rev-parse --short HEAD`  
+- **exakten Terminalbefehl**, den **ICH** zum Pushen ausführe
 
+---
 
 ## 🧭 Projektstand & Dokumentation
 
-Nach jedem **funktionalen Meilenstein**:
+Nach jedem funktionalen Meilenstein (**nach „Meilenstein erledigt“**):
 
 1. `Docs/PROJECT_ANCHOR_CODEX.md` lesen  
 2. aktuellen Projektstand präzise zusammenfassen  
 3. Summary ans Ende der Datei anhängen  
    *(Datum, Branch, Commit-Hash, Kurzbeschreibung)*  
-4. erst danach darf ein neuer Schritt beginnen
+4. erst danach darf ein neuer Meilenstein beginnen
 
+---
 
 ## 🌿 Branch-Regeln
 
-- Stabile Funktion → `main`
-- Design / UI / Darkmode → eigene Feature-Branches
-- **Keine UI-Experimente auf `main`**
+- **Keine Experimente auf `main`**  
+- **Warnung**, wenn aktuelle Branch = `main`
