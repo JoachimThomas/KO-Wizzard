@@ -282,13 +282,13 @@ struct WorkspaceToolbarView: View {
 
 					Image(systemName: icon)
 						.font(.system(size: theme.metrics.toolbarTabIconSize, weight: .semibold))
-						.foregroundColor(.white)
+						.foregroundColor(theme.colors.toolbarIconForeground)
 				}
 				.frame(width: theme.metrics.toolbarTabIconCircle, height: theme.metrics.toolbarTabIconCircle)
 
 				Text(title)
 					.font(theme.fonts.toolbarTab)
-					.foregroundColor(isActive ? .primary : .secondary)
+					.foregroundColor(isActive ? theme.colors.textPrimary : theme.colors.textSecondary)
 			}
 			.padding(.horizontal, theme.metrics.toolbarTabPaddingH)
 			.padding(.vertical, theme.metrics.toolbarTabPaddingV)
@@ -352,7 +352,7 @@ private func toolbarIcon(systemName: String, isHovered: Bool, theme: AppTheme) -
 
 	Image(systemName: systemName)
 		.font(theme.fonts.toolbarIcon)
-		.foregroundColor(.white)
+		.foregroundColor(theme.colors.toolbarIconForeground)
 	}
 	.frame(width: 30, height: 30)
 }

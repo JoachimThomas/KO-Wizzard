@@ -66,6 +66,7 @@ struct AppColors {
 	var toolbarTabActiveBackground: Color {
 		resolve(light: Color.accentColor.opacity(0.12), dark: Color.accentColor.opacity(0.2))
 	}
+	var toolbarIconForeground: Color { resolve(light: .white, dark: .white) }
 }
 
 struct AppFonts {

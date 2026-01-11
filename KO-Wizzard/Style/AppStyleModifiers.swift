@@ -53,7 +53,7 @@ struct AppToolbarTabStyle: ButtonStyle {
 			.padding(.vertical, 6)
 			.background(
 				RoundedRectangle(cornerRadius: 10)
-					.fill(isActive ? Color.accentColor.opacity(0.12) : Color.clear)
+					.fill(isActive ? theme.colors.toolbarTabActiveBackground : Color.clear)
 			)
 			.scaleEffect(configuration.isPressed ? theme.effects.pressScaleSmall : 1)
 			.animation(theme.effects.pressAnimation, value: configuration.isPressed)
