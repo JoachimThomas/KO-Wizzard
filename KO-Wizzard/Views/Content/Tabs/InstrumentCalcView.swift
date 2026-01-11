@@ -27,7 +27,7 @@ struct InstrumentCalcView: View {
 		VStack(alignment: .leading, spacing: 12) {
 
 			Text(headerTitle)
-				.font(.menlo(textStyle: .headline))
+				.font(theme.fonts.headline)
 				.fontWeight(.bold)
 				.contentEmphasis()
 				.padding(.bottom, 4)
@@ -42,7 +42,7 @@ struct InstrumentCalcView: View {
 		Spacer(minLength: 0)
 	}
 		.padding(.vertical, 16)
-		.font(.menlo(textStyle: .body))
+		.font(theme.fonts.body)
 		.sheet(isPresented: $showUnderlyingInput) {
 			ValueInputSheet(
 				title: "Underlying eingeben",
@@ -177,7 +177,7 @@ struct InstrumentCalcView: View {
 	) -> some View {
 		HStack {
 			Text(label)
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
@@ -194,7 +194,7 @@ struct InstrumentCalcView: View {
 	) -> some View {
 		HStack {
 			Text(label)
-				.foregroundColor(mode == .instrumentsCreate ? .blue : .secondary)
+				.foregroundColor(mode == .instrumentsCreate ? theme.colors.actionBlue : theme.colors.textSecondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
@@ -216,7 +216,7 @@ struct InstrumentCalcView: View {
 	) -> some View {
 		HStack {
 			Text(label)
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
@@ -233,7 +233,10 @@ struct InstrumentCalcView: View {
 				} label: {
 					Image(systemName: "doc.on.doc")
 						.imageScale(.small)
-						.foregroundColor(lastCopiedLabel == label ? .green : .secondary)
+						.foregroundColor(lastCopiedLabel == label
+							? theme.colors.successGreen
+							: theme.colors.textSecondary
+						)
 				}
 				.buttonStyle(.plain)
 				.help("In Zwischenablage kopieren")
@@ -306,7 +309,7 @@ struct InstrumentCalcView: View {
 	private var emptyState: some View {
 		VStack(spacing: 8) {
 			Text("Kein Instrument ausgewählt")
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 	}

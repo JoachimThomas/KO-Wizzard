@@ -44,7 +44,7 @@ struct SidebarListArea: View {
 								Image(systemName: appState.collapse.isAssetClassCollapsed(assetClass)
 									  ? "chevron.right"
 									  : "chevron.down")
-								.font(.system(size: 12, weight: .bold))
+								.font(theme.fonts.sidebarChevron)
 								.foregroundColor(theme.colors.sidebarChevron)
 							}
 							.padding(.horizontal, theme.metrics.sidebarGroupPaddingH)
@@ -93,7 +93,7 @@ struct SidebarListArea: View {
 												assetClass: assetClass,
 												subgroup: trimmedSubgroup
 											) ? "chevron.right" : "chevron.down")
-											.font(.system(size: 10, weight: .bold))
+											.font(theme.fonts.sidebarChevronSmall)
 											.foregroundColor(theme.colors.sidebarChevronMuted)
 										}
 										.padding(.horizontal, theme.metrics.sidebarSubgroupPaddingH)
@@ -130,7 +130,7 @@ struct SidebarListArea: View {
 											subgroup: trimmedSubgroup,
 											direction: .long
 										) ? "chevron.right" : "chevron.down")
-											.font(.system(size: 10, weight: .bold))
+											.font(theme.fonts.sidebarChevronSmall)
 											.foregroundColor(theme.colors.sidebarChevronMuted)
 										}
 										.padding(.horizontal, theme.metrics.sidebarDirectionPaddingH)
@@ -174,7 +174,7 @@ struct SidebarListArea: View {
 											subgroup: trimmedSubgroup,
 											direction: .short
 										) ? "chevron.right" : "chevron.down")
-											.font(.system(size: 10, weight: .bold))
+											.font(theme.fonts.sidebarChevronSmall)
 											.foregroundColor(theme.colors.sidebarChevronMuted)
 										}
 										.padding(.horizontal, theme.metrics.sidebarDirectionPaddingH)

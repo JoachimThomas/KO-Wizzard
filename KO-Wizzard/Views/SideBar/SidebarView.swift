@@ -47,8 +47,8 @@ struct SidebarView: View {
 
 				TextField("Suche (Subgroup, isin, Richtung …)", text: $appState.list.searchText)
 					.textFieldStyle(.plain)
-					.foregroundColor(.primary)
-					.font(.custom("Menlo", size: 12))
+					.foregroundColor(theme.colors.textPrimary)
+					.font(theme.fonts.sidebarSearch)
 					.focused($searchIsFocused)
 
 				if !appState.list.searchText.isEmpty {

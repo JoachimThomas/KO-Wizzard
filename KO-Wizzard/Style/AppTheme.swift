@@ -25,7 +25,10 @@ struct AppColors {
 
 	var primaryBlue: Color { Color(red: 0.0, green: 0.48, blue: 1.0) }
 	var accentOrange: Color { Color(red: 1.0, green: 0.62, blue: 0.04) }
+	var actionBlue: Color { resolve(light: .blue, dark: .blue) }
 	var alertRed: Color { .red }
+	var alertRedMuted: Color { resolve(light: Color.red.opacity(0.8), dark: Color.red.opacity(0.8)) }
+	var successGreen: Color { resolve(light: .green, dark: .green) }
 	var textPrimary: Color { resolve(light: .primary, dark: .primary) }
 	var textSecondary: Color { resolve(light: .secondary, dark: .secondary) }
 	var cardBackground: Color {
@@ -80,6 +83,9 @@ struct AppFonts {
 	var sidebarHeader: Font { .custom("Menlo", size: 13).weight(.semibold) }
 	var sidebarSubgroup: Font { .custom("Menlo", size: 12) }
 	var sidebarDirection: Font { .custom("Menlo", size: 11).weight(.medium) }
+	var sidebarChevron: Font { .system(size: 12, weight: .bold) }
+	var sidebarChevronSmall: Font { .system(size: 10, weight: .bold) }
+	var sidebarSearch: Font { .custom("Menlo", size: 12) }
 }
 
 struct Metrics {

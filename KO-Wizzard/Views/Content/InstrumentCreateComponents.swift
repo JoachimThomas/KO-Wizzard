@@ -10,6 +10,7 @@ import SwiftUI
 	/// Generischer Picker-Step mit Dummy-Zeile "–"
 struct PickerStepView<T: Hashable>: View {
 
+	@Environment(\.appTheme) private var theme
 	let title: String
 	let values: [(T, String)]
 	let current: T?
@@ -20,8 +21,8 @@ struct PickerStepView<T: Hashable>: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			Text(title)
-				.font(.menlo(textStyle: .subheadline))
-				.foregroundColor(.secondary)
+				.font(theme.fonts.subheadline)
+				.foregroundColor(theme.colors.textSecondary)
 
 			Picker("", selection: Binding(
 				get: { selection },
@@ -76,7 +77,7 @@ func sheetInputButton(
 			Text(title)
 			Spacer()
 			Text(value.isEmpty ? "–" : value)
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 		}
 		.padding(theme.metrics.paddingSmall)
 		.background(theme.colors.inputBackground)

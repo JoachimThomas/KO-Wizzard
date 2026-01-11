@@ -63,7 +63,7 @@ struct InstrumentCreateFlowView: View {
 
 				HStack {
 					Text("Neueingabe – Schritt für Schritt")
-						.font(.menlo(textStyle: .headline))
+						.font(theme.fonts.headline)
 						.fontWeight(.bold)
 						.contentEmphasis()
 
@@ -118,7 +118,7 @@ struct InstrumentCreateFlowView: View {
 		}
         .frame(maxWidth: .infinity, alignment: .leading) 
 		.workspaceGradientBackground(cornerRadius: theme.metrics.panelCornerRadius)
-		.font(.menlo(textStyle: .body))
+		.font(theme.fonts.body)
 		.onAppear {
 			appState.ensureAllowedEditStepIfNeeded()
 		}
@@ -207,8 +207,8 @@ struct InstrumentCreateFlowView: View {
 
 			VStack(alignment: .leading, spacing: 12) {
 				Text("2. Aktienname eingeben")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 					// Der frei eingegebene Name steckt jetzt ausschließlich in underlyingName
 				let name = appState.draft.draftInstrument.underlyingName
@@ -237,8 +237,8 @@ struct InstrumentCreateFlowView: View {
 				// *** NEU: Subgroup per Sheet statt Picker ***
 			VStack(alignment: .leading, spacing: 12) {
 				Text("2. Subgroup wählen")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 				
 				let subgroupName = appState.draft.draftInstrument.subgroup?.displayName ?? ""
 				
@@ -251,7 +251,7 @@ struct InstrumentCreateFlowView: View {
 							 : subgroupName)
 						Spacer()
 						Image(systemName: "chevron.down")
-							.foregroundColor(.secondary)
+							.foregroundColor(theme.colors.textSecondary)
 					}
 					.padding(theme.metrics.paddingSmall)
 					.background(theme.colors.inputBackground)
@@ -321,8 +321,8 @@ struct InstrumentCreateFlowView: View {
 		} else {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("5. Isin eingeben")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				sheetInputButton(
 					title: "isin",
@@ -358,8 +358,8 @@ struct InstrumentCreateFlowView: View {
 
 		VStack(alignment: .leading, spacing: 12) {
 			Text(titleText)
-				.font(.menlo(textStyle: .subheadline))
-				.foregroundColor(.secondary)
+				.font(theme.fonts.subheadline)
+				.foregroundColor(theme.colors.textSecondary)
 
 			sheetInputButton(
 				title: "Basispreis",
@@ -387,8 +387,8 @@ struct InstrumentCreateFlowView: View {
 		} else {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("Bezugsverhältnis wählen")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				Picker("", selection: $localRatio) {
 					ForEach(RatioOption.allCases) { opt in
@@ -453,8 +453,8 @@ struct InstrumentCreateFlowView: View {
 		if appState.draft.draftInstrument.assetClass == .igBarrier {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("Aufgeld wird für IG-Barrier automatisch auf 0 gesetzt.")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				HStack {
 					Spacer()
@@ -467,8 +467,8 @@ struct InstrumentCreateFlowView: View {
 		} else {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("Aufgeld eingeben")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				sheetInputButton(
 					title: "Aufgeld",
@@ -493,8 +493,8 @@ struct InstrumentCreateFlowView: View {
 	private var favoriteStep: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			Text("Favorit markieren")
-				.font(.menlo(textStyle: .subheadline))
-				.foregroundColor(.secondary)
+				.font(theme.fonts.subheadline)
+				.foregroundColor(theme.colors.textSecondary)
 
 			Toggle("Favorit", isOn: Binding(
 				get: { appState.draft.draftInstrument.isFavorite },
@@ -521,8 +521,8 @@ struct InstrumentCreateFlowView: View {
 		VStack(alignment: .leading, spacing: 12) {
 			if appState.isEditingExistingInstrument {
 				Text("Änderungen übernehmen?")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				HStack {
 					Spacer()
@@ -536,13 +536,13 @@ struct InstrumentCreateFlowView: View {
 				}
 			} else {
 				Text("Instrument fertig erfasst.")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				if !isDraftValid {
 					Text("Bitte alle Pflichtfelder sinnvoll ausfüllen (keine leeren / Defaultwerte).")
-						.font(.menlo(textStyle: .footnote))
-						.foregroundColor(.red.opacity(0.8))
+						.font(theme.fonts.footnote)
+						.foregroundColor(theme.colors.alertRedMuted)
 				}
 
 				HStack {

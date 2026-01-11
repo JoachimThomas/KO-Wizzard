@@ -17,7 +17,7 @@ struct InstrumentDetailView: View {
 		VStack(alignment: .leading, spacing: 12) {
 
 			Text(headerTitle)
-				.font(.menlo(textStyle: .headline))
+				.font(theme.fonts.headline)
 				.fontWeight(.bold)
 				.contentEmphasis()
 				.padding(.bottom, 4)
@@ -33,7 +33,7 @@ struct InstrumentDetailView: View {
 	}
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding(.vertical, mode == .instrumentsShowAndChange ? 16 : 0)
-		.font(.menlo(textStyle: .body))
+		.font(theme.fonts.body)
 	}
 
 		// MARK: - Header
@@ -114,7 +114,7 @@ struct InstrumentDetailView: View {
 	) -> some View {
 		HStack {
 			Text(label)
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
@@ -131,7 +131,7 @@ struct InstrumentDetailView: View {
 	) -> some View {
 		HStack {
 			Text(label)
-				.foregroundColor(mode == .instrumentsCreate ? .blue : .secondary)
+				.foregroundColor(mode == .instrumentsCreate ? theme.colors.actionBlue : theme.colors.textSecondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
@@ -150,7 +150,7 @@ struct InstrumentDetailView: View {
 	private var emptyState: some View {
 		VStack(spacing: 8) {
 			Text("Kein Instrument ausgewählt")
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 	}

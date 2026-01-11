@@ -36,7 +36,7 @@ struct ValueInputSheet: View {
 			if !message.isEmpty {
 				Text(message)
 					.font(theme.fonts.subheadline)
-					.foregroundColor(.secondary)
+					.foregroundColor(theme.colors.textSecondary)
 			}
 
 				// MARK: - Eingabefeld (iOS mit Auto-Fokus, macOS normal)
