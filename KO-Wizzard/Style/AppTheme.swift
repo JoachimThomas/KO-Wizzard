@@ -49,6 +49,7 @@ struct Metrics {
 	var sheetCornerRadius: CGFloat { 8 }
 	var toolbarHeight: CGFloat { 48 }
 	var sidebarWidth: CGFloat { 300 }
+	var titlebarHeight: CGFloat { 28 }
 	var sidebarRowCornerRadius: CGFloat { 6 }
 	var sidebarRowPaddingH: CGFloat { 18 }
 	var sidebarRowPaddingV: CGFloat { 6 }
@@ -130,6 +131,7 @@ struct Effects {
 	}
 
 	var hoverGlowOpacity: Double { 0.75 }
+	var titlebarDividerOpacity: Double { 0.3 }
 	var pressScaleSmall: CGFloat { 0.98 }
 	var pressScaleMedium: CGFloat { 0.96 }
 	var pressAnimation: Animation { .easeInOut(duration: 0.12) }
