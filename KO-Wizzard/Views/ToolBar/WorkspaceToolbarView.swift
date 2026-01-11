@@ -38,6 +38,7 @@ struct WorkspaceToolbarView: View {
 				Button {
 					appState.list.showFavoritesOnly = false
 					appState.list.showRecentOnly = false
+					appState.collapse.setGlobalCollapsed(false)
 				} label: {
 					toolbarIcon(
 						systemName: "chart.line.uptrend.xyaxis",
