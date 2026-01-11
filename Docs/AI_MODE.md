@@ -53,3 +53,27 @@ Jede Session beginnt mit der Bestätigung:
   - Variante A/B/C (falls nötig)
   - Empfehlung
   - Nächste Schritte (ohne Code)
+
+### Arbeitsregeln (verbindlich)
+
+1. **Alle Änderungen müssen in Git erfasst werden.**  
+   Nach jeder abgeschlossenen Aufgabe:
+   - `git status` prüfen
+   - relevante Dateien `git add`
+   - mit sprechender Message `git commit`
+
+2. **Nach jeder Code-Änderung ist ein Build verpflichtend.**  
+   Der Arbeitszyklus ist immer:
+
+   - Änderung vornehmen
+   - Projekt bauen (`xcodebuild` oder Xcode Build)
+   - **Bei Fehlern: sofort beheben**
+   - erst danach Commit durchführen
+
+3. **Ein Schritt gilt erst als abgeschlossen, wenn:**
+   - der Build fehlerfrei ist
+   - die Änderungen committed sind
+   - und der Status sauber ist
+
+4. **Kein neuer Schritt ohne sauberen Zustand.**  
+   Wenn `git status` nicht clean ist, darf nicht mit einer neuen Aufgabe begonnen werden.

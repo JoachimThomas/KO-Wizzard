@@ -35,7 +35,7 @@ extension AssetClass {
 		}
 
 #if DEBUG
-		print("⚠️ Unbekannte AssetClass '\(raw)'. Fallback → index")
+		print("⚠️ Unbekannte AssetClass '\(raw)'. Fallback → none")
 #endif
 		self = .none
 	}
@@ -72,7 +72,7 @@ extension Direction {
 			case "none":  self = .none
 			default:
 #if DEBUG
-				print("⚠️ Unbekannte Direction '\(raw)'. Fallback → long")
+				print("⚠️ Unbekannte Direction '\(raw)'. Fallback → none")
 #endif
 				self = .none
 		}
@@ -106,7 +106,7 @@ extension Emittent {
 		}
 
 #if DEBUG
-		print("⚠️ Unbekannter Emittent '\(raw)'. Fallback → hsbc")
+		print("⚠️ Unbekannter Emittent '\(raw)'. Fallback → none")
 #endif
 		self = .none
 	}

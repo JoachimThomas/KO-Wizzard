@@ -19,22 +19,11 @@ struct InstrumentCreateFlowView: View {
 		// Welches Eingabe-Sheet ist aktiv?
 	@State private var activeSheet: SheetType?
 
-		// Für Ratio (Bezugsverhältnis)
+	// Für Ratio (Bezugsverhältnis)
 	@State private var localRatio: RatioOption = .none
 
-		// NEU: eigenes Sheet für Subgroup bei Nicht-Aktie
+	// NEU: eigenes Sheet für Subgroup bei Nicht-Aktie
 	@State private var showSubgroupSheet: Bool = false
-
-		// MARK: - Import-Button-State
-
-	private enum ImportState {
-		case idle              // Label: "Import"
-		case awaitingClipboard // Label: "Von Zwischenablage einfügen"
-		case readyToImport     // Label: "Start Import"
-	}
-
-	@State private var importState: ImportState = .idle
-	@State private var importedRawText: String = ""
 
 	enum SheetType: Identifiable {
 		case stockName
@@ -69,9 +58,9 @@ struct InstrumentCreateFlowView: View {
 					Spacer()
 
 					Button {
-						handleImportButtonTap()
+						appState.handleImportButtonTap()
 					} label: {
-						Label(importButtonTitle, systemImage: "arrow.down.doc")
+						Label(appState.draft.importButtonTitle, systemImage: "arrow.down.doc")
 							.font(.custom("Menlo", size: 12).weight(.medium))
 							.contentEmphasis()
 					}
@@ -140,7 +129,7 @@ struct InstrumentCreateFlowView: View {
 					draft.underlyingName = selected.displayName   // String für Anzeige
 				}
 
-				if isEditing {
+				if appState.isEditingExistingInstrument {
 					appState.finishEditingStepIfNeeded()
 				} else if appState.draft.draftInstrument.assetClass == .igBarrier {
 					appState.draft.creationStep = .direction
@@ -152,20 +141,6 @@ struct InstrumentCreateFlowView: View {
 	}
 
 		// MARK: - Edit vs Normal Flow
-
-	private var isEditing: Bool {
-		appState.draft.editingReturnStep != nil
-	}
-
-	private func goNextOrReturn(
-		default next: InstrumentDraftController.InstrumentCreationStep
-	) {
-		if isEditing {
-			appState.finishEditingStepIfNeeded()
-		} else {
-			appState.draft.creationStep = next
-		}
-	}
 
 		// MARK: - Steps
 
@@ -194,7 +169,7 @@ struct InstrumentCreateFlowView: View {
 					}
 				}
 				
-				goNextOrReturn(default: .subgroup)
+				appState.advanceDraftOrReturn(default: .subgroup)
 			}
 		)
 	}
@@ -256,7 +231,7 @@ struct InstrumentCreateFlowView: View {
 					.cornerRadius(8)
 				}
 				.onAppear {
-					if isEditing {
+					if appState.isEditingExistingInstrument {
 						DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
 							showSubgroupSheet = true
 						}
@@ -284,7 +259,7 @@ struct InstrumentCreateFlowView: View {
 						}
 					}
 
-					goNextOrReturn(default: .direction)
+					appState.advanceDraftOrReturn(default: .direction)
 				}
 			)
 		}
@@ -299,7 +274,7 @@ struct InstrumentCreateFlowView: View {
 			onSelect: { value in
 				appState.updateDraft { $0.direction = value }
 
-				if isEditing {
+				if appState.isEditingExistingInstrument {
 					appState.finishEditingStepIfNeeded()
 				} else if appState.draft.draftInstrument.assetClass == .igBarrier {
 					appState.draft.creationStep = .basispreis
@@ -400,11 +375,11 @@ struct InstrumentCreateFlowView: View {
 					switch newValue {
 						case .none:
 							appState.updateDraft { $0.bezugsverhaeltnis = "" }
-							goNextOrReturn(default: .aufgeld)
+							appState.advanceDraftOrReturn(default: .aufgeld)
 
 						case .oneToOne, .oneToTen, .oneToHundred, .oneToThousand:
 							appState.updateDraft { $0.bezugsverhaeltnis = newValue.numericValue }
-							goNextOrReturn(default: .aufgeld)
+							appState.advanceDraftOrReturn(default: .aufgeld)
 
 						case .custom:
 							activeSheet = .ratioCustom
@@ -455,7 +430,7 @@ struct InstrumentCreateFlowView: View {
 				HStack {
 					Spacer()
 					Button("Weiter") {
-						goNextOrReturn(default: .favorite)
+						appState.advanceDraftOrReturn(default: .favorite)
 					}
 					.buttonStyle(.borderedProminent)
 				}
@@ -504,7 +479,7 @@ struct InstrumentCreateFlowView: View {
 					if appState.isEditingExistingInstrument {
 						appState.draft.creationStep = .done
 					} else {
-						goNextOrReturn(default: .done)
+						appState.advanceDraftOrReturn(default: .done)
 					}
 				}
 				.buttonStyle(.borderedProminent)
@@ -534,7 +509,7 @@ struct InstrumentCreateFlowView: View {
 					.font(.menlo(textStyle: .subheadline))
 					.foregroundColor(.secondary)
 
-				if !isDraftValid {
+				if !appState.isCurrentDraftValid {
 					Text("Bitte alle Pflichtfelder sinnvoll ausfüllen (keine leeren / Defaultwerte).")
 						.font(.menlo(textStyle: .footnote))
 						.foregroundColor(.red.opacity(0.8))
@@ -546,7 +521,7 @@ struct InstrumentCreateFlowView: View {
 						appState.doneStep()
 					}
 					.buttonStyle(.borderedProminent)
-					.disabled(!isDraftValid)
+					.disabled(!appState.isCurrentDraftValid)
 				}
 			}
 		}
@@ -572,14 +547,14 @@ struct InstrumentCreateFlowView: View {
 					activeSheet = nil
 				
 
-					if isEditing {
+					if appState.isEditingExistingInstrument {
 						appState.finishEditingStepIfNeeded()
 					} else {
 						appState.draft.creationStep = .emittent
 					}
 				} onCancel: {
 					activeSheet = nil
-					cancelEditIfNeeded()
+					appState.cancelEditIfNeeded()
 				}
 
 			case .isin:
@@ -592,14 +567,14 @@ struct InstrumentCreateFlowView: View {
 					appState.updateDraft { $0.isin = value }
 					activeSheet = nil
 
-					if isEditing {
+					if appState.isEditingExistingInstrument {
 						appState.finishEditingStepIfNeeded()
 					} else {
 						appState.draft.creationStep = .basispreis
 					}
 				} onCancel: {
 					activeSheet = nil
-					cancelEditIfNeeded()
+					appState.cancelEditIfNeeded()
 				}
 
 			case .basispreis:
@@ -612,7 +587,7 @@ struct InstrumentCreateFlowView: View {
 					appState.updateDraft { $0.basispreis = value }
 					activeSheet = nil
 
-					if isEditing {
+					if appState.isEditingExistingInstrument {
 						appState.finishEditingStepIfNeeded()
 					} else if appState.draft.draftInstrument.assetClass == .igBarrier {
 						appState.draft.creationStep = .favorite
@@ -623,7 +598,7 @@ struct InstrumentCreateFlowView: View {
 					}
 				} onCancel: {
 					activeSheet = nil
-					cancelEditIfNeeded()
+					appState.cancelEditIfNeeded()
 				}
 
 			case .aufgeld:
@@ -636,10 +611,10 @@ struct InstrumentCreateFlowView: View {
 					appState.updateDraft { $0.aufgeld = value }
 					activeSheet = nil
 
-					goNextOrReturn(default: .favorite)
+					appState.advanceDraftOrReturn(default: .favorite)
 				} onCancel: {
 					activeSheet = nil
-					cancelEditIfNeeded()
+					appState.cancelEditIfNeeded()
 				}
 
 			case .ratioCustom:
@@ -662,185 +637,18 @@ struct InstrumentCreateFlowView: View {
 					}
 					activeSheet = nil
 
-					goNextOrReturn(default: .aufgeld)
+					appState.advanceDraftOrReturn(default: .aufgeld)
 				} onCancel: {
 					activeSheet = nil
 					localRatio = ratioOptionForValue(appState.draft.draftInstrument.bezugsverhaeltnis)
-					cancelEditIfNeeded()
+					appState.cancelEditIfNeeded()
 				}
 
 		}
 	}
 
 		// MARK: - Helpers
-
-
-		// MARK: - Import-Button Logik
-
-	private var importButtonTitle: String {
-		switch importState {
-			case .idle:
-				return "Import"
-			case .awaitingClipboard:
-				return "Von Zwischenablage einfügen"
-			case .readyToImport:
-				return "Start Import"
-		}
-	}
-
-	private func handleImportButtonTap() {
-		switch importState {
-
-			case .idle:
-					// Schritt 1 → in "Clipboard holen"-Modus schalten
-				importState = .awaitingClipboard
-
-			case .awaitingClipboard:
-					// Schritt 2 → Text aus Zwischenablage holen
-				let clipped = readClipboardText().trimmingCharacters(in: .whitespacesAndNewlines)
-				guard !clipped.isEmpty else {
-						// nichts in der Zwischenablage → zurück auf idle
-					importState = .idle
-					return
-				}
-				importedRawText = clipped
-				importState = .readyToImport
-
-			case .readyToImport:
-					// Schritt 3 → Parser starten, Draft füllen
-				runBasicsImport(with: importedRawText, appState: appState)
-					// Button wieder zurücksetzen
-				importedRawText = ""
-				importState = .idle
-		}
-	}
-
-
-	private var isDraftValid: Bool {
-		let d = appState.draft.draftInstrument
-
-			// 1) Subgroup / UnderlyingName prüfen
-		switch d.assetClass {
-
-					// Klassen mit fest definierten Subgroups (Enum-Pflicht)
-			case .index, .fx, .rohstoff, .crypto, .igBarrier:
-				if d.subgroup == nil {
-					return false
-				}
-
-					// Aktie → freier Name im Underlying zwingend
-			case .aktie:
-				if d.underlyingName
-					.trimmingCharacters(in: .whitespacesAndNewlines)
-					.isEmpty {
-					return false
-				}
-
-			case .none:
-				return false
-		}
-
-			// 2) Basispreis prüfen
-		let basis = d.basispreis.trimmingCharacters(in: .whitespacesAndNewlines)
-		if basis.isEmpty || basis == "0" || basis == "0,0" || basis == "0,00" {
-			return false
-		}
-
-			// 3) IG-Barrier: Basis + Subgroup reicht, Rest egal
-		if d.assetClass == .igBarrier {
-			return true
-		}
-
-			// 4) ISIN-Pflicht (z.B. nicht bei IG)
-		if appState.draftNeedsisin {
-			if d.isin.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-				return false
-			}
-		}
-
-			// 5) Aufgeld muss gesetzt sein
-		let auf = d.aufgeld.trimmingCharacters(in: .whitespacesAndNewlines)
-		if auf.isEmpty {
-			return false
-		}
-
-			// 6) Bezugsverhältnis-Pflicht, falls nötig
-		if appState.draftNeedsRatio {
-			let ratio = d.bezugsverhaeltnis.trimmingCharacters(in: .whitespacesAndNewlines)
-			if ratio.isEmpty {
-				return false
-			}
-		}
-
-		return true
-	}
-
 	private func syncLocalFromDraftIfNeeded() {
 		localRatio = ratioOptionForValue(appState.draft.draftInstrument.bezugsverhaeltnis)
 	}
-
-	private func cancelEditIfNeeded() {
-		if appState.isEditingExistingInstrument {
-			appState.discardEditSession()
-		}
-	}
 }
-private func readClipboardText() -> String {
-#if os(iOS)
-	return UIPasteboard.general.string ?? ""
-#elseif os(macOS)
-	return NSPasteboard.general.string(forType: .string) ?? ""
-#else
-	return ""
-#endif
-}
-
-private func runBasicsImport(with raw: String, appState: AppStateEngine) {
-	let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-	guard !trimmed.isEmpty else { return }
-
-		// nutzt dein Utility
-	let basics = BasicsImportParser.parse(raw: trimmed)
-
-	appState.updateDraft { draft in
-		if let ac = basics.assetClass {
-			draft.assetClass = ac
-		}
-		if let subgroupName = basics.subgroup {
-			if let subgroupEnum = Subgroup.from(displayName: subgroupName) {
-				draft.subgroup = subgroupEnum
-				draft.underlyingName = subgroupEnum.displayName
-			} else {
-					// Fallback: wir speichern nur den Namen ins Underlying,
-					// Subgroup bleibt nil, falls der String keiner bekannten Subgroup entspricht
-				draft.subgroup = nil
-				draft.underlyingName = subgroupName
-			}
-		}
-		if let dir = basics.direction {
-			draft.direction = dir
-		}
-		if let em = basics.emittent {
-			draft.emittent = em
-		}
-		if let isin = basics.isin {
-			draft.isin = isin
-		}
-		
-		if let basis = basics.basispreis {
-			draft.basispreis = basis
-		}
-		if let ratio = basics.ratioDisplay {
-			draft.bezugsverhaeltnis = ratio
-		}
-		if let auf = basics.aufgeld {
-			draft.aufgeld = auf
-		}
-	}
-
-		// Flow „wie gehabt“ weiterführen:
-		// Hier z.B. direkt zu Favorit springen,
-		// oder wenn du willst zu .done.
-	appState.draft.creationStep = .favorite
-}
-	

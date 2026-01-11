@@ -35,8 +35,7 @@ struct WorkspaceToolbarView: View {
 
 					//Alle Ansicht
 				Button {
-					appState.list.showFavoritesOnly = false
-					appState.list.showRecentOnly = false
+					appState.list.showAllInstruments()
 				} label: {
 					toolbarIcon(systemName: "chart.line.uptrend.xyaxis", isHovered: isAllHovered)
 				}
@@ -50,7 +49,7 @@ struct WorkspaceToolbarView: View {
 
 				// Favoriten-Ansicht
 				Button {
-					appState.list.showFavoritesOnly.toggle()
+					appState.list.toggleFavoritesOnly()
 				} label: {
 					toolbarIcon(
 						systemName: appState.list.showFavoritesOnly ? "star.fill" : "star",
@@ -66,12 +65,7 @@ struct WorkspaceToolbarView: View {
 				}
 					// Verlauf, die letzten 10
 				Button {
-					if appState.list.showRecentOnly {
-						appState.list.showRecentOnly = false
-					} else {
-						appState.list.showFavoritesOnly = false
-						appState.list.showRecentOnly = true
-					}
+					appState.list.toggleRecentOnly()
 				} label: {
 					toolbarIcon(systemName: "clock", isHovered: isRecentHovered)
 				}
@@ -85,7 +79,7 @@ struct WorkspaceToolbarView: View {
 
 					// Assetklassen Zuklappen / Aufklappen
 				Button {
-					appState.collapse.setGlobalCollapsed(!appState.collapse.isGlobalCollapsed)
+					appState.toggleGlobalCollapse()
 				} label: {
 					toolbarIcon(
 						systemName: appState.collapse.isGlobalCollapsed ? "book" : "book.closed",
@@ -102,7 +96,7 @@ struct WorkspaceToolbarView: View {
 
 					// Neues Instrument
 				Button {
-					appState.enterCreateMode()
+					appState.startCreateFlow()
 				} label: {
 					toolbarIcon(systemName: "document.badge.plus", isHovered: isCreateHoveredLeft)
 				}
@@ -116,7 +110,7 @@ struct WorkspaceToolbarView: View {
 
 					// Instrument ändern
 				Button {
-					appState.enterEditModeForSelectedInstrument()
+					appState.startEditFlow()
 				} label: {
 					toolbarIcon(
 						systemName: "slider.horizontal.2.arrow.trianglehead.counterclockwise",
@@ -133,10 +127,10 @@ struct WorkspaceToolbarView: View {
 
 					// Instrument löschen
 				Button {
-
-                    let inst: Instrument = appState.selectedInstrument!
-                    instrumentToDelete = inst
-                    showDeleteAlert = true
+					if let inst = appState.prepareDeleteSelectedInstrument() {
+						instrumentToDelete = inst
+						showDeleteAlert = true
+					}
 				} label: {
 					toolbarIcon(systemName: "document.on.trash", isHovered: isDeleteHovered)
 				}
@@ -173,7 +167,7 @@ struct WorkspaceToolbarView: View {
 						isActive: appState.navigation.workspaceMode == .instrumentsCreate,
 						isHovered: isCreateHovered
 					) {
-						appState.enterCreateMode()
+						appState.startCreateFlow()
 					}
 					.onHover { hovering in
 						isCreateHovered = hovering
@@ -195,7 +189,7 @@ struct WorkspaceToolbarView: View {
 			.frame(maxWidth: .infinity, alignment: .center)
 			.alert("Achtung!", isPresented: $showDeleteAlert, presenting: instrumentToDelete) { inst in
 				Button("Löschen", role: .destructive) {
-					appState.deleteInstrument(inst)
+					appState.confirmDelete(inst)
 
 				}
 				Button("Abbrechen", role: .cancel) {}

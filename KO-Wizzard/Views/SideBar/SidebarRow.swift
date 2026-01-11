@@ -46,7 +46,7 @@ struct SidebarRow: View {
 				Group {
 					if isSelected {
 						RoundedRectangle(cornerRadius: 6)
-							.fill(Color.white.opacity(0.10))
+							.fill(SidebarStyle.selectedRowBackground)
 					} else {
 						Color.clear
 					}

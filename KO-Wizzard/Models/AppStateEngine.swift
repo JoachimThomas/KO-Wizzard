@@ -1,6 +1,11 @@
 import Foundation
 import SwiftUI
 import Combine
+#if os(iOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 	/// Zentrale Engine der KO-Wizard App
 	/// - Hält globalen State (Landing, Workspace-Modi)
@@ -100,10 +105,7 @@ final class AppStateEngine: ObservableObject {
 
 	// Landing-Button: "Instrument anlegen"
 	func startInstrumentCreation() {
-		endEditSessionForNavigation(keepSelection: false)
-		resetDraftInstrument()
-		navigation.workspaceMode = .instrumentsCreate
-		navigation.isLandingVisible = false
+		enterCreateMode(selectLastSaved: false)
 	}
 
 	// Landing-Button: "Instrument anzeigen"
@@ -152,6 +154,10 @@ final class AppStateEngine: ObservableObject {
 		draft.draftSubgroups
 	}
 
+	var isCurrentDraftValid: Bool {
+		draft.isDraftValid(draft.draftInstrument)
+	}
+
 	func sanitizedDecimalInput(old: String, new: String) -> String {
 		draft.sanitizedDecimalInput(old: old, new: new)
 	}
@@ -198,6 +204,20 @@ final class AppStateEngine: ObservableObject {
 		}
 		if !draft.allowedEditSteps.contains(draft.creationStep) {
 			draft.creationStep = draftNeedsisin ? .isin : .basispreis
+		}
+	}
+
+	func advanceDraftOrReturn(default next: InstrumentDraftController.InstrumentCreationStep) {
+		if isEditingExistingInstrument {
+			finishEditingStepIfNeeded()
+		} else {
+			draft.creationStep = next
+		}
+	}
+
+	func cancelEditIfNeeded() {
+		if isEditingExistingInstrument {
+			discardEditSession()
 		}
 	}
 
@@ -315,12 +335,16 @@ final class AppStateEngine: ObservableObject {
 	}
 
 	func enterCreateMode() {
+		enterCreateMode(selectLastSaved: true)
+	}
+
+	private func enterCreateMode(selectLastSaved: Bool) {
 		endEditSessionForNavigation(keepSelection: false)
 		navigation.workspaceMode = .instrumentsCreate
 		navigation.isLandingVisible = false
 		resetDraftInstrument()
 
-		if let id = lastSavedInstrumentID {
+		if selectLastSaved, let id = lastSavedInstrumentID {
 			selectedInstrumentID = id
 		}
 	}
@@ -342,6 +366,26 @@ final class AppStateEngine: ObservableObject {
 		navigation.workspaceMode = .instrumentsShowAndChange
 	}
 
+	func startCreateFlow() {
+		enterCreateMode()
+	}
+
+	func startEditFlow() {
+		enterEditModeForSelectedInstrument()
+	}
+
+	func toggleGlobalCollapse() {
+		collapse.setGlobalCollapsed(!collapse.isGlobalCollapsed)
+	}
+
+	func prepareDeleteSelectedInstrument() -> Instrument? {
+		selectedInstrument
+	}
+
+	func confirmDelete(_ instrument: Instrument) {
+		deleteInstrument(instrument)
+	}
+
 	// MARK: - Auswahl
 
 	func selectInstrument(_ instrument: Instrument?) {
@@ -355,6 +399,49 @@ final class AppStateEngine: ObservableObject {
 		guard let id = selectedInstrumentID else { return nil }
 		return instruments.first(where: { $0.id == id })
 	}
+
+	// MARK: - Import
+
+	func handleImportButtonTap() {
+		switch draft.importState {
+			case .idle:
+				draft.importState = .awaitingClipboard
+			case .awaitingClipboard:
+				let clipped = readClipboardText().trimmingCharacters(in: .whitespacesAndNewlines)
+				guard !clipped.isEmpty else {
+					draft.importState = .idle
+					return
+				}
+				draft.importedRawText = clipped
+				draft.importState = .readyToImport
+			case .readyToImport:
+				applyBasicsImport(raw: draft.importedRawText)
+				draft.importedRawText = ""
+				draft.importState = .idle
+		}
+	}
+
+	func applyBasicsImport(raw: String) {
+		let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !trimmed.isEmpty else { return }
+
+		let basics = BasicsImportParser.parse(raw: trimmed)
+		updateDraft { draft in
+			self.draft.applyBasicsImport(basics, to: &draft)
+		}
+
+		draft.creationStep = .favorite
+	}
+}
+
+private func readClipboardText() -> String {
+#if os(iOS)
+	return UIPasteboard.general.string ?? ""
+#elseif os(macOS)
+	return NSPasteboard.general.string(forType: .string) ?? ""
+#else
+	return ""
+#endif
 }
 
 extension AppStateEngine {

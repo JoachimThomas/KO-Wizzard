@@ -31,6 +31,12 @@ final class InstrumentStore: ObservableObject {
 	private let fileURL: URL
 	private var cancellables = Set<AnyCancellable>()
 
+	private func log(_ message: String) {
+#if DEBUG
+		print(message)
+#endif
+	}
+
 		// MARK: - Init
 
 	init(fileURL: URL? = nil) {
@@ -55,12 +61,14 @@ final class InstrumentStore: ObservableObject {
 			.dropFirst()
 			.debounce(for: .seconds(1.0), scheduler: DispatchQueue.main)
 			.sink { [weak self] _ in
-				do {
-					try self?.save()
-				} catch {
-#if DEBUG
-					print("❌ InstrumentStore.autosave Fehler: \(error)")
-#endif
+				guard let self else { return }
+				let snapshot = self.instruments
+				DispatchQueue.global(qos: .utility).async { [weak self] in
+					do {
+						try self?.saveSnapshot(snapshot)
+					} catch {
+						self?.log("❌ InstrumentStore.autosave Fehler: \(error)")
+					}
 				}
 			}
 			.store(in: &cancellables)
@@ -72,13 +80,13 @@ final class InstrumentStore: ObservableObject {
 		let fm = FileManager.default
 
 		if !fm.fileExists(atPath: fileURL.path) {
-			print("ℹ️ InstrumentStore.load: Keine Datei gefunden – starte mit leerer Liste.")
+			log("ℹ️ InstrumentStore.load: Keine Datei gefunden – starte mit leerer Liste.")
 			instruments = []
 			return
 		}
 
-		print("📂 InstrumentStore.load: Datei gefunden.")
-		print("📂 Lade Datei -> \(fileURL.path)")
+		log("📂 InstrumentStore.load: Datei gefunden.")
+		log("📂 Lade Datei -> \(fileURL.path)")
 
 		do {
 			let data = try Data(contentsOf: fileURL)
@@ -86,15 +94,19 @@ final class InstrumentStore: ObservableObject {
 			decoder.dateDecodingStrategy = .iso8601
 
 			let decoded = try decoder.decode([Instrument].self, from: data)
-			print("✅ Dekodierung OK – \(decoded.count) Einträge")
+			log("✅ Dekodierung OK – \(decoded.count) Einträge")
 			instruments = decoded
 		} catch {
-			print("❌ Fehler beim Laden/Dekodieren der Instrumente: \(error)")
+			log("❌ Fehler beim Laden/Dekodieren der Instrumente: \(error)")
 			instruments = []
 		}
 	}
 
 	func save() throws {
+		try saveSnapshot(instruments)
+	}
+
+	private func saveSnapshot(_ instruments: [Instrument]) throws {
 		let encoder = JSONEncoder()
 		encoder.dateEncodingStrategy = .iso8601
 		encoder.outputFormatting = [.prettyPrinted, .sortedKeys]

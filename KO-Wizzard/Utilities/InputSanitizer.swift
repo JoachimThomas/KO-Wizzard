@@ -14,13 +14,21 @@ enum InputSanitizer {
 		/// - erlaubt nur 0–9 und Komma
 		/// - maximal ein Komma
 	static func numeric(_ s: String) -> String {
-		var cleaned = s.replacingOccurrences(of: ".", with: ",")
-		cleaned = cleaned.filter { "0123456789,".contains($0) }
+		let replaced = s.replacingOccurrences(of: ".", with: ",")
+		let allowed = Set("0123456789,")
+		let filtered = replaced.filter { allowed.contains($0) }
 
-		let parts = cleaned.split(separator: ",")
-		if parts.count > 2 {
-			cleaned = parts.prefix(2).map(String.init).joined(separator: ",")
+		var result = ""
+		var commaSeen = false
+
+		for ch in filtered {
+			if ch == "," {
+				if commaSeen { continue }
+				if result.isEmpty { continue }
+				commaSeen = true
+			}
+			result.append(ch)
 		}
-		return cleaned
+		return result
 	}
 }

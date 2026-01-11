@@ -119,4 +119,52 @@ final class InstrumentListController: ObservableObject {
 			return (assetClass: key, instruments: items)
 		}
 	}
+
+	struct SidebarSection {
+		let assetClass: AssetClass
+		let subgroups: [SidebarSubgroupSection]
+	}
+
+	struct SidebarSubgroupSection {
+		let name: String
+		let longs: [Instrument]
+		let shorts: [Instrument]
+	}
+
+	func groupedSidebarSections() -> [SidebarSection] {
+		groupedInstruments.map { group in
+			let subgroupMap: [String: [Instrument]] = Dictionary(grouping: group.instruments) { ins in
+				(ins.subgroup?.displayName ?? ins.underlyingName)
+					.trimmingCharacters(in: .whitespacesAndNewlines)
+			}
+
+			let subgroupNames = subgroupMap.keys.sorted { $0.lowercased() < $1.lowercased() }
+			let subgroups = subgroupNames.map { name in
+				let inSub = subgroupMap[name] ?? []
+				let longs = inSub.filter { $0.direction == .long }
+				let shorts = inSub.filter { $0.direction == .short }
+				return SidebarSubgroupSection(name: name, longs: longs, shorts: shorts)
+			}
+
+			return SidebarSection(assetClass: group.assetClass, subgroups: subgroups)
+		}
+	}
+
+	func showAllInstruments() {
+		showFavoritesOnly = false
+		showRecentOnly = false
+	}
+
+	func toggleFavoritesOnly() {
+		showFavoritesOnly.toggle()
+	}
+
+	func toggleRecentOnly() {
+		if showRecentOnly {
+			showRecentOnly = false
+		} else {
+			showFavoritesOnly = false
+			showRecentOnly = true
+		}
+	}
 }

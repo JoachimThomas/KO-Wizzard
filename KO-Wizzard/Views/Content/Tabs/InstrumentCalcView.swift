@@ -224,47 +224,31 @@ struct InstrumentCalcView: View {
 	}
 
 	private func applyUnderlyingInput(_ raw: String) {
-		guard let instrument = instrument,
-			  let underlying = Instrument.parseNumber(raw) else {
+		guard let instrument = instrument else {
 			underlyingValue = "—"
 			certificateValue = "—"
 			return
 		}
-
-		underlyingValue = raw
-
-		let result = InstrumentPricingEngine.priceFromUnderlying(
-			instrument: instrument,
-			underlyingPrice: underlying
+		let result = InstrumentPricingEngine.calculateFromUnderlying(
+			raw: raw,
+			instrument: instrument
 		)
-
-		if let value = result.value {
-			certificateValue = Instrument.compact(value)
-		} else {
-			certificateValue = "—"
-		}
+		underlyingValue = result.underlying
+		certificateValue = result.certificate
 	}
 
 	private func applyCertificateInput(_ raw: String) {
-		guard let instrument = instrument,
-			  let certificate = Instrument.parseNumber(raw) else {
+		guard let instrument = instrument else {
 			certificateValue = "—"
 			underlyingValue = "—"
 			return
 		}
-
-		certificateValue = raw
-
-		let result = InstrumentPricingEngine.underlyingFromPrice(
-			instrument: instrument,
-			certificatePrice: certificate
+		let result = InstrumentPricingEngine.calculateFromCertificate(
+			raw: raw,
+			instrument: instrument
 		)
-
-		if let value = result.value {
-			underlyingValue = Instrument.compact(value)
-		} else {
-			underlyingValue = "—"
-		}
+		underlyingValue = result.underlying
+		certificateValue = result.certificate
 	}
 
 		// MARK: - Empty State

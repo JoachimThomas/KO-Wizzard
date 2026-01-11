@@ -23,6 +23,11 @@ struct InstrumentPricingEngine {
 		let error: PricingError?
 	}
 
+	struct CalculationDisplayResult {
+		let underlying: String
+		let certificate: String
+	}
+
 	static func priceFromUnderlying(
 		instrument: Instrument,
 		underlyingPrice: Double
@@ -62,6 +67,29 @@ struct InstrumentPricingEngine {
 		return PricingResult(value: price, error: nil)
 	}
 
+	static func calculateFromUnderlying(
+		raw: String,
+		instrument: Instrument
+	) -> CalculationDisplayResult {
+		guard let underlying = Instrument.parseNumber(raw) else {
+			return CalculationDisplayResult(underlying: "—", certificate: "—")
+		}
+
+		let result = priceFromUnderlying(
+			instrument: instrument,
+			underlyingPrice: underlying
+		)
+
+		let certificate: String
+		if let value = result.value {
+			certificate = Instrument.compact(value)
+		} else {
+			certificate = "—"
+		}
+
+		return CalculationDisplayResult(underlying: raw, certificate: certificate)
+	}
+
 	static func underlyingFromPrice(
 		instrument: Instrument,
 		certificatePrice: Double
@@ -99,6 +127,29 @@ struct InstrumentPricingEngine {
 		}
 
 		return UnderlyingResult(value: underlying, error: nil)
+	}
+
+	static func calculateFromCertificate(
+		raw: String,
+		instrument: Instrument
+	) -> CalculationDisplayResult {
+		guard let certificate = Instrument.parseNumber(raw) else {
+			return CalculationDisplayResult(underlying: "—", certificate: "—")
+		}
+
+		let result = underlyingFromPrice(
+			instrument: instrument,
+			certificatePrice: certificate
+		)
+
+		let underlying: String
+		if let value = result.value {
+			underlying = Instrument.compact(value)
+		} else {
+			underlying = "—"
+		}
+
+		return CalculationDisplayResult(underlying: underlying, certificate: raw)
 	}
 
 	private static func ratioMultiplier(from raw: String) -> Double? {

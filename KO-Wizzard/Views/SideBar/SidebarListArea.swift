@@ -15,9 +15,10 @@ struct SidebarListArea: View {
 		ScrollView {
 			VStack(alignment: .leading, spacing: 10) {
 
-				ForEach(appState.list.groupedInstruments, id: \.assetClass) { group in
-					let assetClass = group.assetClass
-					let instruments = group.instruments
+				ForEach(appState.list.groupedSidebarSections(), id: \.assetClass) { section in
+					let assetClass = section.assetClass
+					let subgroups = section.subgroups
+					let hasInstruments = subgroups.contains { !$0.longs.isEmpty || !$0.shorts.isEmpty }
 
 						// komplette Gruppe pro AssetClass
 					VStack(alignment: .leading, spacing: 4) {
@@ -29,9 +30,9 @@ struct SidebarListArea: View {
 							HStack(spacing: 8) {
 									// Punkt zeigt: hier lebt was
 								Circle()
-									.fill(instruments.isEmpty
-										  ? Color.gray.opacity(0.3)
-										  : Color.green.opacity(0.9))
+									.fill(hasInstruments
+										  ? Color.green.opacity(0.9)
+										  : Color.gray.opacity(0.3))
 									.frame(width: 6, height: 6)
 
 								Text(assetClass.displayName)
@@ -54,25 +55,8 @@ struct SidebarListArea: View {
 							// Inhalte: nur wenn NICHT eingeklappt
 						if !appState.collapse.isAssetClassCollapsed(assetClass) {
 
-								// nach Subgroup / Underlying gruppieren
-							let subgroupNames: [String] = Array(
-								Set(
-									instruments.map { ins in
-										let name = ins.subgroup?.displayName ?? ins.underlyingName
-										return name.trimmingCharacters(in: .whitespaces)
-									}
-								)
-							)
-								.sorted { $0.lowercased() < $1.lowercased() }
-
-							ForEach(subgroupNames, id: \.self) { subgroupName in
-								let inSub = instruments.filter { ins in
-									let name = (ins.subgroup?.displayName ?? ins.underlyingName)
-										.trimmingCharacters(in: .whitespaces)
-									return name == subgroupName
-								}
-
-								let trimmedSubgroup = subgroupName.trimmingCharacters(in: .whitespaces)
+							ForEach(subgroups, id: \.name) { subgroup in
+								let trimmedSubgroup = subgroup.name.trimmingCharacters(in: .whitespaces)
 
 								if !trimmedSubgroup.isEmpty {
 									Button {
@@ -105,8 +89,8 @@ struct SidebarListArea: View {
 									&& appState.collapse.isSubgroupCollapsed(assetClass: assetClass, subgroup: trimmedSubgroup)
 
 								if !isSubgroupCollapsed {
-									let longs  = inSub.filter { $0.direction == .long }
-									let shorts = inSub.filter { $0.direction == .short }
+									let longs = subgroup.longs
+									let shorts = subgroup.shorts
 
 									// LONG-Block
 									if !longs.isEmpty {

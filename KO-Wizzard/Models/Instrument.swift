@@ -58,15 +58,20 @@ extension Instrument {
 
 extension Instrument {
 
+	private static let numberFormatter: NumberFormatter = {
+		let nf = NumberFormatter()
+		nf.numberStyle = .decimal
+		return nf
+	}()
+
 		/// Tolerant: akzeptiert "1.234,56", "1 234,56", "1234.56"
 	static func parseNumber(_ s: String) -> Double? {
 		let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
 		if t.isEmpty { return nil }
 
 			// zuerst mit Locale versuchen
-		let nf = NumberFormatter()
+		let nf = Self.numberFormatter
 		nf.locale = Locale.current
-		nf.numberStyle = .decimal
 		if let n = nf.number(from: t)?.doubleValue {
 			return n
 		}
