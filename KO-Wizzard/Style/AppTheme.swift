@@ -16,12 +16,15 @@ struct AppColors {
 
 	var primaryBlue: Color { Color(red: 0.0, green: 0.48, blue: 1.0) }
 	var accentOrange: Color { Color(red: 1.0, green: 0.62, blue: 0.04) }
+	var alertRed: Color { .red }
 	var textPrimary: Color { .primary }
 	var textSecondary: Color { .secondary }
 	var cardBackground: Color { Color.secondary.opacity(0.05) }
 	var sidebarSelection: Color { Color.gray.opacity(0.12) }
 	var divider: Color { Color.primary.opacity(0.2) }
 	var strokeLight: Color { Color.white.opacity(0.18) }
+	var highlightLight: Color { Color.white.opacity(0.2) }
+	var footerText: Color { .white }
 }
 
 struct AppFonts {
@@ -31,6 +34,7 @@ struct AppFonts {
 	var headline: Font { .menlo(textStyle: .headline) }
 	var subheadline: Font { .menlo(textStyle: .subheadline) }
 	var footnote: Font { .menlo(textStyle: .footnote) }
+	var footerSmall: Font { .custom("Menlo", size: 11) }
 	var toolbarIcon: Font { .system(size: 12, weight: .semibold) }
 	var toolbarTab: Font { .subheadline.weight(.semibold) }
 }
@@ -76,6 +80,15 @@ struct Gradients {
 			colors: [colors.primaryBlue.opacity(0.9), colors.primaryBlue.opacity(0.6)],
 			startPoint: .topLeading,
 			endPoint: .bottomTrailing
+		)
+	}
+
+	func toolbarIconHighlight(_ colors: AppColors) -> RadialGradient {
+		RadialGradient(
+			colors: [colors.highlightLight, Color.clear],
+			center: .topLeading,
+			startRadius: 2,
+			endRadius: 12
 		)
 	}
 
