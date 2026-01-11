@@ -62,3 +62,9 @@ Desktop-App (SwiftUI) zum Anlegen, Anzeigen und Berechnen von KO-/Turbo-/Barrier
 ## Build
 - Xcode Scheme: `KO-Wizzard`.
 - Debug-Check: `xcodebuild -project KO-Wizzard.xcodeproj -scheme KO-Wizzard -configuration Debug -destination 'platform=macOS' build`.
+
+---
+Stand: 2026-01-11
+Branch: refactor/view-cleanup
+Commit: 600e0f1c74d3acdc30bef666a7da7aa24edeb7e9
+Kurzbeschreibung: Views verschlankt (Logik in Controller/Utilities), Sidebar-Selection-Style zentralisiert, Non-UI-Verbesserungen (Sanitizer/Autosave/Decoder-Logging/Formatter-Caching), Utilities nach Domänen (Parsing/Calculation/Draft) organisiert.
