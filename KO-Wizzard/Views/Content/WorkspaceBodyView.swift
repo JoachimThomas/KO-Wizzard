@@ -16,9 +16,9 @@ struct WorkspaceBodyView: View {
 		VStack(spacing: 0) {
 			HStack(spacing: 0) {
 
-					// Sidebar links
+				// Sidebar links
 				SidebarView()
-					.frame(width: 300)
+					.frame(width: theme.metrics.sidebarWidth)
 
 					// Content rechts
 				ContentRouterView()
