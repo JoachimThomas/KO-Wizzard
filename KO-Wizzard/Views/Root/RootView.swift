@@ -47,6 +47,9 @@ struct RootView: View {
             .ignoresSafeArea(.container, edges: .top)
             .allowsHitTesting(false)
         }
+		.safeAreaInset(edge: .top) {
+			Color.clear.frame(height: theme.metrics.titlebarHeight)
+		}
 		.appTheme(theme)
 		.tint(theme.colors.chromeAccent)
 #if DEBUG
