@@ -242,26 +242,37 @@ struct WorkspaceToolbarView: View {
 					Circle()
 						.fill(
 							LinearGradient(
-								colors: [Color.blue.opacity(0.9), Color.blue.opacity(0.55)],
+								colors: [
+									theme.colors.primaryBlue.opacity(0.9),
+									theme.colors.primaryBlue.opacity(0.55)
+								],
 								startPoint: .topLeading,
 								endPoint: .bottomTrailing
 							)
 						)
-						.shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+						.shadow(
+							color: theme.effects.shadowSoft.color,
+							radius: theme.effects.shadowSoft.radius,
+							x: theme.effects.shadowSoft.x,
+							y: theme.effects.shadowSoft.y
+						)
 						.overlay(
 							Circle()
-								.stroke(Color.white.opacity(0.18), lineWidth: 1)
+								.stroke(theme.colors.strokeLight, lineWidth: 1)
 						)
 
 	Circle()
-		.stroke(Color(red: 1.0, green: 0.62, blue: 0.04).opacity(isHovered ? 0.75 : 0), lineWidth: 2)
+		.stroke(
+			theme.colors.accentOrange.opacity(isHovered ? theme.effects.hoverGlowOpacity : 0),
+			lineWidth: 2
+		)
 		.blur(radius: isHovered ? 1 : 2)
-		.animation(.easeInOut(duration: 0.14), value: isHovered)
+		.animation(theme.effects.hoverAnimation, value: isHovered)
 
 					Circle()
 						.fill(
 							RadialGradient(
-								colors: [Color.white.opacity(0.18), Color.clear],
+								colors: [theme.colors.highlightLight, Color.clear],
 								center: .topLeading,
 								startRadius: 2,
 								endRadius: 14
@@ -270,21 +281,20 @@ struct WorkspaceToolbarView: View {
 						.blendMode(.screen)
 
 					Image(systemName: icon)
-						.font(.system(size: 13, weight: .semibold))
+						.font(.system(size: theme.metrics.toolbarTabIconSize, weight: .semibold))
 						.foregroundColor(.white)
 				}
-				.frame(width: 26, height: 26)
+				.frame(width: theme.metrics.toolbarTabIconCircle, height: theme.metrics.toolbarTabIconCircle)
 
 				Text(title)
-					.font(.subheadline)
-					.fontWeight(.semibold)
+					.font(theme.fonts.toolbarTab)
 					.foregroundColor(isActive ? .primary : .secondary)
 			}
-			.padding(.horizontal, 10)
-			.padding(.vertical, 6)
+			.padding(.horizontal, theme.metrics.toolbarTabPaddingH)
+			.padding(.vertical, theme.metrics.toolbarTabPaddingV)
 			.background(
-				RoundedRectangle(cornerRadius: 10)
-					.fill(isActive ? Color.accentColor.opacity(0.12) : Color.clear)
+				RoundedRectangle(cornerRadius: theme.metrics.toolbarTabCornerRadius)
+					.fill(isActive ? theme.colors.toolbarTabActiveBackground : Color.clear)
 			)
 		}
 		.buttonStyle(PressableToolbarStyle())

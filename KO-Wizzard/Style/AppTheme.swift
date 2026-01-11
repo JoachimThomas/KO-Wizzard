@@ -28,6 +28,7 @@ struct AppColors {
 	var highlightLight: Color { Color.white.opacity(0.2) }
 	var footerText: Color { .white }
 	var inputBackground: Color { Color.secondary.opacity(0.08) }
+	var toolbarTabActiveBackground: Color { Color.accentColor.opacity(0.12) }
 }
 
 struct AppFonts {
@@ -57,6 +58,11 @@ struct Metrics {
 	var sidebarSearchPaddingH: CGFloat { 8 }
 	var sidebarSearchPaddingTop: CGFloat { 8 }
 	var sidebarSearchPaddingBottom: CGFloat { 6 }
+	var toolbarTabCornerRadius: CGFloat { 10 }
+	var toolbarTabPaddingH: CGFloat { 10 }
+	var toolbarTabPaddingV: CGFloat { 6 }
+	var toolbarTabIconSize: CGFloat { 13 }
+	var toolbarTabIconCircle: CGFloat { 26 }
 	var paddingSmall: CGFloat { 8 }
 	var paddingMedium: CGFloat { 12 }
 	var paddingLarge: CGFloat { 16 }
