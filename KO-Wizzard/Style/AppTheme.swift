@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-enum ThemeMode {
+enum ThemeMode: String {
 	case system
 	case light
 	case dark
@@ -14,32 +14,55 @@ enum ThemeMode {
 struct AppColors {
 	let mode: ThemeMode
 
+	private func resolve(light: Color, dark: Color) -> Color {
+		switch mode {
+		case .dark:
+			return dark
+		case .light, .system:
+			return light
+		}
+	}
+
 	var primaryBlue: Color { Color(red: 0.0, green: 0.48, blue: 1.0) }
 	var accentOrange: Color { Color(red: 1.0, green: 0.62, blue: 0.04) }
 	var alertRed: Color { .red }
-	var textPrimary: Color { .primary }
-	var textSecondary: Color { .secondary }
-	var cardBackground: Color { Color.secondary.opacity(0.05) }
-	var workspaceGradientTop: Color { Color.secondary.opacity(0.03) }
-	var workspaceGradientBottom: Color { Color.secondary.opacity(0.05) }
-	var sidebarSelection: Color { Color.black.opacity(0.08) }
-	var sidebarSearchBackground: Color { Color.white.opacity(0.08) }
-	var sidebarText: Color { Color.black.opacity(0.88) }
-	var sidebarHeaderText: Color { Color.black.opacity(0.88) }
-	var sidebarSubgroupText: Color { Color.black.opacity(0.75) }
-	var sidebarDirectionText: Color { Color.black.opacity(0.65) }
-	var sidebarChevron: Color { Color.black.opacity(0.65) }
-	var sidebarChevronMuted: Color { Color.black.opacity(0.55) }
-	var sidebarIndicatorEmpty: Color { Color.gray.opacity(0.3) }
-	var sidebarIndicatorActive: Color { Color.green.opacity(0.9) }
-	var sidebarIndicatorFavorite: Color { .yellow }
-	var sidebarIndicatorRecent: Color { .red }
-	var divider: Color { Color.primary.opacity(0.2) }
-	var strokeLight: Color { Color.white.opacity(0.18) }
-	var highlightLight: Color { Color.white.opacity(0.2) }
-	var footerText: Color { .white }
-	var inputBackground: Color { Color.secondary.opacity(0.08) }
-	var toolbarTabActiveBackground: Color { Color.accentColor.opacity(0.12) }
+	var textPrimary: Color { resolve(light: .primary, dark: .primary) }
+	var textSecondary: Color { resolve(light: .secondary, dark: .secondary) }
+	var cardBackground: Color {
+		resolve(light: Color.secondary.opacity(0.05), dark: Color.white.opacity(0.06))
+	}
+	var workspaceGradientTop: Color {
+		resolve(light: Color.secondary.opacity(0.03), dark: Color.white.opacity(0.03))
+	}
+	var workspaceGradientBottom: Color {
+		resolve(light: Color.secondary.opacity(0.05), dark: Color.white.opacity(0.05))
+	}
+	var sidebarSelection: Color {
+		resolve(light: Color.black.opacity(0.08), dark: Color.white.opacity(0.08))
+	}
+	var sidebarSearchBackground: Color {
+		resolve(light: Color.white.opacity(0.08), dark: Color.white.opacity(0.06))
+	}
+	var sidebarText: Color { resolve(light: Color.black.opacity(0.88), dark: Color.white.opacity(0.9)) }
+	var sidebarHeaderText: Color { resolve(light: Color.black.opacity(0.88), dark: Color.white.opacity(0.9)) }
+	var sidebarSubgroupText: Color { resolve(light: Color.black.opacity(0.75), dark: Color.white.opacity(0.8)) }
+	var sidebarDirectionText: Color { resolve(light: Color.black.opacity(0.65), dark: Color.white.opacity(0.7)) }
+	var sidebarChevron: Color { resolve(light: Color.black.opacity(0.65), dark: Color.white.opacity(0.7)) }
+	var sidebarChevronMuted: Color { resolve(light: Color.black.opacity(0.55), dark: Color.white.opacity(0.6)) }
+	var sidebarIndicatorEmpty: Color { resolve(light: Color.gray.opacity(0.3), dark: Color.white.opacity(0.3)) }
+	var sidebarIndicatorActive: Color { resolve(light: Color.green.opacity(0.9), dark: Color.green.opacity(0.8)) }
+	var sidebarIndicatorFavorite: Color { resolve(light: .yellow, dark: .yellow) }
+	var sidebarIndicatorRecent: Color { resolve(light: .red, dark: .red) }
+	var divider: Color { resolve(light: Color.primary.opacity(0.2), dark: Color.white.opacity(0.2)) }
+	var strokeLight: Color { resolve(light: Color.white.opacity(0.18), dark: Color.white.opacity(0.2)) }
+	var highlightLight: Color { resolve(light: Color.white.opacity(0.2), dark: Color.white.opacity(0.25)) }
+	var footerText: Color { resolve(light: .white, dark: .white) }
+	var inputBackground: Color {
+		resolve(light: Color.secondary.opacity(0.08), dark: Color.white.opacity(0.08))
+	}
+	var toolbarTabActiveBackground: Color {
+		resolve(light: Color.accentColor.opacity(0.12), dark: Color.accentColor.opacity(0.2))
+	}
 }
 
 struct AppFonts {
@@ -176,6 +199,10 @@ struct AppTheme {
 	var metrics: Metrics { Metrics() }
 	var gradients: Gradients { Gradients() }
 	var effects: Effects { Effects() }
+
+	init(mode: ThemeMode = .system) {
+		self.mode = mode
+	}
 }
 
 extension EnvironmentValues {

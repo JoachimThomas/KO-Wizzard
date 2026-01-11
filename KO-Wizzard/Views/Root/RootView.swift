@@ -6,6 +6,9 @@ struct RootView: View {
 
     @EnvironmentObject var appState: AppStateEngine
 	@Environment(\.appTheme) private var theme
+#if DEBUG
+	@AppStorage("debugThemeMode") private var debugThemeModeRaw: String = ThemeMode.system.rawValue
+#endif
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -38,10 +41,35 @@ struct RootView: View {
             .ignoresSafeArea(.container, edges: .top)
             .allowsHitTesting(false)
         }
+#if DEBUG
+		.overlay(alignment: .bottomTrailing) {
+			debugThemeControl
+		}
+#endif
             // System-Hintergrund der Toolbar ausblenden
         .toolbarBackground(.hidden, for: .windowToolbar)
         .toolbarBackground(.hidden, for: .automatic)
 	}
+
+#if DEBUG
+	private var debugThemeControl: some View {
+		HStack(spacing: 8) {
+			Text("Theme")
+				.font(.caption2)
+			Picker("", selection: $debugThemeModeRaw) {
+				Text("System").tag(ThemeMode.system.rawValue)
+				Text("Hell").tag(ThemeMode.light.rawValue)
+				Text("Dunkel").tag(ThemeMode.dark.rawValue)
+			}
+			.pickerStyle(.segmented)
+			.frame(width: 180)
+		}
+		.padding(8)
+		.background(.ultraThinMaterial)
+		.clipShape(RoundedRectangle(cornerRadius: 8))
+		.padding(12)
+	}
+#endif
 }
 
 #Preview {
