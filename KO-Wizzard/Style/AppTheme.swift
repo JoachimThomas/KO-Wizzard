@@ -27,7 +27,7 @@ struct AppColors {
 	var accentOrange: Color { Color(red: 1.0, green: 0.62, blue: 0.04) }
 	var glowRing: Color { resolve(light: accentOrange, dark: primaryBlue) }
 	var chromeAccent: Color { resolve(light: primaryBlue, dark: accentOrange) }
-	var actionBlue: Color { resolve(light: .blue, dark: .blue) }
+	var actionBlue: Color { resolve(light: .blue, dark: accentOrange) }
 	var alertRed: Color { .red }
 	var alertRedMuted: Color { resolve(light: Color.red.opacity(0.8), dark: Color.red.opacity(0.8)) }
 	var successGreen: Color { resolve(light: .green, dark: .green) }
