@@ -4,6 +4,11 @@
 	//
 
 import SwiftUI
+#if os(iOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 struct InstrumentCalcView: View {
 
@@ -16,6 +21,7 @@ struct InstrumentCalcView: View {
 	@State private var showCertificateInput: Bool = false
 	@State private var underlyingValue: String = "—"
 	@State private var certificateValue: String = "—"
+	@State private var lastCopiedLabel: String?
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
@@ -215,6 +221,23 @@ struct InstrumentCalcView: View {
 			Text(value)
 				.fontWeight(.medium)
 				.contentEmphasis(.identifier)
+			if value != "—" {
+				Button {
+					copyToClipboard(value)
+					lastCopiedLabel = label
+					DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+						if lastCopiedLabel == label {
+							lastCopiedLabel = nil
+						}
+					}
+				} label: {
+					Image(systemName: "doc.on.doc")
+						.imageScale(.small)
+						.foregroundColor(lastCopiedLabel == label ? .green : .secondary)
+				}
+				.buttonStyle(.plain)
+				.help("In Zwischenablage kopieren")
+			}
 			Spacer()
 			Button(action: action) {
 				Image(systemName: icon)
@@ -222,6 +245,16 @@ struct InstrumentCalcView: View {
 			}
 			.buttonStyle(.plain)
 		}
+	}
+	
+	private func copyToClipboard(_ value: String) {
+#if os(iOS)
+		UIPasteboard.general.string = value
+#elseif os(macOS)
+		let pasteboard = NSPasteboard.general
+		pasteboard.clearContents()
+		pasteboard.setString(value, forType: .string)
+#endif
 	}
 
 	private func applyUnderlyingInput(_ raw: String) {
