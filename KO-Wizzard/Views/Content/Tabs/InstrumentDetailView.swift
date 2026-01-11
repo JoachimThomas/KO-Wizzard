@@ -8,6 +8,7 @@ import SwiftUI
 struct InstrumentDetailView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 
 	let mode: NavigationController.WorkspaceMode
 	let instrument: Instrument?
@@ -100,8 +101,8 @@ struct InstrumentDetailView: View {
 						step: .favorite)
 		}
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-		.workspaceGradientBackground(cornerRadius: 14)
+        .padding(theme.metrics.paddingLarge)
+		.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
 	}
 
 		// MARK: - Rows
