@@ -127,14 +127,13 @@ Ein Schritt gilt als abgeschlossen, wenn:
 1) Build grün
 2) Änderungen committed (lokal)
 3) `git status` clean
-4) Codex liefert **den exakten Terminalbefehl**, den ICH ausführe, um zu pushen (push mache ich selbst)
 
-### Standard-Output am Ende jedes Meilensteins 
+
+### Standard-Output am Ende jedes Meilensteins ( Wenn ich poste:"Meilenstein erledigt"
 Codex muss am Ende immer ausgeben:
 - `git status` (soll clean sein)
 - letzter Commit-Hash (`git rev-parse --short HEAD`)
-- Push-Befehl als Copy&Paste (auszuführen durch den User), z.B.:
-  `git push -u origin <branch>`
+- Codex liefert **den exakten Terminalbefehl**, den ICH ausführe, um zu pushen (push mache ich selbst)
 
 
 
