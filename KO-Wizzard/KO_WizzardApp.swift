@@ -9,6 +9,7 @@ struct KO_WizardApp: App {
 	@StateObject private var appState = AppStateEngine()
 #if DEBUG
 	@AppStorage("debugThemeMode") private var debugThemeModeRaw: String = ThemeMode.system.rawValue
+	@AppStorage("debugThemeOverrideEnabled") private var debugThemeOverrideEnabled: Bool = false
 #endif
 
 	init() {
@@ -19,7 +20,9 @@ struct KO_WizardApp: App {
 
 	var body: some Scene {
 #if DEBUG
-		let themeMode = ThemeMode(rawValue: debugThemeModeRaw) ?? .system
+		let themeMode = debugThemeOverrideEnabled
+			? (ThemeMode(rawValue: debugThemeModeRaw) ?? .system)
+			: .system
 #else
 		let themeMode = ThemeMode.system
 #endif
