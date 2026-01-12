@@ -106,3 +106,86 @@ git branch -d feature/neues-feature
 Wenn Feature verworfen wird:  
 git switch main  
 git branch -D feature/neues-feature
+
+
+Git Cheat Sheet – KO-Wizzard
+Solo-Workflow | sicher | nachvollziehbar | stressfrei
+
+Ziel:
+Nie wieder hinterher merken, was man vorher hätte wissen sollen.
+Fokus: kleine Schritte, saubere Zustände, sichere Rückwege.
+
+Goldene Regeln:
+Nie auf main basteln.
+Vor jedem neuen Schritt: git status → muss sauber sein.
+Nach jeder sinnvollen Etappe: Commit.
+Push = Backup (optional, aber sinnvoll).
+Keine Panik-Kommandos.
+
+Die 6 wichtigsten Befehle:
+git status
+git diff
+git add -A
+git commit -m "Kurz & konkret: was/warum"
+git switch <branch>
+git switch -c feature/<name>
+
+Standard-Workflow:
+
+Start eines Features:
+git switch main
+git pull --ff-only
+git switch -c feature/<thema>
+
+Arbeiten & Checkpoints:
+git status
+git diff
+git add -A
+git commit -m "Sinnvoller Zwischenstand (Build grün)"
+
+Optionales Backup:
+git push -u origin feature/<thema>
+
+Feature fertig → Merge nach main:
+git switch main
+git pull --ff-only
+git merge --no-ff feature/<thema> -m "Merge feature/<thema>"
+Build prüfen → danach (manuell):
+git push
+Branch aufräumen:
+git branch -d feature/<thema>
+git push origin --delete feature/<thema>
+
+Lokale Änderungen verwalten:
+
+Neue / gelöschte Dateien sichern:
+git add -A
+git commit -m "Add/Remove: Beschreibung"
+
+Alles auf letzten Commit zurücksetzen:
+git restore .
+
+Eine einzelne Datei zurücksetzen:
+git restore Pfad/zur/Datei
+
+Kurz parken (Stash):
+git stash push -m "WIP"
+git stash pop
+
+Notfall:
+git reset --soft HEAD~1
+git reset --hard HEAD~1
+git clean -fd
+
+Überblick:
+git branch --show-current
+git log --oneline --decorate --graph --max-count=20
+
+Abendroutine – Lebensversicherung:
+Vor dem Schlafen immer:
+git status
+git add -A
+git commit -m "Checkpoint: Feierabend"
+Optionales Backup:
+git push
+Wenn diese drei Befehle gelaufen sind, kannst du ruhig schlafen.
