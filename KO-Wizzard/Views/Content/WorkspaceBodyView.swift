@@ -10,14 +10,15 @@ import SwiftUI
 struct WorkspaceBodyView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 
 	var body: some View {
 		VStack(spacing: 0) {
 			HStack(spacing: 0) {
 
-					// Sidebar links
+				// Sidebar links
 				SidebarView()
-					.frame(width: 300)
+					.frame(width: theme.metrics.sidebarWidth)
 
 					// Content rechts
 				ContentRouterView()
@@ -27,21 +28,18 @@ struct WorkspaceBodyView: View {
 	}
 
        
-        // Stelle sicher, dass diese Definition in RootView oder einem gemeinsam genutzten Bereich existiert
-    private let appBlue = Color(red: 0.0, green: 0.48, blue: 1.0)
-
 	private var footer: some View {
 		let isEditing = appState.draft.isEditingExistingInstrument
 
 		return HStack {
 			Text("Wizard – \(appState.instrumentStore.instrumentCount) Assets geladen")
-				.foregroundColor(.white)
+				.foregroundColor(theme.colors.footerText)
 			Spacer()
 			Text(isEditing ? "Modus: Asset-Änderung" : "Modus: \(modeLabel)")
-				.foregroundColor(isEditing ? .red : .white)
+				.foregroundColor(isEditing ? theme.colors.alertRed : theme.colors.footerText)
 		}
-		.font(.custom("Menlo", size: 11))
-		.padding(.horizontal, 12)
+		.font(theme.fonts.footerSmall)
+		.padding(.horizontal, theme.metrics.paddingMedium)
 		.frame(height: 26)
         .background(
             ZStack {
@@ -50,16 +48,10 @@ struct WorkspaceBodyView: View {
                     .fill(.ultraThinMaterial)
 
                     // 2. Der spezifische, invertierte Farbverlauf als Overlay
-                LinearGradient(
-                    colors: [
-                        appBlue.opacity(0.5),  // Oberer Rand des Footers (heller zur App-Mitte)
-                        appBlue.opacity(0.8)   // Unterer Rand des Footers (dunkler zum Fensterrand)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .blendMode(.multiply) // Sorgt für organische Verschmelzung
+				theme.gradients.footer(theme.colors)
+					.blendMode(theme.chromeBlendMode) // Sorgt für organische Verschmelzung
             }
+			.allowsHitTesting(false)
         )
     }
 

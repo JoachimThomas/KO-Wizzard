@@ -4,10 +4,16 @@
 	//
 
 import SwiftUI
+#if os(iOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 struct InstrumentCalcView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 
 	let instrument: Instrument?
 	private let mode: NavigationController.WorkspaceMode = .instrumentCalculation
@@ -15,27 +21,21 @@ struct InstrumentCalcView: View {
 	@State private var showCertificateInput: Bool = false
 	@State private var underlyingValue: String = "—"
 	@State private var certificateValue: String = "—"
+	@State private var lastCopiedLabel: String?
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 12) {
-
-			Text(headerTitle)
-				.font(.menlo(textStyle: .headline))
-				.fontWeight(.bold)
-				.contentEmphasis()
-				.padding(.bottom, 4)
+		VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
+			titleCard("Asset-Kursberechnungen")
 
 			if let instrument = instrument {
-				detailCard(for: instrument)
-				calculationCard()
+				mainCard(for: instrument)
 			} else {
 				emptyState
 			}
 
-		Spacer(minLength: 0)
-	}
-		.padding(.vertical, 16)
-		.font(.menlo(textStyle: .body))
+			Spacer(minLength: 0)
+		}
+		.font(theme.fonts.body)
 		.sheet(isPresented: $showUnderlyingInput) {
 			ValueInputSheet(
 				title: "Underlying eingeben",
@@ -68,23 +68,22 @@ struct InstrumentCalcView: View {
 		}
 	}
 
-		// MARK: - Header
-
-	private var headerTitle: String {
-		switch mode {
-			case .instrumentsCreate:
-				return "Instrument – Vorschau"
-			case .instrumentsShowAndChange:
-				return "Instrument – Details"
-			case .instrumentCalculation:
-				return "Instrument – Berechnung"
-		}
+	private func titleCard(_ title: String) -> some View {
+		Text(title)
+			.font(theme.fonts.headline)
+			.fontWeight(.bold)
+			.contentEmphasis()
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(.horizontal, theme.metrics.paddingLarge)
+			.frame(height: theme.metrics.sidebarSearchHeight)
+			.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
+			.padding(.top, theme.metrics.sidebarSearchPaddingTop)
 	}
 
 	// MARK: - Detail-Card
 
 	@ViewBuilder
-	private func detailCard(for i: Instrument) -> some View {
+	private func detailContent(for i: Instrument) -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 
 				// Name nur Anzeige, nicht direkt editierbar
@@ -132,14 +131,12 @@ struct InstrumentCalcView: View {
 						i.isFavorite ? "★ Ja" : "– Nein",
 						step: .favorite)
 		}
-		.padding()
-		.workspaceGradientBackground(cornerRadius: 14)
 	}
 
 		// MARK: - Calculation Card
 
 	@ViewBuilder
-	private func calculationCard() -> some View {
+	private func calculationContent() -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 			calculationRow(
 				label: "Underlying",
@@ -157,8 +154,16 @@ struct InstrumentCalcView: View {
 				showCertificateInput = true
 			}
 		}
-		.padding()
-		.workspaceGradientBackground(cornerRadius: 14)
+	}
+
+	private func mainCard(for instrument: Instrument) -> some View {
+		VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
+			detailContent(for: instrument)
+			Divider()
+			calculationContent()
+		}
+		.padding(theme.metrics.paddingLarge)
+		.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
 	}
 
 		// MARK: - Rows
@@ -170,7 +175,7 @@ struct InstrumentCalcView: View {
 	) -> some View {
 		HStack {
 			Text(label)
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
@@ -187,7 +192,7 @@ struct InstrumentCalcView: View {
 	) -> some View {
 		HStack {
 			Text(label)
-				.foregroundColor(mode == .instrumentsCreate ? .blue : .secondary)
+				.foregroundColor(mode == .instrumentsCreate ? theme.colors.actionBlue : theme.colors.textSecondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
@@ -209,11 +214,31 @@ struct InstrumentCalcView: View {
 	) -> some View {
 		HStack {
 			Text(label)
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 				.frame(width: 150, alignment: .leading)
 			Text(value)
 				.fontWeight(.medium)
 				.contentEmphasis(.identifier)
+			if value != "—" {
+				Button {
+					copyToClipboard(value)
+					lastCopiedLabel = label
+					DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+						if lastCopiedLabel == label {
+							lastCopiedLabel = nil
+						}
+					}
+				} label: {
+					Image(systemName: "doc.on.doc")
+						.imageScale(.small)
+						.foregroundColor(lastCopiedLabel == label
+							? theme.colors.successGreen
+							: theme.colors.textSecondary
+						)
+				}
+				.buttonStyle(.plain)
+				.help("In Zwischenablage kopieren")
+			}
 			Spacer()
 			Button(action: action) {
 				Image(systemName: icon)
@@ -221,6 +246,16 @@ struct InstrumentCalcView: View {
 			}
 			.buttonStyle(.plain)
 		}
+	}
+	
+	private func copyToClipboard(_ value: String) {
+#if os(iOS)
+		UIPasteboard.general.string = value
+#elseif os(macOS)
+		let pasteboard = NSPasteboard.general
+		pasteboard.clearContents()
+		pasteboard.setString(value, forType: .string)
+#endif
 	}
 
 	private func applyUnderlyingInput(_ raw: String) {
@@ -272,7 +307,7 @@ struct InstrumentCalcView: View {
 	private var emptyState: some View {
 		VStack(spacing: 8) {
 			Text("Kein Instrument ausgewählt")
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 	}

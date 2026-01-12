@@ -14,6 +14,7 @@ import SwiftUI
 struct SidebarView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 	@FocusState private var searchIsFocused: Bool
 
 	var body: some View {
@@ -30,24 +31,29 @@ struct SidebarView: View {
 		.frame(width: 280)
 		.frame(maxHeight: .infinity, alignment: .top)
 		.workspaceGradientBackground()
+		.clipShape(RoundedRectangle(cornerRadius: theme.metrics.panelCornerRadius))
+		.overlay(
+			RoundedRectangle(cornerRadius: theme.metrics.panelCornerRadius)
+				.stroke(theme.colors.strokeLight, lineWidth: 1)
+		)
 	}
 
 		// MARK: - Suche
 
 	private var searchField: some View {
 		ZStack {
-			RoundedRectangle(cornerRadius: 6)
-				.fill(Color.white.opacity(0.08))
+			RoundedRectangle(cornerRadius: theme.metrics.sidebarSearchCornerRadius)
+				.fill(theme.colors.sidebarSearchBackground)
 
 			HStack(spacing: 6) {
 				Image(systemName: "magnifyingglass")
-					.font(.system(size: 11))
+					.font(.system(size: theme.metrics.sidebarSearchIconSize))
 					.opacity(0.7)
 
 				TextField("Suche (Subgroup, isin, Richtung …)", text: $appState.list.searchText)
 					.textFieldStyle(.plain)
-					.foregroundColor(.primary)
-					.font(.custom("Menlo", size: 12))
+					.foregroundColor(theme.colors.textPrimary)
+					.font(theme.fonts.sidebarSearch)
 					.focused($searchIsFocused)
 
 				if !appState.list.searchText.isEmpty {
@@ -55,17 +61,17 @@ struct SidebarView: View {
 						appState.list.searchText = ""
 					} label: {
 						Image(systemName: "xmark.circle.fill")
-							.font(.system(size: 11))
+							.font(.system(size: theme.metrics.sidebarSearchIconSize))
 							.opacity(0.6)
 					}
 					.buttonStyle(.plain)
 				}
 			}
-			.padding(.horizontal, 8)
+			.padding(.horizontal, theme.metrics.sidebarSearchPaddingH)
 		}
-		.frame(height: 30)
-		.padding(.horizontal, 8)
-		.padding(.top, 8)
-		.padding(.bottom, 6)
+		.frame(height: theme.metrics.sidebarSearchHeight)
+		.padding(.horizontal, theme.metrics.sidebarSearchPaddingH)
+		.padding(.top, theme.metrics.sidebarSearchPaddingTop)
+		.padding(.bottom, theme.metrics.sidebarSearchPaddingBottom)
 	}
 }

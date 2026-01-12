@@ -62,3 +62,64 @@ Desktop-App (SwiftUI) zum Anlegen, Anzeigen und Berechnen von KO-/Turbo-/Barrier
 ## Build
 - Xcode Scheme: `KO-Wizzard`.
 - Debug-Check: `xcodebuild -project KO-Wizzard.xcodeproj -scheme KO-Wizzard -configuration Debug -destination 'platform=macOS' build`.
+
+#### ✅ Milestone Summary — 2026-01-11 19:55 (Local)
+- **Branch:** feature/style-system
+- **Commit:** 3bbff54
+- **Tag (optional):** —
+- **Status:** Build green / App runs (not verified) / git status clean
+
+##### Scope (was war das Ziel?)
+- Zentralisierte UI-Tokens und ein konsistentes Light/Dark-Theme schaffen sowie die Toolbar/Sidebar/Content-Ansichten visuell vereinheitlichen und stabilisieren.
+
+##### Changes (was wurde geändert?)
+- Zentrales Theme-System eingefuehrt (Colors/Fonts/Metrics/Gradients/Effects) mit System/Light/Dark-Aufloesung.
+- Reusable Style-Modifiers fuer Cards, Toolbar-Tabs/Icon-Buttons und Titlebar/Footer-Styles aufgebaut.
+- System-Mode korrekt an `colorScheme` gekoppelt, um falsche Farben im Systemmodus zu vermeiden.
+- Darkmode-Chrome (Titlebar/Footer/Buttons) auf Orange ausgerichtet, Glow-Ring in Darkmode Blau, Hover/Pressed staerker.
+- Toolbar-Position dynamisch unter der Titlebar stabilisiert; feiner Fensterrahmen hinzugefuegt.
+- Sidebar-Selektion auf Suchfeld-Farbton gesetzt; Sidebar mit card-aehnlichem Rahmen versehen.
+- Tab-Content vereinheitlicht: Title-Cards oben, Detail/Berechnung in eine Haupt-Card konsolidiert.
+- Import-Aktion in Create-Flow inline zu Assetklasse/Subgroup gezogen, Tooltip erklaert Komplett-Import.
+- Copy-to-Clipboard-Icon fuer berechnete Werte in der Berechnung sichtbar (bei vorhandenem Wert).
+
+##### Files touched (Whitelist / Ueberblick)
+- Docs/AI_MODE.md
+- Docs/CLEANUP_CANDIDATES.md
+- KO-Wizzard/KO_WizzardApp.swift
+- KO-Wizzard/Style/AppStyleModifiers.swift
+- KO-Wizzard/Style/AppTheme.swift
+- KO-Wizzard/Views/Content/ContentRouterView.swift
+- KO-Wizzard/Views/Content/InstrumentCreateComponents.swift
+- KO-Wizzard/Views/Content/InstrumentCreateFlowView.swift
+- KO-Wizzard/Views/Content/InstrumentCreateView.swift
+- KO-Wizzard/Views/Content/SubgroupPickerSheet.swift
+- KO-Wizzard/Views/Content/Tabs/InstrumentCalcView.swift
+- KO-Wizzard/Views/Content/Tabs/InstrumentDetailView.swift
+- KO-Wizzard/Views/Content/ValueInputSheet.swift
+- KO-Wizzard/Views/Content/WorkspaceBodyView.swift
+- KO-Wizzard/Views/Root/RootView.swift
+- KO-Wizzard/Views/Shared/WorkspaceGradient.swift
+- KO-Wizzard/Views/SideBar/SidebarListArea.swift
+- KO-Wizzard/Views/SideBar/SidebarRow.swift
+- KO-Wizzard/Views/SideBar/SidebarView.swift
+- KO-Wizzard/Views/ToolBar/WorkspaceToolbarView.swift
+- KO-Wizzard/Views/WorkspaceView.swift
+
+##### Architecture impact (nur wenn relevant)
+- UI-Layer nutzt jetzt ein zentrales Theme (AppTheme) als Source of Truth fuer Farben/Typo/Metriken/Effekte.
+- RootView resolved Theme per ColorScheme und steuert Chrome-Overlay/Blend zentral.
+
+##### Behavior / UX notes
+- Title-Cards starten oben buendig und haben Suchfeld-Hoehe; Tabs wirken einheitlicher.
+- Create-Flow: Import-Button bleibt konstant inline bei Assetklasse/Subgroup.
+- Darkmode: Orange Chrome, blauer Glow; Sidebar-Selektion uses Search-Background.
+- Subtiler Fensterrahmen macht das App-Fenster im Vollbild erkennbar.
+
+##### Known limitations / TODO (max 5)
+- Buttons reagieren teils erst nach 2–3 Klicks (noch zu untersuchen).
+- Systemmodus benoetigt erneuten visuellen Smoke-Test fuer alle Views.
+- LandingView ist optisch separat gehalten (bewusst), nicht komplett tokenisiert.
+
+##### Verification (zwingend)
+- `xcodebuild -project KO-Wizzard.xcodeproj -scheme KO-Wizzard -configuration Debug build` (Build succeeded)

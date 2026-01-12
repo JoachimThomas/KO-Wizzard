@@ -15,6 +15,10 @@ import AppKit
 struct InstrumentCreateFlowView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
+
+	let showsCard: Bool
+	let usesInternalPadding: Bool
 
 		// Welches Eingabe-Sheet ist aktiv?
 	@State private var activeSheet: SheetType?
@@ -35,6 +39,11 @@ struct InstrumentCreateFlowView: View {
 
 	@State private var importState: ImportState = .idle
 	@State private var importedRawText: String = ""
+
+	init(showsCard: Bool = true, usesInternalPadding: Bool = true) {
+		self.showsCard = showsCard
+		self.usesInternalPadding = usesInternalPadding
+	}
 
 	enum SheetType: Identifiable {
 		case stockName
@@ -57,67 +66,43 @@ struct InstrumentCreateFlowView: View {
 	}
 
 	var body: some View {
-		ZStack {
-			VStack(alignment: .leading, spacing: 20) {
-
-				HStack {
-					Text("Neueingabe – Schritt für Schritt")
-						.font(.menlo(textStyle: .headline))
-						.fontWeight(.bold)
-						.contentEmphasis()
-
-					Spacer()
-
-					Button {
-						handleImportButtonTap()
-					} label: {
-						Label(importButtonTitle, systemImage: "arrow.down.doc")
-							.font(.custom("Menlo", size: 12).weight(.medium))
-							.contentEmphasis()
-					}
-					.buttonStyle(.bordered)
-				}
-
-				Divider()
-
-				switch appState.draft.creationStep {
-
-					case .assetClass:
-						assetClassStep
-
-					case .subgroup:
-						subgroupStep
-
-					case .emittent:
-						emittentStep
-
-					case .direction:
-						directionStep
-
-					case .isin:
-						isinStep
-
-					case .basispreis:
-						basispreisStep
-
-					case .bezugsverhaeltnis:
-						ratioStep
-
-					case .aufgeld:
-						aufgeldStep
-
-					case .favorite:
-						favoriteStep
-
-					case .done:
-						doneStep
-				}
+		let contentPadding = usesInternalPadding ? theme.metrics.spacingLarge : 0
+		let content = VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
+			switch appState.draft.creationStep {
+				case .assetClass:
+					assetClassStep
+				case .subgroup:
+					subgroupStep
+				case .emittent:
+					emittentStep
+				case .direction:
+					directionStep
+				case .isin:
+					isinStep
+				case .basispreis:
+					basispreisStep
+				case .bezugsverhaeltnis:
+					ratioStep
+				case .aufgeld:
+					aufgeldStep
+				case .favorite:
+					favoriteStep
+				case .done:
+					doneStep
 			}
-			.padding(20)
 		}
-        .frame(maxWidth: .infinity, alignment: .leading) 
-		.workspaceGradientBackground(cornerRadius: 16)
-		.font(.menlo(textStyle: .body))
+		.padding(contentPadding)
+
+		Group {
+			if showsCard {
+				content
+					.workspaceGradientBackground(cornerRadius: theme.metrics.panelCornerRadius)
+			} else {
+				content
+			}
+		}
+        .frame(maxWidth: .infinity, alignment: .leading)
+		.font(theme.fonts.body)
 		.onAppear {
 			appState.ensureAllowedEditStepIfNeeded()
 		}
@@ -151,6 +136,28 @@ struct InstrumentCreateFlowView: View {
 		}
 	}
 
+	private var importButton: some View {
+		Button {
+			handleImportButtonTap()
+		} label: {
+			Label(importButtonTitle, systemImage: "arrow.down.doc")
+				.font(theme.fonts.importButton)
+				.contentEmphasis()
+		}
+		.buttonStyle(.bordered)
+		.help("Komplett-Import eines Assets")
+	}
+
+	private func stepRowWithImport<Content: View>(
+		@ViewBuilder content: () -> Content
+	) -> some View {
+		HStack(alignment: .bottom, spacing: theme.metrics.spacingMedium) {
+			content()
+				.frame(maxWidth: .infinity, alignment: .leading)
+			importButton
+		}
+	}
+
 		// MARK: - Edit vs Normal Flow
 
 	private var isEditing: Bool {
@@ -171,32 +178,34 @@ struct InstrumentCreateFlowView: View {
 
 	@ViewBuilder
 	private var assetClassStep: some View {
-		pickerStep(
-			title: "1. Assetklasse wählen",
-			values: AssetClass.allCases.map { ($0, $0.displayName) },
-			selected: nil,
-			onSelect: { value in
-				appState.updateDraft { draft in
-					draft.assetClass = value
-					draft.subgroup = nil          // vorher: ""
-					draft.underlyingName = ""     // bleibt String, wird später aus Subgroup gesetzt
-					
-					if value == .igBarrier {
-						draft.emittent = .igMarkets
-						draft.isin = ""
-						draft.bezugsverhaeltnis = ""
-						draft.aufgeld = "0"
-					} else {
-						draft.emittent = .none
-						draft.isin = ""
-						draft.bezugsverhaeltnis = ""
-						draft.aufgeld = ""
+		stepRowWithImport {
+			pickerStep(
+				title: "1. Assetklasse wählen",
+				values: AssetClass.allCases.map { ($0, $0.displayName) },
+				selected: nil,
+				onSelect: { value in
+					appState.updateDraft { draft in
+						draft.assetClass = value
+						draft.subgroup = nil          // vorher: ""
+						draft.underlyingName = ""     // bleibt String, wird später aus Subgroup gesetzt
+						
+						if value == .igBarrier {
+							draft.emittent = .igMarkets
+							draft.isin = ""
+							draft.bezugsverhaeltnis = ""
+							draft.aufgeld = "0"
+						} else {
+							draft.emittent = .none
+							draft.isin = ""
+							draft.bezugsverhaeltnis = ""
+							draft.aufgeld = ""
+						}
 					}
+					
+					goNextOrReturn(default: .subgroup)
 				}
-				
-				goNextOrReturn(default: .subgroup)
-			}
-		)
+			)
+		}
 	}
 
 	@ViewBuilder
@@ -206,8 +215,8 @@ struct InstrumentCreateFlowView: View {
 
 			VStack(alignment: .leading, spacing: 12) {
 				Text("2. Aktienname eingeben")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 					// Der frei eingegebene Name steckt jetzt ausschließlich in underlyingName
 				let name = appState.draft.draftInstrument.underlyingName
@@ -217,7 +226,8 @@ struct InstrumentCreateFlowView: View {
 					title: "Aktienname",
 					value: name.isEmpty
 					? "Noch kein Aktienname eingegeben"
-					: name
+					: name,
+					theme: theme
 				) {
 					activeSheet = .stockName
 				}
@@ -233,32 +243,34 @@ struct InstrumentCreateFlowView: View {
 		} else {
 
 				// *** NEU: Subgroup per Sheet statt Picker ***
-			VStack(alignment: .leading, spacing: 12) {
-				Text("2. Subgroup wählen")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
-				
-				let subgroupName = appState.draft.draftInstrument.subgroup?.displayName ?? ""
-				
-				Button {
-					showSubgroupSheet = true
-				} label: {
-					HStack {
-						Text(subgroupName.isEmpty
-							 ? "Noch keine Subgroup gewählt"
-							 : subgroupName)
-						Spacer()
-						Image(systemName: "chevron.down")
-							.foregroundColor(.secondary)
+			stepRowWithImport {
+				VStack(alignment: .leading, spacing: 12) {
+					Text("2. Subgroup wählen")
+						.font(theme.fonts.subheadline)
+						.foregroundColor(theme.colors.textSecondary)
+					
+					let subgroupName = appState.draft.draftInstrument.subgroup?.displayName ?? ""
+					
+					Button {
+						showSubgroupSheet = true
+					} label: {
+						HStack {
+							Text(subgroupName.isEmpty
+								 ? "Noch keine Subgroup gewählt"
+								 : subgroupName)
+							Spacer()
+							Image(systemName: "chevron.down")
+								.foregroundColor(theme.colors.textSecondary)
+						}
+						.padding(theme.metrics.paddingSmall)
+						.background(theme.colors.inputBackground)
+						.cornerRadius(theme.metrics.sheetCornerRadius)
 					}
-					.padding(8)
-					.background(Color.secondary.opacity(0.08))
-					.cornerRadius(8)
-				}
-				.onAppear {
-					if isEditing {
-						DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-							showSubgroupSheet = true
+					.onAppear {
+						if isEditing {
+							DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+								showSubgroupSheet = true
+							}
 						}
 					}
 				}
@@ -319,14 +331,15 @@ struct InstrumentCreateFlowView: View {
 		} else {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("5. Isin eingeben")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				sheetInputButton(
 					title: "isin",
 					value: appState.draft.draftInstrument.isin.isEmpty
 					? "Noch keine Isin eingegeben"
-					: appState.draft.draftInstrument.isin
+					: appState.draft.draftInstrument.isin,
+					theme: theme
 				) {
 					activeSheet = .isin
 				}
@@ -355,14 +368,15 @@ struct InstrumentCreateFlowView: View {
 
 		VStack(alignment: .leading, spacing: 12) {
 			Text(titleText)
-				.font(.menlo(textStyle: .subheadline))
-				.foregroundColor(.secondary)
+				.font(theme.fonts.subheadline)
+				.foregroundColor(theme.colors.textSecondary)
 
 			sheetInputButton(
 				title: "Basispreis",
 				value: appState.draft.draftInstrument.basispreis.isEmpty
 				? "Noch kein Basispreis eingegeben"
-				: appState.draft.draftInstrument.basispreis
+				: appState.draft.draftInstrument.basispreis,
+				theme: theme
 			) {
 				activeSheet = .basispreis
 			}
@@ -383,8 +397,8 @@ struct InstrumentCreateFlowView: View {
 		} else {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("Bezugsverhältnis wählen")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				Picker("", selection: $localRatio) {
 					ForEach(RatioOption.allCases) { opt in
@@ -449,8 +463,8 @@ struct InstrumentCreateFlowView: View {
 		if appState.draft.draftInstrument.assetClass == .igBarrier {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("Aufgeld wird für IG-Barrier automatisch auf 0 gesetzt.")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				HStack {
 					Spacer()
@@ -463,14 +477,15 @@ struct InstrumentCreateFlowView: View {
 		} else {
 			VStack(alignment: .leading, spacing: 12) {
 				Text("Aufgeld eingeben")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				sheetInputButton(
 					title: "Aufgeld",
 					value: appState.draft.draftInstrument.aufgeld.isEmpty
 					? "Noch kein Aufgeld eingegeben"
-					: appState.draft.draftInstrument.aufgeld
+					: appState.draft.draftInstrument.aufgeld,
+					theme: theme
 				) {
 					activeSheet = .aufgeld
 				}
@@ -488,8 +503,8 @@ struct InstrumentCreateFlowView: View {
 	private var favoriteStep: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			Text("Favorit markieren")
-				.font(.menlo(textStyle: .subheadline))
-				.foregroundColor(.secondary)
+				.font(theme.fonts.subheadline)
+				.foregroundColor(theme.colors.textSecondary)
 
 			Toggle("Favorit", isOn: Binding(
 				get: { appState.draft.draftInstrument.isFavorite },
@@ -516,8 +531,8 @@ struct InstrumentCreateFlowView: View {
 		VStack(alignment: .leading, spacing: 12) {
 			if appState.isEditingExistingInstrument {
 				Text("Änderungen übernehmen?")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				HStack {
 					Spacer()
@@ -531,13 +546,13 @@ struct InstrumentCreateFlowView: View {
 				}
 			} else {
 				Text("Instrument fertig erfasst.")
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 
 				if !isDraftValid {
 					Text("Bitte alle Pflichtfelder sinnvoll ausfüllen (keine leeren / Defaultwerte).")
-						.font(.menlo(textStyle: .footnote))
-						.foregroundColor(.red.opacity(0.8))
+						.font(theme.fonts.footnote)
+						.foregroundColor(theme.colors.alertRedMuted)
 				}
 
 				HStack {

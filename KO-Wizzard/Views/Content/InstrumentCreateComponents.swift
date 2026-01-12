@@ -10,6 +10,7 @@ import SwiftUI
 	/// Generischer Picker-Step mit Dummy-Zeile "–"
 struct PickerStepView<T: Hashable>: View {
 
+	@Environment(\.appTheme) private var theme
 	let title: String
 	let values: [(T, String)]
 	let current: T?
@@ -20,8 +21,8 @@ struct PickerStepView<T: Hashable>: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			Text(title)
-				.font(.menlo(textStyle: .subheadline))
-				.foregroundColor(.secondary)
+				.font(theme.fonts.subheadline)
+				.foregroundColor(theme.colors.textSecondary)
 
 			Picker("", selection: Binding(
 				get: { selection },
@@ -65,16 +66,21 @@ func pickerStep<T: Hashable>(
 }
 
 	/// Standardisierter Button für Sheet-basierte Eingaben
-func sheetInputButton(title: String, value: String, action: @escaping () -> Void) -> some View {
+func sheetInputButton(
+	title: String,
+	value: String,
+	theme: AppTheme,
+	action: @escaping () -> Void
+) -> some View {
 	Button(action: action) {
 		HStack {
 			Text(title)
 			Spacer()
 			Text(value.isEmpty ? "–" : value)
-				.foregroundColor(.secondary)
+				.foregroundColor(theme.colors.textSecondary)
 		}
-		.padding(8)
-		.background(Color.secondary.opacity(0.08))
-		.cornerRadius(8)
+		.padding(theme.metrics.paddingSmall)
+		.background(theme.colors.inputBackground)
+		.cornerRadius(theme.metrics.sheetCornerRadius)
 	}
 }

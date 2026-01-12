@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentRouterView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 
 	var body: some View {
 		Group {
@@ -18,11 +19,14 @@ struct ContentRouterView: View {
 			case .instrumentsCreate:
 				InstrumentCreateView()
 
-				case .instrumentsShowAndChange:
+			case .instrumentsShowAndChange:
+				VStack(alignment: .leading, spacing: theme.metrics.spacingLarge) {
+					titleCard("Asset-Details")
 					InstrumentDetailView(
 						mode: .instrumentsShowAndChange,
 						instrument: appState.selectedInstrument
 					)
+				}
 				case .instrumentCalculation:
 					InstrumentCalcView(
 						instrument: appState.selectedInstrument
@@ -30,7 +34,19 @@ struct ContentRouterView: View {
 
 			}
 		}
-		.font(.menlo(textStyle: .body))
-		.padding(.horizontal, 18)
+		.font(theme.fonts.body)
+		.padding(.horizontal, theme.metrics.contentPaddingH)
+	}
+
+	private func titleCard(_ title: String) -> some View {
+		Text(title)
+			.font(theme.fonts.headline)
+			.fontWeight(.bold)
+			.contentEmphasis()
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(.horizontal, theme.metrics.paddingLarge)
+			.frame(height: theme.metrics.sidebarSearchHeight)
+			.workspaceGradientBackground(cornerRadius: theme.metrics.cardCornerRadius)
+			.padding(.top, theme.metrics.sidebarSearchPaddingTop)
 	}
 }

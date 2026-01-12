@@ -25,17 +25,18 @@ struct ValueInputSheet: View {
 	let onCancel: () -> Void
 
 	@State private var text: String = ""
+	@Environment(\.appTheme) private var theme
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 16) {
+		VStack(alignment: .leading, spacing: theme.metrics.paddingLarge) {
 
 			Text(title)
-				.font(.menlo(textStyle: .headline))
+				.font(theme.fonts.headline)
 
 			if !message.isEmpty {
 				Text(message)
-					.font(.menlo(textStyle: .subheadline))
-					.foregroundColor(.secondary)
+					.font(theme.fonts.subheadline)
+					.foregroundColor(theme.colors.textSecondary)
 			}
 
 				// MARK: - Eingabefeld (iOS mit Auto-Fokus, macOS normal)
@@ -73,9 +74,9 @@ struct ValueInputSheet: View {
 				.disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 			}
 		}
-		.padding()
+		.padding(theme.metrics.paddingLarge)
 		.presentationDetents([.medium])
-		.font(.menlo(textStyle: .body))
+		.font(theme.fonts.body)
 		.onAppear {
 			text = initialValue
 		}

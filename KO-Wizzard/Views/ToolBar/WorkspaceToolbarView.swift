@@ -11,6 +11,7 @@ import SwiftUI
 struct WorkspaceToolbarView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 	@State private var showDeleteAlert = false
 	@State private var instrumentToDelete: Instrument?
 	@State private var isCreateHovered: Bool = false
@@ -37,8 +38,13 @@ struct WorkspaceToolbarView: View {
 				Button {
 					appState.list.showFavoritesOnly = false
 					appState.list.showRecentOnly = false
+					appState.collapse.setGlobalCollapsed(false)
 				} label: {
-					toolbarIcon(systemName: "chart.line.uptrend.xyaxis", isHovered: isAllHovered)
+					toolbarIcon(
+						systemName: "chart.line.uptrend.xyaxis",
+						isHovered: isAllHovered,
+						theme: theme
+					)
 				}
 				.buttonStyle(ToolbarIconStyle())
 				.focusable(false)
@@ -54,7 +60,8 @@ struct WorkspaceToolbarView: View {
 				} label: {
 					toolbarIcon(
 						systemName: appState.list.showFavoritesOnly ? "star.fill" : "star",
-						isHovered: isFavoritesHovered
+						isHovered: isFavoritesHovered,
+						theme: theme
 					)
 				}
 				.buttonStyle(ToolbarIconStyle())
@@ -73,7 +80,11 @@ struct WorkspaceToolbarView: View {
 						appState.list.showRecentOnly = true
 					}
 				} label: {
-					toolbarIcon(systemName: "clock", isHovered: isRecentHovered)
+					toolbarIcon(
+						systemName: "clock",
+						isHovered: isRecentHovered,
+						theme: theme
+					)
 				}
 				.buttonStyle(ToolbarIconStyle())
 				.focusable(false)
@@ -89,7 +100,8 @@ struct WorkspaceToolbarView: View {
 				} label: {
 					toolbarIcon(
 						systemName: appState.collapse.isGlobalCollapsed ? "book" : "book.closed",
-						isHovered: isCollapseHovered
+						isHovered: isCollapseHovered,
+						theme: theme
 					)
 				}
 				.buttonStyle(ToolbarIconStyle())
@@ -104,7 +116,11 @@ struct WorkspaceToolbarView: View {
 				Button {
 					appState.enterCreateMode()
 				} label: {
-					toolbarIcon(systemName: "document.badge.plus", isHovered: isCreateHoveredLeft)
+					toolbarIcon(
+						systemName: "document.badge.plus",
+						isHovered: isCreateHoveredLeft,
+						theme: theme
+					)
 				}
 				.buttonStyle(ToolbarIconStyle())
 				.focusable(false)
@@ -120,7 +136,8 @@ struct WorkspaceToolbarView: View {
 				} label: {
 					toolbarIcon(
 						systemName: "slider.horizontal.2.arrow.trianglehead.counterclockwise",
-						isHovered: isEditHovered
+						isHovered: isEditHovered,
+						theme: theme
 					)
 				}
 				.buttonStyle(ToolbarIconStyle())
@@ -138,7 +155,11 @@ struct WorkspaceToolbarView: View {
                     instrumentToDelete = inst
                     showDeleteAlert = true
 				} label: {
-					toolbarIcon(systemName: "document.on.trash", isHovered: isDeleteHovered)
+					toolbarIcon(
+						systemName: "document.on.trash",
+						isHovered: isDeleteHovered,
+						theme: theme
+					)
 				}
 				.buttonStyle(ToolbarIconStyle())
 				.focusable(false)
@@ -221,26 +242,37 @@ struct WorkspaceToolbarView: View {
 					Circle()
 						.fill(
 							LinearGradient(
-								colors: [Color.blue.opacity(0.9), Color.blue.opacity(0.55)],
+								colors: [
+									theme.colors.chromeAccent.opacity(0.9),
+									theme.colors.chromeAccent.opacity(0.55)
+								],
 								startPoint: .topLeading,
 								endPoint: .bottomTrailing
 							)
 						)
-						.shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+						.shadow(
+							color: theme.effects.shadowSoft.color,
+							radius: theme.effects.shadowSoft.radius,
+							x: theme.effects.shadowSoft.x,
+							y: theme.effects.shadowSoft.y
+						)
 						.overlay(
 							Circle()
-								.stroke(Color.white.opacity(0.18), lineWidth: 1)
+								.stroke(theme.colors.strokeLight, lineWidth: 1)
 						)
 
 	Circle()
-		.stroke(Color(red: 1.0, green: 0.62, blue: 0.04).opacity(isHovered ? 0.75 : 0), lineWidth: 2)
+		.stroke(
+			theme.colors.glowRing.opacity(isHovered ? theme.effects.hoverGlowOpacity : 0),
+			lineWidth: 2
+		)
 		.blur(radius: isHovered ? 1 : 2)
-		.animation(.easeInOut(duration: 0.14), value: isHovered)
+		.animation(theme.effects.hoverAnimation, value: isHovered)
 
 					Circle()
 						.fill(
 							RadialGradient(
-								colors: [Color.white.opacity(0.18), Color.clear],
+								colors: [theme.colors.highlightLight, Color.clear],
 								center: .topLeading,
 								startRadius: 2,
 								endRadius: 14
@@ -249,21 +281,20 @@ struct WorkspaceToolbarView: View {
 						.blendMode(.screen)
 
 					Image(systemName: icon)
-						.font(.system(size: 13, weight: .semibold))
-						.foregroundColor(.white)
+						.font(.system(size: theme.metrics.toolbarTabIconSize, weight: .semibold))
+						.foregroundColor(theme.colors.toolbarIconForeground)
 				}
-				.frame(width: 26, height: 26)
+				.frame(width: theme.metrics.toolbarTabIconCircle, height: theme.metrics.toolbarTabIconCircle)
 
 				Text(title)
-					.font(.subheadline)
-					.fontWeight(.semibold)
-					.foregroundColor(isActive ? .primary : .secondary)
+					.font(theme.fonts.toolbarTab)
+					.foregroundColor(isActive ? theme.colors.textPrimary : theme.colors.textSecondary)
 			}
-			.padding(.horizontal, 10)
-			.padding(.vertical, 6)
+			.padding(.horizontal, theme.metrics.toolbarTabPaddingH)
+			.padding(.vertical, theme.metrics.toolbarTabPaddingV)
 			.background(
-				RoundedRectangle(cornerRadius: 10)
-					.fill(isActive ? Color.accentColor.opacity(0.12) : Color.clear)
+				RoundedRectangle(cornerRadius: theme.metrics.toolbarTabCornerRadius)
+					.fill(isActive ? theme.colors.toolbarTabActiveBackground : Color.clear)
 			)
 		}
 		.buttonStyle(PressableToolbarStyle())
@@ -274,55 +305,54 @@ struct WorkspaceToolbarView: View {
 
 
 private struct PressableToolbarStyle: ButtonStyle {
+	@Environment(\.appTheme) private var theme
+
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
-			.scaleEffect(configuration.isPressed ? 0.98 : 1)
-			.animation(.easeInOut(duration: 0.12), value: configuration.isPressed)
+			.scaleEffect(configuration.isPressed ? theme.effects.pressScaleSmall : 1)
+			.animation(theme.effects.pressAnimation, value: configuration.isPressed)
 	}
 }
 
 private struct ToolbarIconStyle: ButtonStyle {
+	@Environment(\.appTheme) private var theme
+
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
-			.scaleEffect(configuration.isPressed ? 0.96 : 1)
-			.animation(.easeInOut(duration: 0.12), value: configuration.isPressed)
+			.scaleEffect(configuration.isPressed ? theme.effects.pressScaleMedium : 1)
+			.animation(theme.effects.pressAnimation, value: configuration.isPressed)
 	}
 }
 
-private func toolbarIcon(systemName: String, isHovered: Bool) -> some View {
+private func toolbarIcon(systemName: String, isHovered: Bool, theme: AppTheme) -> some View {
 	ZStack {
 		Circle()
-			.fill(
-				LinearGradient(
-					colors: [Color.blue.opacity(0.9), Color.blue.opacity(0.6)],
-					startPoint: .topLeading,
-					endPoint: .bottomTrailing
-				)
+			.fill(theme.gradients.toolbarIcon(theme.colors))
+			.shadow(
+				color: theme.effects.shadowSoft.color,
+				radius: theme.effects.shadowSoft.radius,
+				x: theme.effects.shadowSoft.x,
+				y: theme.effects.shadowSoft.y
 			)
-			.shadow(color: Color.black.opacity(0.2), radius: 3, x: 0, y: 2)
 
 		Circle()
-			.stroke(Color.white.opacity(0.18), lineWidth: 1)
+			.stroke(theme.colors.strokeLight, lineWidth: 1)
 
 	Circle()
-		.stroke(Color(red: 1.0, green: 0.62, blue: 0.04).opacity(isHovered ? 0.75 : 0), lineWidth: 2)
+		.stroke(
+			theme.colors.glowRing.opacity(isHovered ? theme.effects.hoverGlowOpacity : 0),
+			lineWidth: 2
+		)
 		.blur(radius: isHovered ? 1 : 2)
-		.animation(.easeInOut(duration: 0.14), value: isHovered)
+		.animation(theme.effects.hoverAnimation, value: isHovered)
 
-		Circle()
-			.fill(
-				RadialGradient(
-					colors: [Color.white.opacity(0.2), Color.clear],
-					center: .topLeading,
-					startRadius: 2,
-					endRadius: 12
-				)
-			)
-			.blendMode(.screen)
+	Circle()
+		.fill(theme.gradients.toolbarIconHighlight(theme.colors))
+		.blendMode(.screen)
 
-		Image(systemName: systemName)
-			.font(.system(size: 12, weight: .semibold))
-			.foregroundColor(.white)
+	Image(systemName: systemName)
+		.font(theme.fonts.toolbarIcon)
+		.foregroundColor(theme.colors.toolbarIconForeground)
 	}
 	.frame(width: 30, height: 30)
 }
