@@ -124,6 +124,20 @@ struct LandingView: View {
 					.font(.system(size: 27, weight: .semibold))
 			}
 			.frame(width: 64, height: 64)
+			.shadow(
+				color: Color.black.opacity(isHovered ? 0.35 : 0.22),
+				radius: isHovered ? 12 : 8,
+				x: 0,
+				y: isHovered ? 8 : 6
+			)
+			.shadow(
+				color: theme.colors.glowRing.opacity(isHovered ? 0.25 : 0.12),
+				radius: isHovered ? 10 : 6,
+				x: 0,
+				y: 0
+			)
+			.offset(y: isHovered ? -3 : 0)
+			.animation(theme.effects.hoverAnimation, value: isHovered)
 		}
 		.buttonStyle(PressableGlossyStyle())
 		.focusable(false)
