@@ -9,6 +9,7 @@ import SwiftUI
 struct LandingView: View {
 
 	@EnvironmentObject var appState: AppStateEngine
+	@Environment(\.appTheme) private var theme
 	@State private var isCreateHovered: Bool = false
 	@State private var isShowHovered: Bool = false
 	@State private var isCalcHovered: Bool = false
@@ -86,20 +87,14 @@ struct LandingView: View {
 		Button(action: action) {
 			ZStack {
 				Circle()
-					.fill(
-						LinearGradient(
-							colors: [Color.blue.opacity(0.95), Color.blue.opacity(0.65)],
-							startPoint: .topLeading,
-							endPoint: .bottomTrailing
-						)
-					)
+					.fill(theme.gradients.landingButton(theme.colors))
 					.shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 4)
 
 				Circle()
 					.stroke(Color.white.opacity(0.18), lineWidth: 1)
 
 				Circle()
-					.stroke(Color.cyan.opacity(isHovered ? 0.7 : 0), lineWidth: 2)
+					.stroke(theme.colors.glowRing.opacity(isHovered ? 0.7 : 0), lineWidth: 2)
 					.blur(radius: isHovered ? 1 : 2)
 					.animation(.easeInOut(duration: 0.14), value: isHovered)
 
