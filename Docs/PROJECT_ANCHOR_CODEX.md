@@ -123,3 +123,42 @@ Desktop-App (SwiftUI) zum Anlegen, Anzeigen und Berechnen von KO-/Turbo-/Barrier
 
 ##### Verification (zwingend)
 - `xcodebuild -project KO-Wizzard.xcodeproj -scheme KO-Wizzard -configuration Debug build` (Build succeeded)
+
+#### ✅ Milestone Summary — 2026-01-12 07:58 (Local)
+- **Branch:** feature/LandingButtons/CardHeaders
+- **Commit:** 4ac0e51
+- **Tag (optional):** backup-before-style-merge-20260112-0454
+- **Status:** Build green / App runs (not verified) / git status clean
+
+##### Scope (was war das Ziel?)
+- Landing-Buttons konsistent zu Toolbar-Styles, Sidebar-Selektion dezenter, Title-Cards zentriert und Debug-Theme-Override standardmaessig deaktiviert, damit System-Appearance wirkt.
+
+##### Changes (was wurde geaendert?)
+- Landing-Buttons nutzen Theme-Farben fuer Light/Dark inkl. Glow und erhalten eine schwebende Hover-Anmutung.
+- Debug-Theme-Override bleibt erhalten, ist aber standardmaessig deaktiviert; Systemmodus folgt wieder dem OS.
+- Sidebar-Selektion leicht in App-Button-Blau abgesetzt (sehr geringe Opacity).
+- Title-Cards in allen Tabs zentriert ausgerichtet.
+
+##### Files touched (Whitelist / Ueberblick)
+- KO-Wizzard/Views/Landing/LandingView.swift
+- KO-Wizzard/KO_WizzardApp.swift
+- KO-Wizzard/Style/AppTheme.swift
+- KO-Wizzard/Views/Content/ContentRouterView.swift
+- KO-Wizzard/Views/Content/InstrumentCreateView.swift
+- KO-Wizzard/Views/Content/Tabs/InstrumentCalcView.swift
+
+##### Architecture impact (nur wenn relevant)
+- Keine strukturellen Aenderungen; Theme-Override-Logik nur im App-Entry angepasst.
+
+##### Behavior / UX notes
+- Landing-Buttons: Light/Dark konsistent zur Toolbar, Hover wirkt schwebender.
+- Sidebar-Selektion wirkt dezenter und klarer abgesetzt.
+- Title-Cards der Tabs sind jetzt mittig ausgerichtet.
+- System-Appearance greift wieder automatisch (Debug-Override standardmaessig aus).
+
+##### Known limitations / TODO (max 5)
+- —
+
+##### Verification (zwingend)
+- `xcodebuild -project KO-Wizzard.xcodeproj -scheme KO-Wizzard -configuration Debug -destination 'platform=macOS' build` (Build succeeded)
+- Sanity-Check: Build gruen; keine App-Run-Pruefung.
