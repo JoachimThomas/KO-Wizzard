@@ -43,7 +43,10 @@ struct AppColors {
 		resolve(light: Color.secondary.opacity(0.05), dark: Color(red: 0.07, green: 0.08, blue: 0.09))
 	}
 	var sidebarSelection: Color {
-		sidebarSearchBackground
+		resolve(
+			light: primaryBlue.opacity(0.1),
+			dark: primaryBlue.opacity(0.18)
+		)
 	}
 	var sidebarSearchBackground: Color {
 		resolve(light: Color.white.opacity(0.08), dark: Color.white.opacity(0.1))
